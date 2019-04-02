@@ -1,0 +1,4 @@
+-R . hanoi
+-arg -w -arg -notation-overridden
+
+gdist.v
