@@ -2,3 +2,4 @@
 -arg -w -arg -notation-overridden
 
 gdist.v
+ghanoi.v
