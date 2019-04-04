@@ -11,6 +11,7 @@
 (*****************************************************************************)
 
 From mathcomp Require Import all_ssreflect.
+Require Import gdist.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -553,6 +554,19 @@ have := sorted_nth _ _ L_sorted _.
 apply; first exact: ltn_trans.
 rewrite HH -ltnS /=.
 by apply: ltn_ord.
+Qed.
+
+Lemma gdist_mask (c1 c2 : configuration q1 mcs) :
+ 1 < mcs ->
+ connect (move r1) c1 c2 ->
+ gdist (move r2) (mask c1) (mask c2) <=
+ gdist (move r1) c1 c2.
+Proof.
+move=> mcsG1 /gdist_path [p1 [c1Pp1 lc1p2Ec2 Uc1p1 <-]].
+pose p2 := map mask p1.
+rewrite -(size_map mask).
+apply: gdist_path_le; first by apply: proj_path.
+by rewrite last_map lc1p2Ec2.
 Qed.
 
 End Projection.
