@@ -130,6 +130,7 @@ case: (boolP (hrel _ _)) => [Hrel|Hrel].
   have [cPlr lclrEp2] := IH (cunlift c1) cp2.
   have [p2Plr lp2lrEc2'] := IH cp2 (cunlift c2).
   rewrite last_cat cat_path /= -{1 3}[c1]cunliftK !path_lift //=.
+  rewrite cPlr p2Plr.
   rewrite !last_map lclrEp2 lp2lrEc2'  andbT; split => //.
     by apply: move_lperfect; rewrite // eq_sym (opeg3Dl, opeg3Dr).
   by rewrite cunliftK.
@@ -140,7 +141,8 @@ rewrite cat_path /= cat_path last_cat /= last_cat.
 rewrite -{1 3}[c1]cunliftK /= !last_map !path_lift //=.
 rewrite lclrEp lplrEp lp1lrEp; split=> //; last first.
   by rewrite cunliftK.
-apply/and3P; split => //; apply: move_lperfect => //.
+rewrite cPlr pPlr p1Plr /= andbT.
+apply/andP; split => //; apply: move_lperfect => //.
 - by rewrite opeg3Dr.
 - by apply: hrelO.
 - by rewrite opeg3Dl.
@@ -263,7 +265,8 @@ have [p1Rp| p1NRp] := boolP (hrel p1 p).
     rewrite /cs5 csE cs2E !size_cat /= !size_cat /= !size_map.
     by rewrite ltn_add2l // !addnS! ltnS -addSn leq_addl.
   have c1Mcs5 : path hmove c1 cs5.
-    rewrite cat_path -{1}[c1]cunliftK /= path_lift //=.
+    rewrite cat_path -{1}[c1]cunliftK /= !path_lift //=.
+    rewrite c1'Pcs1.
     rewrite -{1}[c1]cunliftK  last_map lc1'cs1Epp3 //.
     by rewrite -p6Ep3 -/p1 -p5Ep1.
   have lc1cs5E : last c1 cs5 = c.
@@ -312,7 +315,8 @@ case: (p5 =P p1) => [p5Ep1|/eqP p5Dp1].
     rewrite /cs5 csE cs2E !size_cat /= !size_cat /= !size_map.
     by rewrite ltn_add2l // addnS !ltnS -addSn leq_addl.
   have c1Mcs5 : path hmove c1 cs5.
-    rewrite cat_path -{1}[c1]cunliftK /= path_lift //=.
+    rewrite cat_path -{1}[c1]cunliftK /= !path_lift //=.
+    rewrite c1'Pcs1.
     rewrite -{1}[c1]cunliftK  last_map lc1'cs1Epp3 //.
     by rewrite -p6Ep3 -/p1 -p5Ep1.
   have lc1cs5E : last c1 cs5 = c.
@@ -406,11 +410,12 @@ have scs7Lscs7: size cs7 < size cs.
   rewrite size_cat /= size_cat /= size_cat /= size_cat /= size_cat /= !size_map.
   by rewrite !addnS ltnS -!addnS !leq_add2l addnS ltnS -addSnnS leq_addl.
 have c1Mcs7 : path hmove c1 cs7.
-  rewrite cat_path -{1}[c1]cunliftK /= path_lift //=.
+  rewrite cat_path -{1}[c1]cunliftK /= !path_lift //=.
+  rewrite c1'Pcs1.
   rewrite -{1}[c1]cunliftK  last_map lc1'cs1Epp3 //.
-  rewrite p4Ep2 cat_path /c2 -/p1.
+  rewrite p4Ep2 cat_path /c2 -/p1 /=.
   apply/and3P; split; first by apply: move_perfect3.
-    by apply: path_lift; rewrite [c2']cliftK in c2'Pcs3.
+    by rewrite path_lift //; rewrite [c2']cliftK in c2'Pcs3.
   by rewrite last_map; rewrite [c2']cliftK in cc; rewrite cc.
 have lc1cs7E : last c1 cs7 = c.
   rewrite last_cat /= last_cat p4Ep2.
