@@ -304,8 +304,11 @@ Proof. by rewrite size_nseq. Qed.
 Definition cliftn n m (p : peg) (c : configuration n) :=
   ecast n (configuration n) (cliftn_cast n m p) (cliftl (nseq m p) c).
 
+Fixpoint cunliftn n m : configuration (m + n) -> configuration n :=
+  if m is m1.+1 then (@cunliftn _ _) \o cunlift else id.
+
 Lemma move_liftn n m p (c1 c2 : configuration n) :
-    move (cliftn m p c1) (cliftn m p c2)  = move c1 c2.
+    move (cliftn m p c1) (cliftn m p c2) = move c1 c2.
 Proof.
 apply: etrans (_ : move  (cliftl (nseq m p) c1) (cliftl (nseq m p) c2) = _).
   rewrite /cliftn.
