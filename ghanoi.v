@@ -263,6 +263,25 @@ elim: cs c => //= c1 cs -> c.
 by rewrite move_lift //= IH.
 Qed.
 
+Lemma connect_lift n p (c1 c2 : configuration n) : 
+  connect move c1 c2 -> connect move (clift p c1) (clift p c2).
+Proof.
+move=> /connectP[cs H1cs H2cs].
+apply/connectP; exists (map (clift p) cs).
+  by rewrite path_lift.
+by rewrite last_map -H2cs.
+Qed.
+
+Lemma gdist_lift n p (c1 c2 : configuration n) : 
+  connect move c1 c2 ->
+  gdist move (clift p c1) (clift p c2) <= gdist move c1 c2.
+Proof.
+move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
+rewrite -(size_map (clift p)).
+apply: gdist_path_le; first by rewrite path_lift.
+by rewrite last_map H2p1.
+Qed.
+
 Lemma path_unlift n (c : configuration n.+1) (cs : seq (configuration _)) :
    (forall c1, c1 \in cs -> c1 ldisk = c ldisk)-> 
     path move (cunlift c) (map cunlift cs) = path move c cs.
@@ -277,65 +296,47 @@ rewrite -{1}(H a).
 by rewrite inE eqxx.
 Qed.
 
-Fixpoint cliftl n l (c : configuration n) {struct l} :
-   configuration (size l + n) :=
-  match l with
-  | nil => c
-  | a :: l1 => clift a (cliftl l1 c)
-  end.
+Fixpoint cliftn n m p (c : configuration n) {struct m} :=
+  if m is m1.+1 return configuration (m + n) then 
+       clift p (cliftn m1 p c) 
+  else c.
 
-Lemma move_liftl n l (c1 c2 : configuration n) :
-    move (cliftl l c1) (cliftl l c2)  = move c1 c2.
+Lemma move_liftn n m p (c1 c2 : configuration n) :
+    move (cliftn m p c1) (cliftn m p c2)  = move c1 c2.
 Proof.
-elim: l n c1 c2 => [// | a l IH n c1 c2 /=].
+elim: m c1 c2 => [// | m1 IH c1 c2 /=].
 by rewrite move_lift IH.
 Qed.
 
-Lemma path_liftl n l (c : configuration n) (cs : seq (configuration _)) :
-    path move (cliftl l c) (map (cliftl  l) cs) = path move c cs.
+Lemma path_liftn n m p (c : configuration n) (cs : seq (configuration _)) :
+    path move (cliftn m p c) (map (cliftn m p) cs) = path move c cs.
 Proof.
-elim: l n c cs => [n c cs | a l IH n c cs]; first by rewrite map_id.
+elim: m c cs => [c cs | m1 IH c cs]; first by rewrite map_id.
 by rewrite /= map_comp path_lift IH.
 Qed.
 
-Let cliftn_cast n m (p : peg) : size (nseq m p) + n = m + n.
-Proof. by rewrite size_nseq. Qed.
-
-Definition cliftn n m (p : peg) (c : configuration n) :=
-  ecast n (configuration n) (cliftn_cast n m p) (cliftl (nseq m p) c).
-
-Fixpoint cunliftn n m : configuration (m + n) -> configuration n :=
-  if m is m1.+1 then (@cunliftn _ _) \o cunlift else id.
-
-Lemma move_liftn n m p (c1 c2 : configuration n) :
-    move (cliftn m p c1) (cliftn m p c2) = move c1 c2.
+Lemma connect_liftn n m p (c1 c2 : configuration n) : 
+  connect move c1 c2 -> connect move (cliftn m p c1) (cliftn m p c2).
 Proof.
-apply: etrans (_ : move  (cliftl (nseq m p) c1) (cliftl (nseq m p) c2) = _).
-  rewrite /cliftn.
-  move:  (cliftn_cast n m p).
-  rewrite -(cliftn_cast n m p) => H.
-  by rewrite (eq_axiomK H).
+move=> c1Cc2.
+elim: m => //= m1 IH.
+by apply/connect_lift/IH.
+Qed.
+
+Lemma gdist_liftn n m p (c1 c2 : configuration n) : 
+  connect move c1 c2 ->
+  gdist move (cliftn m p c1) (cliftn m p c2) <= gdist move c1 c2.
+Proof.
+move=> c1Cc2.
 elim: m => //= m IH.
-by rewrite move_lift.
+apply: leq_trans (gdist_lift _ _) IH.
+by apply: connect_liftn.
 Qed.
 
-Lemma path_liftn n m p (c : configuration n) (cs : seq (configuration _)) :
-  path move (cliftn m p c) (map (cliftn m p) cs) = path move c cs.
+Lemma perfect_liftn n m p : cliftn m p (perfect n p) = perfect (m + n) p.
 Proof.
-elim: cs c => //= a l IH c.
-by rewrite move_liftn IH.
-Qed.
-
-Lemma perfect_liftn n m p : cliftn m p (perfect n p) = perfect _ p.
-Proof.
-rewrite /cliftn.
-suff -> : cliftl (nseq m p) (perfect n p) = perfect (size (nseq m p) + n) p.
-  move:  (cliftn_cast n m p).
-  rewrite (cliftn_cast n m p) //= => H /=.
-  by rewrite (eq_axiomK H).
 elim: m n => //= m IH n.
-rewrite -[_.+1 + n]/((size (nseq m p) + n).+1) -perfect_lift.
-by rewrite -IH.
+by rewrite IH perfect_lift.
 Qed.
 
 Inductive pathS_spec (n : nat)  (c : configuration n.+1) (cs : seq (configuration n.+1)) :
@@ -636,5 +637,293 @@ by rewrite last_map lc1p2Ec2.
 Qed.
 
 End Projection.
- 
+
+Section PLift.
+
+Variables n q : nat.
+Variables i : 'I_q.+1.
+Variable r1 : rel 'I_q.
+Variable r2 : rel 'I_q.+1.
+Let p := lift i.
+Hypothesis r2Rr1 : forall i j, r2 (p i) (p j) = r1 i j.
+
+Definition plift (c : configuration q n) : configuration q.+1 n := 
+  [ffun j => lift i (c j)].
+
+Lemma plift_on_top c1 x : 
+  on_top x c1 <-> on_top x (plift c1).
+Proof.
+split => H d; have := H d; rewrite !ffunE => H1 H2; apply: H1.
+  by apply: lift_inj H2.
+by rewrite H2.
+Qed.
+
+Lemma plift_move (c1 c2 : configuration q n) :
+  move r2 (plift c1) (plift c2) = move r1 c1 c2.
+Proof.
+apply/moveP/moveP => [] [x [H1x H2x H3x H4x]]; exists x; split => //.
+- by rewrite !ffunE in H1x; rewrite -r2Rr1.
+- by move=> d2 xDd2; have := H2x _ xDd2; rewrite !ffunE => /lift_inj.
+- by apply /plift_on_top.
+- by apply /plift_on_top.
+- by rewrite !ffunE r2Rr1.
+- by move=> d2 /H2x; rewrite !ffunE => ->.
+- by apply /plift_on_top.
+by apply /plift_on_top.
+Qed.
+
+Lemma plift_path (c1 : configuration q n) cs :
+  path (move r2) (plift c1) (map plift cs) =
+  path (move r1) c1 cs. 
+Proof.
+elim: cs c1 => //= c2 cs IH c1.
+by rewrite plift_move IH.
+Qed.
+
+Lemma plift_mask (c1 c2 : configuration q n) :
+ connect (move r1) c1 c2 ->
+ gdist (move r2) (plift c1) (plift c2) <=
+ gdist (move r1) c1 c2.
+Proof.
+move=> /gdist_path [p1 [c1Pp1 lc1p2Ec2 Uc1p1 <-]].
+rewrite -(size_map plift).
+apply: gdist_path_le; first by rewrite plift_path.
+by rewrite last_map lc1p2Ec2.
+Qed.
+
+End PLift.
+
+Section Crlift.
+
+Variable q : nat.
+Variable p : peg q.+1.
+Variable r1 : rel 'I_q.
+Variable r2 : rel 'I_q.+1.
+
+Hypothesis r2Irr : irreflexive r2.
+Hypothesis r1Rr2 : forall i j : 'I_q, r1 i j = r2 (lift p i) (lift p j).
+
+Definition crlift n (c : configuration q.+1 n) :
+   configuration q.+1 n.+1 :=
+  [ffun i => oapp c p (unlift ord0 i)].
+
+Lemma on_top_rlift n (d : disk n) (c : configuration q n) :
+  on_top d c -> on_top (lift ord0 d) (crlift (plift p c)).
+Proof.
+move=> dTc d1.
+rewrite /plift !ffunE /= (liftK ord0 d) /= ffunE.
+case: unliftP => [k1 -> /= |/= -> HH].
+  by rewrite ffunE => /lift_inj /dTc.
+by case/eqP : (neq_lift p (c d)).
+Qed.
+
+Lemma on_top_rlift_inv n (d : disk n) (c : configuration q n) :
+  on_top (lift ord0 d) (crlift (plift p c)) -> on_top d c.
+Proof.
+move=> dTc d1 Hc.
+have := dTc (lift ord0 d1).
+rewrite !ffunE !liftK /=; apply.
+by rewrite !ffunE Hc.
+Qed.
+
+Lemma move_rlift n (c1 c2 : configuration q n) :
+  move r2 (crlift (plift p c1)) (crlift (plift p c2)) = move r1 c1 c2.
+Proof.
+apply/moveP/moveP.
+  case => [] [m mLn].
+  rewrite !ffunE; case: unliftP => [j -> /= [H1 H2 H3 H4]| _ []]; last first.
+    by rewrite r2Irr.
+  exists j; split => //.
+  - by rewrite !ffunE in H1; rewrite r1Rr2.
+  - move=> d2 jDd2.
+    have := H2 (lift ord0 d2).
+    rewrite !ffunE !liftK /= !ffunE => H.
+    apply/(@lift_inj _ p)/H.
+    by apply: contra jDd2 => /eqP /lift_inj ->.
+  - by apply: on_top_rlift_inv.
+  by apply: on_top_rlift_inv H4.
+move=> [d1 [H1 H2 H3 H4]].
+exists (lift ord0 d1).
+rewrite !ffunE !liftK; split => //.
+- by rewrite /= !ffunE -r1Rr2.
+- move=> d2.
+  rewrite !ffunE; case: unliftP => [j ->/= Hj|//].
+  rewrite !ffunE; congr (lift p).
+  apply: H2.
+  by apply: contra Hj => /eqP ->.
+- by apply: on_top_rlift.
+by apply: on_top_rlift.
+Qed.
+
+Lemma perfect_rlift n : crlift (perfect p) = perfect p :> _ _ n.+1.
+Proof.
+apply/ffunP => i; rewrite !ffunE.
+by case: unlift => //= j; rewrite !ffunE.
+Qed.
+
+Definition crliftn n m (c : configuration q.+1 n) 
+  : configuration q.+1 (m + n)  :=
+ [ffun x => if (split x) is inr y then (c y) else p].
+
+Lemma split_rshift k m (x : 'I_k) : split (rshift m x) = inr x.
+Proof.
+case: splitP => [j /= jE|k1 /= /eqP].
+  by have := ltn_ord j; rewrite -jE ltnNge leq_addr.
+by rewrite eqn_add2l => /val_eqP->.
+Qed.
+
+Lemma on_top_crliftn n m x (c : configuration q n) : 
+  on_top x c -> on_top (rshift m x) (crliftn m (plift p c)).
+Proof.
+move=> H d; rewrite !ffunE split_rshift /=.
+case: splitP => [j _ /eqP |k -> H1].
+  by rewrite !ffunE eq_sym (negPf (neq_lift _ _)).
+move: H1; rewrite !ffunE => /lift_inj H1.
+by rewrite leq_add2l; apply: H.
+Qed.
+
+Lemma on_top_crliftn_inv n m x (c : configuration q n) : 
+  on_top (rshift m x) (crliftn m (plift p c)) -> on_top x c.
+Proof.
+move=> Hx d2 cxEcd2.
+have := Hx (rshift m d2).
+rewrite !ffunE split_rshift !ffunE.
+case: splitP => [j jE| k1 /eqP].
+  by have := ltn_ord j; rewrite -jE ltnNge leq_addr.
+rewrite !ffunE eqn_add2l => /val_eqP<- HH1.
+rewrite -(leq_add2l m).
+by apply: HH1; rewrite cxEcd2.
+Qed.
+
+Lemma move_crliftn n m  (c1 c2 : configuration q n) :
+    move r2 (crliftn m (plift p c1)) (crliftn m (plift p c2)) = 
+    move r1 c1 c2.
+Proof.
+apply/moveP/moveP => [] [x [H1x H2x H3x H4x]]; last first.
+  exists (rshift m x); split => //.
+  - by rewrite !ffunE /= split_rshift !ffunE -r1Rr2.
+  - move=> d2; rewrite !ffunE; case: splitP => // k d2E H.
+    rewrite !ffunE  H2x //; apply: contra H => /eqP->.
+    by apply/eqP/val_eqP/eqP.
+  - by apply: on_top_crliftn.
+  by apply: on_top_crliftn.
+move: H1x; rewrite !ffunE.
+case: splitP => [j _ pRp|k kE].
+  by case: (r2Irr p); rewrite pRp.
+rewrite !ffunE => H1x.
+have xE : (rshift m k) = x by apply/val_eqP/eqP.
+rewrite -xE in H3x H4x.
+exists k; split => //.
+- by rewrite r1Rr2.
+- move=> d2 kDd2.
+  have := H2x (rshift m d2).
+  rewrite !ffunE split_rshift !ffunE => H.
+  apply: lift_inj (H _).
+  by apply/eqP/val_eqP=> /=; rewrite kE eqn_add2l.
+- by apply: on_top_crliftn_inv H3x.
+by apply: on_top_crliftn_inv H4x.
+Qed.
+
+Lemma path_crliftn n m (c : configuration q n) (cs : seq (configuration _ _)) :
+    path (move r2) (crliftn m (plift p c)) (map (crliftn m \o (plift p)) cs) = 
+    path (move r1) c cs.
+Proof. by elim: cs c => //= c1 cs1 IH c; rewrite move_crliftn IH. Qed.
+
+Lemma connect_crliftn n m (c1 c2 : configuration q n) : 
+  connect (move r1) c1 c2 -> 
+  connect (move r2) (crliftn m (plift p c1)) 
+                    (crliftn m (plift p c2)).
+Proof.
+move=> /connectP[x]; rewrite -(path_crliftn m) => Hp Hl.
+apply/connectP; eexists; first exact: Hp.
+by rewrite Hl [RHS]last_map.
+Qed.
+
+Lemma gdist_crliftn n m (c1 c2 : configuration q n) : 
+  connect (move r1) c1 c2 ->
+  gdist (move r2) (crliftn m (plift p c1)) (crliftn m (plift p c2)) <= 
+  gdist (move r1) c1 c2.
+Proof.
+move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
+rewrite -(size_map (crliftn m \o plift p)).
+apply: gdist_path_le; first by rewrite path_crliftn.
+by rewrite [LHS]last_map H2p1.
+Qed.
+
+End Crlift.
+
+(*****************************************************************************)
+(*  Other peg                                                                *)
+(*****************************************************************************)
+
+Definition opeg n (p1 p2 : peg n.+1) :=
+  odflt ord0 [pick i | (i != p1) && (i != p2)].
+
+Lemma opeg_sym n (p1 p2 : peg n.+1) : opeg p1 p2 = opeg p2 p1.
+Proof. by congr odflt; apply: eq_pick => p; rewrite andbC. Qed.
+
+Lemma opegDl n (p1 p2 : peg n.+3) : opeg p1 p2 != p1.
+Proof.
+rewrite /opeg; case: pickP => [x /andP[]//| HD].
+have D (p3 p4 : peg n.+3) : (p3 == p4) = (val p3 == val p4).
+  by apply/eqP/idP => /val_eqP.
+have := HD ord0; have := HD (inord 1); have := HD (inord 2).
+rewrite !D /= !inordK //.
+by case: {HD}p1 => [] [|[|[|p1 Hp1]]] /=;
+   case: p2 => [] [|[|[|p2 Hp2]]].
+Qed.
+
+Lemma opegDr n (p1 p2 : peg n.+3) : opeg p1 p2 != p2.
+Proof.
+rewrite /opeg; case: pickP => [x /andP[]//| HD].
+have D (p3 p4 : peg n.+3) : (p3 == p4) = (val p3 == val p4).
+  by apply/eqP/idP => /val_eqP.
+have := HD ord0; have := HD (inord 1); have := HD (inord 2).
+rewrite !D /= !inordK //.
+by case: {HD}p1 => [] [|[|[|p1 Hp1]]] /=;
+   case: p2 => [] [|[|[|p2 Hp2]]].
+Qed.
+
+Notation "`p[ p1 , p2 ] " := (opeg p1 p2)
+    (format "`p[ p1 ,  p2 ]", at level 60).
+
+(*****************************************************************************)
+(*  Difference relation                                                      *)
+(*****************************************************************************)
+
+Section Drel.
+
+Variable n : nat.
+
+Definition drel : rel (peg n) := [rel x  y | x != y].
+
+Definition dirr : irreflexive drel.
+by move=> x; apply/eqP.
+Qed.
+
+Definition dsym : symmetric drel.
+by move=> x y; rewrite /drel /= eq_sym.
+Qed.
+
+End Drel.
+
+
+(*****************************************************************************)
+(*  Linear relation                                                          *)
+(*****************************************************************************)
+
+Section Lrel.
+
+Variable n : nat.
+
+Definition lrel : rel (peg n) := [rel x y | ((nat_of_ord x).+1 == y) || (y.+1 == x)].
+
+Definition lirr : irreflexive lrel.
+Proof. by move=> k; rewrite /lrel /= (gtn_eqF (leqnn _)). Qed.
+
+Definition lsym : symmetric lrel.
+Proof. by move=> x y; rewrite /lrel /= orbC.
+Qed.
+
+End Lrel.
 

@@ -13,46 +13,62 @@ Unset Printing Implicit Defensive.
 
 Section LHanoi3.
 
-Let hrel : rel (peg 3) := [rel x y | ((nat_of_ord x).+1 == y) || (y.+1 == x)].
-Let hirr : irreflexive hrel.
-Proof. by move=> n; rewrite /hrel /= (gtn_eqF (leqnn _)). Qed.
-Let hsym : symmetric hrel.
-Proof. by move=> x y; rewrite /hrel /= orbC.
-Qed.
-
-Let hrelD p1 p2 : p1 != p2 -> hrel p1 p2 || hrel p1 (opeg3 p1 p2).
+Lemma lrel3D (p1 p2 : peg 3) : p1 != p2 -> lrel p1 p2 || lrel p1 (opeg p1 p2).
 Proof.
-by case: (peg3E p1) => ->; case: (peg3E p2) => -> // /eqP/val_eqP;
-  rewrite /hrel /opeg3 /= ?inordK.
+move=> p1Dp2.
+have D p3 p4 : (p3 == p4) = (val p3 == val p4).
+  by apply/eqP/idP => /val_eqP.
+move: p1Dp2 (opegDl p1 p2) (opegDr p1 p2).
+by case: (peg3E (opeg p1 p2)) => ->;
+   case: (peg3E p1) => ->; 
+   case: (peg3E p2) => ->; 
+   rewrite !D /lrel /= ?inordK.
 Qed.
 
-Let hrelB p1 p2 : p1 != p2 -> ~~ [&& hrel p1 p2, hrel p1 (opeg3 p1 p2) & hrel p2 (opeg3 p1 p2)].
+Lemma lrel3B (p1 p2 : peg 3) : p1 != p2 -> 
+  ~~ [&& lrel p1 p2, lrel p1 (opeg p1 p2) & lrel p2 (opeg p1 p2)].
 Proof.
-by case: (peg3E p1) => ->; case: (peg3E p2) => -> // /eqP/val_eqP;
-  rewrite /hrel /opeg3 /= ?inordK.
+have D p3 p4 : (p3 == p4) = (val p3 == val p4).
+  by apply/eqP/idP => /val_eqP.
+move: (opegDl p1 p2) (opegDr p1 p2).
+by case: (peg3E (opeg p1 p2)) => ->;
+   case: (peg3E p1) => ->; 
+   case: (peg3E p2) => ->; 
+   rewrite !D /lrel /= ?inordK.
 Qed.
 
-Let hrelO p1 p2 : p1 != p2 -> ~~ hrel p1 p2 -> hrel p1 (opeg3 p1 p2).
-Proof. by move/hrelD; case: hrel. Qed.
+Lemma lrel3O (p1 p2 : peg 3) : p1 != p2 -> 
+  ~~ lrel p1 p2 -> lrel p1 (opeg p1 p2).
+Proof. by move/lrel3D; case: lrel. Qed.
 
-Let hrelON p1 p2 : p1 != p2 -> hrel p1 p2 -> ~~ hrel p1 (opeg3 p1 p2) ->
-        hrel p2 (opeg3 p1 p2).
+Lemma lrel3ON (p1 p2 : peg 3) : p1 != p2 -> 
+  lrel p1 p2 -> ~~ lrel p1 (opeg p1 p2) -> lrel p2 (opeg p1 p2).
 Proof.
-by case: (peg3E p1) => ->; case: (peg3E p2) => -> // /eqP/val_eqP;
-  rewrite /hrel /opeg3 /= ?inordK.
+have D p3 p4 : (p3 == p4) = (val p3 == val p4).
+  by apply/eqP/idP => /val_eqP.
+move: (opegDl p1 p2) (opegDr p1 p2).
+by case: (peg3E (opeg p1 p2)) => ->;
+   case: (peg3E p1) => ->; 
+   case: (peg3E p2) => ->; 
+   rewrite !D /lrel /= ?inordK.
 Qed.
 
-Let hrelON4 p1 p2 p3 p4 : p1 != p2 -> p1 != p3 -> p2 != p3 ->
-     hrel p1 p2 -> hrel p1 p3 -> hrel p3 p4 -> p4 = p1.
+Lemma lrel3ON4 (p1 p2 p3 p4 : peg 3) : 
+     p1 != p2 -> p1 != p3 -> p2 != p3 ->
+     lrel p1 p2 -> lrel p1 p3 -> lrel p3 p4 -> p4 = p1.
 Proof.
-by case: (peg3E p1) => ->; case: (peg3E p2) => ->;
-   case: (peg3E p3) => ->; case: (peg3E p4) => ->// /eqP/val_eqP;
-   rewrite /hrel /opeg3 /= ?inordK // eqxx.
+have D p5 p6 : (p5 == p6) = (val p5 == val p6).
+  by apply/eqP/idP => /val_eqP.
+by case: (peg3E p1) => ->;
+   case: (peg3E p2) => ->; 
+   case: (peg3E p3) => ->; 
+   case: (peg3E p4) => ->; 
+   rewrite !D /lrel /= ?inordK.
 Qed.
 
-Let hmove {n} := @move 3 hrel n.
+Let hmove {n} := @move 3 (@lrel 3) n.
 Let hmove_sym n (c1 c2 : configuration 3 n) : hmove c1 c2 = hmove c2 c1
-  := move_sym hsym c1 c2.
+  := move_sym (@lsym 3) c1 c2.
 Let hconnect n := connect (@hmove n).
 
 Local Notation "c1 `--> c2" := (hmove c1 c2)
@@ -61,16 +77,14 @@ Local Notation "c1 `-->* c2" := (hconnect c1 c2)
     (format "c1  `-->*  c2", at level 60).
 Local Notation "`c[ p ] " := (perfect p )
     (format "`c[ p ]", at level 60).
-Local Notation "`p[ p1 , p2 ] " := (opeg3 p1 p2)
-    (format "`p[ p1 ,  p2 ]", at level 60).
 
 Lemma move_lperfect n p1 p2 p3 :
-  p1 != p3 -> p2 != p3 -> hrel p1 p2 ->
+  p1 != p3 -> p2 != p3 -> lrel p1 p2 ->
  @hmove n.+1 (clift p1 (perfect p3)) (clift p2 (perfect p3)).
 Proof.
 move=> p1Dp3 p2Dp3 Hrel.
 have p1Dp2 : p1 != p2.
-  by apply/eqP=> p1Ep2; have := hirr p2; rewrite -{1}p1Ep2 Hrel.
+  by apply/eqP=> p1Ep2; have := lirr p2; rewrite -{1}p1Ep2 Hrel.
 apply/moveP; exists ldisk; split => [|d lDd|d|d].
 - by rewrite !ffunE unlift_none.
 - by rewrite !ffunE; case: unliftP => // lEd /=; case/eqP: lDd.
@@ -85,7 +99,7 @@ Qed.
 (* Function that builds a path from a configuration to a peg                 *)
 (*****************************************************************************)
 
-Fixpoint lhanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
+Fixpoint lhanoi {n : nat} : configuration 3 n -> configuration _ n -> _ :=
   match n with
   | 0 => fun _ _ => [::] : seq (configuration _ 0)
   | n1.+1 =>
@@ -93,8 +107,8 @@ Fixpoint lhanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
        let p1 := c1 ldisk in
        let p2 := c2 ldisk in
        if p1 == p2 then map (clift p2) (lhanoi (cunlift c1) (cunlift c2)) else
-       let p3 := opeg3 p1 p2 in
-       if hrel p1 p2 then
+       let p3 := opeg p1 p2 in
+       if lrel p1 p2 then
          map (clift p1) (lhanoi (cunlift c1) (perfect p3)) ++
          map (clift p2) (perfect p3 :: lhanoi (perfect p3) (cunlift c2)) else
          map (clift p1) (lhanoi (cunlift c1) (perfect p2)) ++
@@ -105,7 +119,7 @@ Fixpoint lhanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
 Lemma lhanoi_nil_inv n (c1 c2 : _ _ n) : lhanoi c1 c2 = [::] -> c1 = c2.
 Proof.
 elim: n c1 c2 => [c1 c2 _|n IH c1 c2] /=; first by apply/ffunP=> [] [].
-case: eqP => [H | H] //=; last by case: hrel; case: map.
+case: eqP => [H | H] //=; last by case: lrel; case: map.
 rewrite -{2}[c1]cunliftK -{3}[c2]cunliftK.
 case: lhanoi (IH (cunlift c1) (cunlift c2)) => //= -> // _.
 by rewrite H.
@@ -114,6 +128,7 @@ Qed.
 Lemma lhanoi_correct n (c1 c2 : _ _ n) (cs := lhanoi c1 c2) :
   path (@hmove n) c1 cs /\ last c1 cs = c2.
 Proof.
+have HH := @lirr 3.
 rewrite /cs; elim: n c1 c2 {cs} => /= [c1 c2| n IH c1 c2].
   by split=> //; apply/ffunP=> [] [].
 case: eqP => [Ho|/eqP Do].
@@ -122,17 +137,17 @@ case: eqP => [Ho|/eqP Do].
     by rewrite -{1}[c1](cunliftK) Ho path_lift.
   by rewrite -{1}[c1](cunliftK) Ho last_map Hl cunliftK.
 set p1 := _ ldisk.
-set p2 := opeg3 _ _.
+set p2 := opeg _ _.
 set cp2 := perfect _.
 set cp := perfect _.
 set cp1 := perfect _.
-case: (boolP (hrel _ _)) => [Hrel|Hrel].
+case: (boolP (lrel _ _)) => [Hrel|Hrel].
   have [cPlr lclrEp2] := IH (cunlift c1) cp2.
   have [p2Plr lp2lrEc2'] := IH cp2 (cunlift c2).
   rewrite last_cat cat_path /= -{1 3}[c1]cunliftK !path_lift //=.
   rewrite cPlr p2Plr.
   rewrite !last_map lclrEp2 lp2lrEc2'  andbT; split => //.
-    by apply: move_lperfect; rewrite // eq_sym (opeg3Dl, opeg3Dr).
+    by apply: move_lperfect; rewrite // eq_sym (opegDl, opegDr).
   by rewrite cunliftK.
 have [cPlr lclrEp] := IH (cunlift c1) cp.
 have [pPlr lplrEp] := IH cp cp1.
@@ -143,13 +158,13 @@ rewrite lclrEp lplrEp lp1lrEp; split=> //; last first.
   by rewrite cunliftK.
 rewrite cPlr pPlr p1Plr /= andbT.
 apply/andP; split => //; apply: move_lperfect => //.
-- by rewrite opeg3Dr.
-- by apply: hrelO.
-- by rewrite opeg3Dl.
+- by rewrite opegDr.
+- by apply: lrel3O.
+- by rewrite opegDl.
 - by rewrite eq_sym.
-rewrite hsym [p2]opeg3_sym.
-apply: hrelO; first by rewrite eq_sym.
-by rewrite hsym.
+rewrite lsym [p2]opeg_sym.
+apply: lrel3O; first by rewrite eq_sym.
+by rewrite lsym.
 Qed.
 
 (* Two configurations are always connected *)
@@ -175,7 +190,8 @@ set (p := c ldisk).
 rewrite !fun_if !size_cat /= !size_cat /= !size_map.
 case: (c1 _ =P p) => [lc1Ep |/eqP lc1Dp].
   (* the last disk is already well-placed *)
-  have [cs1 [c1'Pcs1 lc1'csElc1cs' /leqifP]] := pathS_restrict hirr c1Pcs.
+  have [cs1 [c1'Pcs1 lc1'csElc1cs' /leqifP]] := 
+     pathS_restrict (@lirr 3) c1Pcs.
   have lc1'cs1E : last (cunlift c1) cs1 = cunlift c.
     by rewrite lc1'csElc1cs'; congr cunlift.
   case: eqP=> [csEcs1 /eqP<- |/eqP csDcs1 scs1L].
@@ -188,6 +204,8 @@ case: (c1 _ =P p) => [lc1Ep |/eqP lc1Dp].
   apply: IH => //.
   by apply: ltn_trans Scs.
 pose f (c : configuration 3 n.+1) := c ldisk.
+have HHr := @lirr 3.
+have HHs := @lsym 3.
 (* We need to move the last disk *)
 case: path3SP c1Pcs => // [c1' cs' p1 csE c1'Ecs1'|
                            cs1 cs2 p1 p2 p3 c1' c2 p1Dp2 p1Rp2
@@ -204,11 +222,11 @@ have Scs1 : size cs1 < m.+1.
 have Scs2 : size cs2 < m.+1.
   apply: ltn_trans Scs.
   by rewrite csE size_cat /= size_map addnS ltnS leq_addl.
-have [p1Rp| p1NRp] := boolP (hrel p1 p).
+have [p1Rp| p1NRp] := boolP (lrel p1 p).
   case: (p2 =P p) => [p2Ep|/eqP p2Dp].
     (* the first moves of last disk of cs is the right one *)
     rewrite -p2Ep -/p3 size_map /=.
-    have/(pathS_restrict hirr)[cs2' [c2'Pcs2' lc2'cs2'E cs2'L]] := c2Pcs2.
+    have/(pathS_restrict (@lirr 3))[cs2' [c2'Pcs2' lc2'cs2'E cs2'L]] := c2Pcs2.
     have Scs2' : size cs2' < m.+1.
       by apply: leq_ltn_trans Scs2; rewrite cs2'L.
     have /IH := lc1'cs1Epp3 => // /(_ Scs1 c1'Pcs1) IHc1.
@@ -255,7 +273,7 @@ have [p1Rp| p1NRp] := boolP (hrel p1 p).
   (* cs has a duplicate *)
   have p4Ep2 : p4 = p2 by rewrite /p4 ffunE unlift_none.
   have p5Ep1: p5 = p1.
-    apply: (@hrelON4 p1 p p2 p5) => //; first by rewrite eq_sym.
+    apply: (@lrel3ON4 p1 p p2 p5) => //; first by rewrite eq_sym.
     by rewrite -p4Ep2.
   have p6Ep3 : p6 = p3.
     by apply/eqP; rewrite /p6 opeg3E // p4Ep2 p5Ep1 p3Ep p2Dp.
@@ -306,7 +324,7 @@ case: (p5 =P p1) => [p5Ep1|/eqP p5Dp1].
     rewrite !size_cat /= size_cat !size_map size_cat /= !size_map => ->.
     by rewrite !(addSn, addnS) addnA.
   have p6Ep3 : p6 = p3.
-    by rewrite /p6 /p3 opeg3_sym; congr opeg3.
+    by rewrite /p6 /p3 opeg_sym; congr opeg.
   have lc1'cs1Ec3 : clift p1 (last c1' cs1) = c3.
     by rewrite lc1'cs1Epp3 -p6Ep3 -p5Ep1.
   (* exhibit a shortest path *)
@@ -335,7 +353,7 @@ case: (p5 =P p1) => [p5Ep1|/eqP p5Dp1].
   by rewrite !size_cat /= size_cat /= !size_map => ->.
 have p5Ep : p5 = p.
   by apply/eqP; rewrite eq_sym -p3Ep opeg3E // eq_sym p5Dp1 -p4Ep2.
-have p2Ep1p : p2 = opeg3 p1 p.
+have p2Ep1p : p2 = opeg p1 p.
   by apply/eqP; rewrite eq_sym opeg3E // p1Dp2 eq_sym p2Dp.
 have p6Ep1 : p6 = p1.
   by apply/eqP; rewrite opeg3E // p4Ep2 eq_sym p1Dp2.
@@ -390,11 +408,11 @@ case: path3SP c3Pcs4 => // [c3' cs4' p8 cs4E c3'Pcs4' _|
 (* three moves in a row -> duplicate *)
 have p8Ep : p8 = p by rewrite [LHS]ffunE unlift_none p5Ep.
 have p9Ep2 : p9 = p2.
-  apply: hrelON4 p8Rp9.
+  apply: lrel3ON4 p8Rp9.
   - by rewrite eq_sym; exact: p1Dp2.
   - by rewrite p8Ep.
   - by rewrite p8Ep.
-  - by rewrite hsym.
+  - by rewrite lsym.
   by rewrite p8Ep -p4Ep2 -p5Ep.
 have p10Ep1 : p10 = p1.
   by apply/eqP; rewrite opeg3E // p8Ep eq_sym lc1Dp p9Ep2 eq_sym.
@@ -439,31 +457,31 @@ Qed.
 (* size on a perfect configuration depends which peg we consider *)
 Lemma size_app_lhanoi_p n p1 p2 :
    size (@lhanoi n (perfect p1) (perfect p2))  =
-     if hrel p1 p2 then (3 ^ n).-1./2 else (3 ^ n).-1 * (p1 != p2).
+     if lrel p1 p2 then (3 ^ n).-1./2 else (3 ^ n).-1 * (p1 != p2).
 Proof.
 elim: n p1 p2 => [p1 p2|n IH p1 p2] /=; first by rewrite if_same.
 rewrite !ffunE; case: eqP => [p1Ep2|/eqP p1Dp2].
-  by rewrite !perfect_unlift size_map IH p1Ep2 eqxx hirr !muln0.
+  by rewrite !perfect_unlift size_map IH p1Ep2 eqxx lirr !muln0.
 rewrite !perfect_unlift !fun_if !size_cat /= !size_cat /= !size_map.
-rewrite !IH eq_sym opeg3Dl // opeg3Dr //= !muln1.
+rewrite !IH eq_sym opegDl // opegDr //= !muln1.
 have Hd : (3 ^ n.+1).-1 = (3 ^ n).-1 + (3 ^ n).*2.
   rewrite expnS -[3 ^n]prednK ?expn_gt0 //.
   by rewrite mulnS /= doubleS !addnS mulSn mul2n.
-rewrite ![hrel p2 _]hsym.
-case: (boolP (hrel _ _)) => [Hrel1|Hrel1]; last first.
+rewrite ![lrel p2 _]lsym.
+case: (boolP (lrel _ _)) => [Hrel1|Hrel1]; last first.
   rewrite [p2 == _]eq_sym p1Dp2 !muln1.
   rewrite expnS !mulSn addn0.
   by case: expn (expn_gt0 3 n) => // k _; rewrite !addnS addnA.
-case: (boolP (hrel _ _)) => [Hrel2|Hrel2].
+case: (boolP (lrel _ _)) => [Hrel2|Hrel2].
   rewrite !ifN.
     by rewrite Hd halfD /= odd_double andbF add0n doubleK prednK ?expn_gt0.
-  by have := hrelB p1Dp2; rewrite Hrel1 Hrel2 hsym.
-rewrite ifT; last by rewrite hsym; apply: hrelON.
+  by have := lrel3B p1Dp2; rewrite Hrel1 Hrel2 lsym.
+rewrite ifT; last by rewrite lsym; apply: lrel3ON.
 rewrite Hd halfD /= odd_double andbF add0n doubleK -addSnnS addnC.
 by rewrite prednK // expn_gt0.
 Qed.
 
-Fixpoint size_lhanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
+Fixpoint size_lhanoi {n : nat} : configuration 3 n -> configuration _ n -> _ :=
   match n with
   | 0 => fun _ _ => 0
   | n1.+1 =>
@@ -471,8 +489,8 @@ Fixpoint size_lhanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
        let p1 := c1 ldisk in
        let p2 := c2 ldisk in
        if p1 == p2 then size_lhanoi (cunlift c1) (cunlift c2) else
-       let p3 := opeg3 p1 p2 in
-       if hrel p1 p2 then
+       let p3 := opeg p1 p2 in
+       if lrel p1 p2 then
          (size_lhanoi (cunlift c1) (perfect p3) + size_lhanoi (perfect p3) (cunlift c2)).+1 else
          (size_lhanoi (cunlift c1) (perfect p2) +
           (3 ^ n1).-1  +
@@ -484,16 +502,16 @@ Proof.
 elim: n c1 c2 => //= n IH c1 c2.
 case: eqP => [lc1Elc2|/eqP lc1Dlc2].
   by rewrite size_map IH.
-case: (boolP (hrel _ _)) => [lc1Rlc2|lc1NRlc2].
+case: (boolP (lrel _ _)) => [lc1Rlc2|lc1NRlc2].
   by rewrite size_cat /= !size_map !IH addnS.
-rewrite size_cat /= size_cat /= !size_map size_app_lhanoi_p hsym (negPf lc1NRlc2).
+rewrite size_cat /= size_cat /= !size_map size_app_lhanoi_p lsym (negPf lc1NRlc2).
 by rewrite eq_sym (negPf lc1Dlc2) muln1 !addnS addnA !IH.
 Qed.
 
 (* size on a perfect configuration depends which peg we consider *)
 Lemma size_lhanoi_p n p1 p2 :
    @size_lhanoi n (perfect p1) (perfect p2)  =
-     if hrel p1 p2 then (3 ^ n).-1./2 else (3 ^ n).-1 * (p1 != p2).
+     if lrel p1 p2 then (3 ^ n).-1./2 else (3 ^ n).-1 * (p1 != p2).
 Proof. by rewrite size_lhanoiE size_app_lhanoi_p. Qed.
 
 Lemma dist_size_lhanoi n (c1 c2 : _ _ n) :
