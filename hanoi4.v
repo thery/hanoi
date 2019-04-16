@@ -102,7 +102,7 @@ move => p1Dp2.
 have p1'Dp2' : p1' != p2' by apply: contra p1Dp2 => /eqP->.
 rewrite -[X in _ <= X]muln1 {10}(_ : 1 = (p1' != p2')); last first.
   by rewrite (negPf p1'Dp2').
-rewrite -dist_perfect -/p3 -!crliftn_perfect -!plift_perfect.
+rewrite -gdist_perfect -/p3 -!crliftn_perfect -!plift_perfect.
 rewrite -(prednK kP).
 apply: gdist_liftln => // [i j|].
   by (apply/idP/idP; apply: contra => /eqP) => [/lift_inj->|->].

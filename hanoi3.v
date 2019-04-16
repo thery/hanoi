@@ -78,7 +78,7 @@ have [IH1 IH2] := IH (cunliftr c) (opeg (c sdisk) p).
 have [IH3 IH4] := IH c2 p.
 rewrite cat_path /= -{1}[c]cunliftrK !path_liftr // IH1 IH3 ?andbT /=.
 rewrite -{1}[c]cunliftrK last_map IH2 -/c2.
-apply: move_perfect => //.
+apply: move_liftr_perfect => //.
   by rewrite eq_sym (opegDl _).
 by rewrite eq_sym (opegDr _).
 Qed.

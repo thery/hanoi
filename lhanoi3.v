@@ -130,7 +130,7 @@ case: (boolP (lrel _ _)) => [Hrel|Hrel].
   rewrite last_cat cat_path /= -{1 3}[c1]cunliftrK !path_liftr //=.
   rewrite cPlr p2Plr.
   rewrite !last_map lclrEp2 lp2lrEc2'  andbT; split => //.
-    by apply: move_perfect; rewrite // eq_sym (opegDl, opegDr).
+    by apply: move_liftr_perfect; rewrite // eq_sym (opegDl, opegDr).
   by rewrite cunliftrK.
 have [cPlr lclrEp] := IH (cunliftr c1) cp.
 have [pPlr lplrEp] := IH cp cp1.
@@ -140,7 +140,7 @@ rewrite -{1 3}[c1]cunliftrK /= !last_map !path_liftr //=.
 rewrite lclrEp lplrEp lp1lrEp; split=> //; last first.
   by rewrite cunliftrK.
 rewrite cPlr pPlr p1Plr /= andbT.
-apply/andP; split => //; apply: move_perfect => //.
+apply/andP; split => //; apply: move_liftr_perfect => //.
 - by apply: lrel3O.
 - by rewrite opegDr.
 - rewrite lsym [p2]opeg_sym.
@@ -417,7 +417,7 @@ have c1Mcs7 : path hmove c1 cs7.
   rewrite -{1}[c1]cunliftrK  last_map lc1'cs1Epp3 //.
   rewrite p4Ep2 cat_path /c2 -/p1 /=.
   apply/and3P; split => //.
-    - apply: move_perfect => //.
+    - apply: move_liftr_perfect => //.
         by rewrite eq_sym opegDl.
       by rewrite eq_sym opegDr.
     by rewrite path_liftr //; rewrite [c2']cliftrK in c2'Pcs3.

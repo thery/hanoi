@@ -1,3 +1,4 @@
+-R . hanoi
 -arg -w -arg -notation-overridden
 
 gdist.v
@@ -7,3 +8,4 @@ lhanoi3.v
 hanoi3.v
 triangular.v
 phi.v
+hanoi4.v
