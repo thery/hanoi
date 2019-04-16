@@ -52,57 +52,42 @@ Local Notation "c1 `--> c2" := (hmove c1 c2)
 Local Notation "c1 `-->* c2" := (hconnect c1 c2) 
     (format "c1  `-->*  c2", at level 60).
 
-Lemma move_perfect3 n p1 p2 (p3 := opeg p1 p2) (c : _ _ n := perfect p3) :
-  hrel p1 p2 ->  hmove (clift p1 c) (clift p2 c).
-Proof.
-move=> p1Rp2.
-have p1Dp2 : p1 != p2.
-  by apply/eqP=> p1Ep2; have /idP := hirr p1; rewrite {2}p1Ep2.
-apply/moveP; exists ldisk; split => [|d|d|d]; rewrite ?ffunE ?unlift_none //=.
-- by case: unliftP => [j -> | U /eqP[]].
-- case: unliftP => [j -> /eqP |->] //=.
-  by rewrite eq_sym ffunE opeg3E // eqxx.
-case: unliftP => [j -> /eqP |->] //=.
-by rewrite eq_sym ffunE opeg3E // eqxx andbF.
-Qed.
 
-(* In a move only one, all the smaller disks are pilled up *)
-Lemma move_perfect3r n (c1 c2 : configuration 3 n.+1) : 
-  hmove c1 c2 -> c1 ldisk != c2 ldisk -> 
-  cunlift c2 = perfect (opeg (c1 ldisk) (c2 ldisk)).
+(* In a move only one, all the larger disks are pilled up *)
+Lemma move_perfectr n (c1 c2 : configuration 3 n.+1) : 
+  hmove c1 c2 -> c1 sdisk != c2 sdisk -> 
+  cunliftr c2 = perfect (opeg (c1 sdisk) (c2 sdisk)).
 Proof.
 move=> c1Mc2 c1lDc2l.
 apply/ffunP => i; rewrite !ffunE.
-have /ffunP/(_ i) := move_ldisk c1Mc2 c1lDc2l; rewrite !ffunE => c1Ec2.
+have /ffunP/(_ i) := move_sdisk c1Mc2 c1lDc2l; rewrite !ffunE => c1Ec2.
 apply/sym_equal/eqP; rewrite opeg3E //; apply/andP; split.
-  rewrite -c1Ec2; apply/eqP => /(move_on_topl c1Mc2 c1lDc2l).
-  by rewrite lift_max leqNgt ltn_ord.
-apply/eqP => /(move_on_topr c1Mc2 c1lDc2l).
-by rewrite lift_max leqNgt ltn_ord.
+  by rewrite -c1Ec2; apply/eqP => /(move_on_topl c1Mc2 c1lDc2l).
+by apply/eqP => /(move_on_topr c1Mc2 c1lDc2l).
 Qed.
 
-Lemma move_perfect3l n (c1 c2 : configuration 3 n.+1) : 
-  hmove c1 c2 -> c1 ldisk != c2 ldisk -> 
-  cunlift c1 = perfect (opeg (c1 ldisk) (c2 ldisk)).
+Lemma move_perfectl n (c1 c2 : configuration 3 n.+1) : 
+  hmove c1 c2 -> c1 sdisk != c2 sdisk -> 
+  cunliftr c1 = perfect (opeg (c1 sdisk) (c2 sdisk)).
 Proof.
 rewrite hmove_sym eq_sym opeg_sym.
-exact: move_perfect3r.
+exact: move_perfectr.
 Qed.
 
 Inductive path3S_spec (n : nat)  (c : configuration 3 n.+1)
                                  (cs : seq (configuration 3 n.+1)) :
    forall (b : bool), Type  :=
   path3S_specW : 
-    forall (c' := cunlift c) (cs' := map cunlift cs) (p := c ldisk),
-      cs = map (clift p) cs'  -> path hmove c' cs' -> path3S_spec c cs true |
+    forall (c' := cunliftr c) (cs' := map cunliftr cs) (p := c sdisk),
+      cs = map (cliftr p) cs'  -> path hmove c' cs' -> path3S_spec c cs true |
   path3S_spec_move : 
     forall cs1 cs2
-           (p1 := c ldisk) p2 (p3 := opeg p1 p2)
-           (c1 := cunlift c) 
-           (c2 := clift p2 (perfect p3)),
+           (p1 := c sdisk) p2 (p3 := opeg p1 p2)
+           (c1 := cunliftr c) 
+           (c2 := cliftr p2 (perfect p3)),
         p1 != p2 -> hrel p1 p2 ->
         last c1 cs1 = perfect p3 ->
-        cs = map (clift p1) cs1 ++ c2 :: cs2 ->
+        cs = map (cliftr p1) cs1 ++ c2 :: cs2 ->
         path hmove c1 cs1 -> path hmove c2 cs2 ->
         path3S_spec c cs true |
   path3S_spec_false : path3S_spec c cs false.
@@ -113,9 +98,10 @@ Proof.
 case: pathSP=> //; try by constructor.
 move=> p1 p2 cs1 cs2 c1 c2 p1Dp2 p1Rp2 csE c1Pcs1 lMc2 c2Pcs2.
 have lc1cs1E : last c1 cs1 =  perfect (opeg p1 p2).
-  by have := move_perfect3l lMc2; rewrite !ffunE unlift_none /= cliftK => ->.
+  have := move_perfectl lMc2.
+  by rewrite !cliftr_sdisk cliftrK; apply.
 apply: path3S_spec_move (lc1cs1E) _ _ _  => //.
-- by rewrite csE; congr (_ ++ clift _ _ :: _).
+- by rewrite csE; congr (_ ++ cliftr _ _ :: _).
 by rewrite -lc1cs1E.
 Qed.
 
