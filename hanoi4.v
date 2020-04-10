@@ -48,7 +48,8 @@ Definition p3top4 (k : 'I_4) : peg 3 -> peg 4 := lift k.
 Lemma p3to4_inj k : injective (p3top4 k).
 Proof. exact: lift_inj. Qed.
 
-Lemma gdist_leq (n : nat) (p1 p2 : peg 4) : gdist hmove (perfect p1 : _ _ n) (perfect p2) <= phi n .
+Lemma gdist_leq (n : nat) (p1 p2 : peg 4) : 
+ `d[`c[p1] : configuration 4 n, `c[p2]]_hmove  <= ϕ(n).
 Proof.
 have [/eqP->|p1Dp2] := boolP (p1 == p2); first by rewrite gdist0.
 elim: {n}_.+1 {-2}n (ltnSn n) p1 p2 p1Dp2 => // n IH [_ |[_|m mLn]] p1 p2 p1Dp2.
@@ -56,12 +57,12 @@ elim: {n}_.+1 {-2}n (ltnSn n) p1 p2 p1Dp2 => // n IH [_ |[_|m mLn]] p1 p2 p1Dp2.
   by apply/ffunP => [] [].
 - rewrite -[phi 1]/(size [:: (@perfect 4 1 p2)]).
   apply: gdist_path_le => //=.
-  rewrite andbT; apply/moveP; exists sdisk; split => //=.
+  rewrite andbT; apply/moveP; exists ldisk; split => //=.
   - by rewrite !ffunE.
   - by move=> [[|]].
-  - by move=> [] [].
-  by move=> [] [].
-pose p3 := opeg p1 p2.
+  - by apply/on_topP => [] [].
+  by apply/on_topP => [] [].
+pose p3 := `p[p1, p2].
 set k := gmin m.+2.
 set k1 := k.-1.+1.
 have kP : 0 < k by apply: gmin_gt0.

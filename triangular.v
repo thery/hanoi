@@ -180,8 +180,7 @@ Qed.
 Lemma trootE m n : (troot m == n) = (delta n <= m < delta n.+1).
 Proof.
 rewrite ltnNge -!root_delta_le -ltnNge.
-case: ltngtP => // [|->]; last by rewrite leqnn.
-by rewrite leqNgt => /negPf->.
+by rewrite ltnS -eqn_leq.
 Qed.
 
 Lemma troot_delta n : troot (delta n) = n.

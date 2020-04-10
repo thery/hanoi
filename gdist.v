@@ -2,9 +2,9 @@ From mathcomp Require Import all_ssreflect.
 
 (******************************************************************************)
 (*             Definition of a distance on graph                              *)
-(* sconnect_n r n x  ==  the set of all the elements connect to x in n steps  *)
+(* sconnect_n r n x == the set of all the elements connected to x in n steps  *)
 (*                                                                            *)
-(*   `d[t1, t2]_r    ==  the distance between t1 and t2 in r                  *)
+(*   `d[t1, t2]_r   == the distance between t1 and t2 in r                    *)
 (*                     if they are not connected returns the cardinal of the  *)
 (*                     the subtype                                            *)
 (******************************************************************************)
@@ -223,7 +223,7 @@ by rewrite (eq_sconnect r1Er2).
 Qed.
 
 Lemma gdist_sym t1 t2 :
-  gdist r t1 t2 = gdist (fun z : T => r^~ z) t2 t1.
+ `d[t1, t2]_r  =  `d[t2, t1]_(fun z : T => r^~ z).
 Proof.
 apply: eq_find => i.
 apply/sconnect_nP/sconnect_nP => /= [] [p [H1p H2p H3p]].
@@ -239,7 +239,7 @@ exists (rev (belast t2 p)); split => //.
 by rewrite size_rev size_belast.
 Qed.
 
-Lemma gdistC t1 t2 : symmetric r -> gdist r t1 t2 = gdist r t2 t1.
+Lemma gdistC t1 t2 : symmetric r -> `d[t1, t2]_r  =  `d[t2, t1]_r.
 Proof.
 move=> rSym; rewrite gdist_sym.
 by apply: eq_dist.

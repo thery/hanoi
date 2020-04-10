@@ -5,12 +5,18 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+(******************************************************************************)
+(*                                                                            *)
+(*              Generalised Hanoi Problem with only 3 pegs                    *)
+(*                                                                            *)
+(******************************************************************************)
+
 
 Section GHanoi3.
 
-(*****************************************************************************)
-(*  The pegs are the three elements of 'I_3                                  *)
-(*****************************************************************************)
+(******************************************************************************)
+(*  The pegs are the three elements of 'I_3                                   *)
+(******************************************************************************)
 
 Implicit Type p : peg 3.
 Let peg1 : peg 3 := ord0.
@@ -25,7 +31,7 @@ Qed.
 
 (* Finding the free peg that differs from p1 and p2 *)
 
-Lemma opeg3E p p1 p2 : p1 != p2 -> (opeg p1 p2 == p) = ((p1 != p) && (p2 != p)).
+Lemma opeg3E p p1 p2 : p1 != p2 -> (`p[p1, p2] == p) = ((p1 != p) && (p2 != p)).
 Proof.
 move=> p1Dp2.
 have D p3 p4 : (p3 == p4) = (val p3 == val p4).
@@ -52,23 +58,24 @@ Local Notation "c1 `--> c2" := (hmove c1 c2)
 Local Notation "c1 `-->* c2" := (hconnect c1 c2) 
     (format "c1  `-->*  c2", at level 60).
 
-
-(* In a move only one, all the larger disks are pilled up *)
+(* In a move the largest disk has moved, all the smaller disks are pilled up *)
 Lemma move_perfectr n (c1 c2 : configuration 3 n.+1) : 
-  hmove c1 c2 -> c1 sdisk != c2 sdisk -> 
-  cunliftr c2 = perfect (opeg (c1 sdisk) (c2 sdisk)).
+  c1 `--> c2 -> c1 ldisk != c2 ldisk -> 
+   ↓[c2] = perfect (`p[c1 ldisk, c2 ldisk]).
 Proof.
 move=> c1Mc2 c1lDc2l.
 apply/ffunP => i; rewrite !ffunE.
-have /ffunP/(_ i) := move_sdisk c1Mc2 c1lDc2l; rewrite !ffunE => c1Ec2.
+have /ffunP/(_ i) := move_ldisk c1Mc2 c1lDc2l; rewrite !ffunE => c1Ec2.
 apply/sym_equal/eqP; rewrite opeg3E //; apply/andP; split.
-  by rewrite -c1Ec2; apply/eqP => /(move_on_topl c1Mc2 c1lDc2l).
-by apply/eqP => /(move_on_topr c1Mc2 c1lDc2l).
+  rewrite -c1Ec2 /=; apply/eqP => c1lEc1r.
+  by have /on_topP /(_ _ c1lEc1r) := move_on_topl c1Mc2 c1lDc2l.
+apply/eqP => c2lEc2r.
+by have /on_topP /(_ _ c2lEc2r):= move_on_topr c1Mc2 c1lDc2l.
 Qed.
 
 Lemma move_perfectl n (c1 c2 : configuration 3 n.+1) : 
-  hmove c1 c2 -> c1 sdisk != c2 sdisk -> 
-  cunliftr c1 = perfect (opeg (c1 sdisk) (c2 sdisk)).
+  c1 `--> c2 -> c1 ldisk != c2 ldisk -> 
+  ↓[c1] = perfect (`p[c1 ldisk, c2 ldisk]).
 Proof.
 rewrite hmove_sym eq_sym opeg_sym.
 exact: move_perfectr.
@@ -77,17 +84,18 @@ Qed.
 Inductive path3S_spec (n : nat)  (c : configuration 3 n.+1)
                                  (cs : seq (configuration 3 n.+1)) :
    forall (b : bool), Type  :=
-  path3S_specW : 
-    forall (c' := cunliftr c) (cs' := map cunliftr cs) (p := c sdisk),
-      cs = map (cliftr p) cs'  -> path hmove c' cs' -> path3S_spec c cs true |
-  path3S_spec_move : 
+| path3S_specW : 
+    forall (c' := ↓[c]) (cs' := [seq ↓[i] | i <- cs]) (p := c ldisk),
+      cs = [seq ↑[i]_p | i <- cs'] ->
+      path hmove c' cs' -> path3S_spec c cs true 
+| path3S_spec_move : 
     forall cs1 cs2
-           (p1 := c sdisk) p2 (p3 := opeg p1 p2)
-           (c1 := cunliftr c) 
-           (c2 := cliftr p2 (perfect p3)),
+           (p1 := c ldisk) p2 (p3 :=`p[p1, p2])
+           (c1 := ↓[c]) 
+           (c2 := ↑[perfect p3]_p2),
         p1 != p2 -> hrel p1 p2 ->
         last c1 cs1 = perfect p3 ->
-        cs = map (cliftr p1) cs1 ++ c2 :: cs2 ->
+        cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2 ->
         path hmove c1 cs1 -> path hmove c2 cs2 ->
         path3S_spec c cs true |
   path3S_spec_false : path3S_spec c cs false.
@@ -99,7 +107,7 @@ case: pathSP=> //; try by constructor.
 move=> p1 p2 cs1 cs2 c1 c2 p1Dp2 p1Rp2 csE c1Pcs1 lMc2 c2Pcs2.
 have lc1cs1E : last c1 cs1 =  perfect (opeg p1 p2).
   have := move_perfectl lMc2.
-  by rewrite !cliftr_sdisk cliftrK; apply.
+  by rewrite !cliftr_ldisk cliftrK; apply.
 apply: path3S_spec_move (lc1cs1E) _ _ _  => //.
 - by rewrite csE; congr (_ ++ cliftr _ _ :: _).
 by rewrite -lc1cs1E.
