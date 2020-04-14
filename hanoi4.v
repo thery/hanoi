@@ -109,7 +109,6 @@ apply: gdist_liftln => // [i j|].
   by (apply/idP/idP; apply: contra => /eqP) => [/lift_inj->|->].
 by apply: move_connect.
 Qed.
-Check psi.
 
 (* This is theorem 2.9 *)
 Lemma phi_2_9 n (u v : configuration 4 n) (E := [set i | u i == peg0 ]) : 
@@ -120,14 +119,7 @@ elim: n u v E => // [u v E cH |n IH u v E cH].
   by apply/setP=> [] [].
 pose N : disk n.+1 := ord_max.
 have [NiE|NniE] := boolP (N \in E); last first.
-  
-  Search psi.
-Search gdist cliftrn.
-Check cliftrn.
 
-Check plift.
-
-Search psi.
 
 End Hanoi4.
 

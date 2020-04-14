@@ -49,7 +49,7 @@
 (******************************************************************************)
 
 From mathcomp Require Import all_ssreflect.
-Require Import gdist.
+Require Import tsplit gdist.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -79,9 +79,6 @@ Variable n : nat.
 Definition disk := 'I_n.
 Definition mk_disk m (H : m < n) : disk := Ordinal H.
 
-
-Definition dlarger : rel disk := [rel d1 d2 | (d1 : disk) <= (d2 : disk)].
-
 (******************************************************************************)
 (* Given a configuration c, the disks on the peg p can be reconstructed by    *)
 (* the list in decreasing order of the disk d such that c d = p               *)
@@ -94,28 +91,21 @@ Definition perfect p : configuration :=  [ffun d => p].
 
 End Disk.
 
-Notation " d1 \larger d2 " := (dlarger d1 d2) (at level 60).
-
 (* The smallest disk *)
-Definition sdisk {n} : disk n.+1 := ord_max.
+Definition sdisk {n} : disk n.+1 := ord0.
 
 (* The largest disk *)
-Definition ldisk {n} : disk n.+1 := ord0.
-
-Lemma split_ldisk n : @split 1 _ (ldisk : 'I_(n.+1)) = inl ord0.
-Proof.
-by case: splitP => // [] [[]] // i _; congr inl; apply/val_eqP.
-Qed.
+Definition ldisk {n} : disk n.+1 := ord_max.
 
 (******************************************************************************)
 (* The disk d is on top of peg (c d)                                          *)
 (******************************************************************************)
 
 Definition on_top n (d : disk n) (c : configuration n) :=
-   [forall d1 : disk n, (c d == c d1) ==> (dlarger d1 d)].
+   [forall d1 : disk n, (c d == c d1) ==> (d <= d1)].
 
 Lemma on_topP n (d : disk n) (c : configuration n) :
-  reflect (forall d1, c d = c d1 -> d1 \larger d) (on_top d c).
+  reflect (forall d1, c d = c d1 -> d <= d1) (on_top d c).
 Proof.
 apply: (iffP forallP) => [H d1 cdEcd1|H d1].
   by have /implyP->// := H d1; apply/eqP.
@@ -127,6 +117,7 @@ Qed.
 (* there must exist a disk d1, that is the only one that has changed of       *)
 (* peg (c1 d1 != c2 d1) that is on top of c1 and c2                           *)
 (******************************************************************************)
+
 
 Definition move {n} : rel (configuration n) :=
    [rel c1 c2 | [exists d1 : disk n, 
@@ -208,77 +199,78 @@ Qed.
 
 (* merging two configurations : c1 for the small disks, c2 for the big ones *)
 Definition cmerge m n (c1 : configuration m) (c2 : configuration n) :=
-  [ffun i => match split i with inl j => c1 j | inr j => c2 j end].
+  [ffun i => match tsplit i with inl j => c1 j | inr j => c2 j end].
 
-(* right shifting a configuration : taking the disks larger than m *)
+(* right shifting a configuration : taking the disks smaller than n *)
 Definition crshift m n (c : configuration (m + n)) : configuration n := 
-   [ffun i => c (rshift m i)].
+   [ffun i => c (trshift m i)].
 
-(* left shifting a configuration : taking the disks smaller than m *)
+(* left shifting a configuration : taking the disks larger than n *)
 Definition clshift m n (c : configuration (m + n)) : configuration m := 
-   [ffun i => c (lshift n i)].
+   [ffun i => c (tlshift n i)].
 
 (* Sanity check *)
 Lemma cmergeK m n (c : configuration (m + n)) :
   cmerge (clshift c) (crshift c) = c.
 Proof.
 apply/ffunP=> i; rewrite !ffunE.
-by case: splitP => [] j iE; rewrite !ffunE /=;
+by case: tsplitP => [] j iE; rewrite !ffunE /=;
    congr fun_of_fin; apply/val_eqP/eqP.
 Qed.
 
-Lemma split_lshift k m (x : 'I_k) : split (lshift m x) = inl x.
+Lemma tsplit_tlshift k m (x : 'I_k) : tsplit (tlshift m x) = inl x.
 Proof.
-case: splitP => [j /= /eqP/val_eqP-> //|k1 /= xE].
-by have := ltn_ord x; rewrite xE ltnNge leq_addr.
+case: tsplitP=> [j /= jE|k1 /= /eqP].
+  by have := ltn_ord j; rewrite -jE ltnNge leq_addl.
+rewrite eqn_add2r => /eqP H.
+by congr (inl _); apply: val_inj.
 Qed.
 
-Lemma split_rshift k m (x : 'I_k) : split (rshift m x) = inr x.
+Lemma tsplit_trshift k m (x : 'I_k) : tsplit (trshift m x) = inr x.
 Proof.
-case: splitP => [j /= jE|k1 /= /eqP].
-  by have := ltn_ord j; rewrite -jE ltnNge leq_addr.
-by rewrite eqn_add2l => /val_eqP->.
+case: tsplitP => [j /= jE|k1 /= xE].
+  by congr (inr _); apply: val_inj.
+by have := ltn_ord x; rewrite xE ltnNge leq_addl.
 Qed.
 
 Lemma on_top_merger m n x (c1 : configuration m) (c2 : configuration n) : 
-  on_top (rshift m x) (cmerge c1 c2) = on_top x c2.
+  on_top (trshift m x) (cmerge c1 c2) = on_top x c2.
 Proof.
 apply/on_topP/on_topP.
   move=> Hx d2 cxEcd2.
-  have := Hx (rshift m d2).
-  rewrite !ffunE !split_rshift => /(_ cxEcd2).
-  by rewrite [_ \larger _]leq_add2l.
-move=> H d; rewrite !ffunE split_rshift /dlarger /=.
-case: splitP => [j -> _ | k -> H1].
-  by apply: leq_trans (ltnW _) (leq_addr _ _).
-by rewrite leq_add2l; apply: H.
+  have := Hx (trshift m d2).
+  by rewrite !ffunE !tsplit_trshift => /(_ cxEcd2).
+move=> H d; rewrite !ffunE tsplit_trshift /=.
+case: tsplitP => [j -> H1 | k -> _].
+  by apply: H.
+by apply: leq_trans (ltnW _) (leq_addl _ _).
 Qed.
 
-Lemma move_merger m n (c : configuration m) (c1 c2 : configuration n) :
+Lemma move_merger m n (c : configuration n) (c1 c2 : configuration m) :
     move (cmerge c c1) (cmerge c c2) = move c1 c2.
 Proof.
 apply/moveP/moveP => [] [d1 [H1d1 H2d1 H3d1 H4d1]]; last first.
-  exists (rshift m d1); split => //; try by rewrite on_top_merger.
-    by rewrite !ffunE /= split_rshift.
-  move=> d2; rewrite !ffunE; case: splitP => // k d2E H.
+  exists (trshift n d1); split => //; try by rewrite on_top_merger.
+    by rewrite !ffunE /= tsplit_trshift.
+  move=> d2; rewrite !ffunE; case: tsplitP => // k d2E H.
   apply: H2d1 => //; apply: contra H => /eqP->.
   by apply/eqP/val_eqP/eqP.
 move: H1d1; rewrite !ffunE.
-case: splitP => [j _|k kE H1x]; first by rewrite irH.
-have d1E : (rshift m k) = d1 by apply/val_eqP/eqP.
+case: tsplitP => [j jE H1x|k _]; last by rewrite irH.
+have d1E : (trshift n j) = d1 by apply/val_eqP/eqP.
 rewrite -d1E in H3d1 H4d1.
-exists k; split => //; try by rewrite -(on_top_merger _ c).
+exists j; split => //; try by rewrite -(on_top_merger _ c).
 move=> d2 kDd2.
-have := H2d1 (rshift m d2).
-rewrite !ffunE split_rshift => H.
+have := H2d1 (trshift n d2).
+rewrite !ffunE tsplit_trshift => H.
 apply: H.
 apply: contra kDd2 => /eqP/val_eqP /=.
-by rewrite kE eqn_add2l.
+by rewrite jE.
 Qed.
 
 Lemma path_merger m n (c1 : configuration m)
          (c2 : configuration n) (cs : seq (configuration _)) :
-    path move (cmerge c1 c2) (map (cmerge c1) cs) = 
+    path move (cmerge c1 c2) [seq cmerge c1 c | c <- cs]  = 
     path move c2 cs.
 Proof. by elim: cs c2 => //= c3 cs IH c2; rewrite move_merger IH. Qed.
 
@@ -290,6 +282,7 @@ apply/connectP; eexists; first exact: Hp.
 by rewrite Hl [RHS]last_map.
 Qed.
 
+(* this should be equality *)
 Lemma gdist_merger m n (c: configuration m) (c1 c2 : configuration n) : 
   connect move c1 c2 ->
   `d[cmerge c c1, cmerge c c2]_move <= `d[c1, c2]_move.
@@ -301,20 +294,21 @@ by rewrite [LHS]last_map H2p1.
 Qed.
 
 Lemma on_top_mergel m n (c1 : configuration m) (c2 : configuration n) d :
-  cdisjoint c1 c2 -> on_top d c1 -> on_top (lshift n d) (cmerge c1 c2).
+  cdisjoint c1 c2 -> on_top d c1 -> on_top (tlshift n d) (cmerge c1 c2).
 Proof.
 move=> c1Dc2 /on_topP dTc; apply/on_topP => d1.
-rewrite !ffunE split_lshift /dlarger /=.
-case: splitP => j -> c1dc1j; first by apply: dTc.
+rewrite !ffunE tsplit_tlshift /=.
+case: tsplitP => j -> c1dc1j; last first.
+  by rewrite leq_add2r; apply: dTc.
 by have /cdisjointP/(_ d j)/eqP[] := c1Dc2.
 Qed.
 
 Lemma on_top_mergel_inv m n (c1 : configuration m) (c2 : configuration n) d :
-  on_top (lshift n d) (cmerge c1 c2) -> on_top d c1.
+  on_top (tlshift n d) (cmerge c1 c2) -> on_top d c1.
 Proof.
 move=> /on_topP dTc; apply/on_topP => d1 Hc.
-have := dTc (lshift n d1).
-by rewrite !ffunE !split_lshift /=; apply.
+have := dTc (tlshift n d1).
+by rewrite !ffunE !tsplit_tlshift /= leq_add2r; apply.
 Qed.
 
 Lemma move_mergel m n (c1 c2 : configuration m) (c : configuration n) :
@@ -322,16 +316,16 @@ Lemma move_mergel m n (c1 c2 : configuration m) (c : configuration n) :
 Proof.
 move=> /moveP [x [H1x H2x H3x H4x]]; apply/moveP.
 move: H1x; rewrite !ffunE.
-case: splitP => [j jE J1x | k]; last by rewrite irH.
-have xE : (lshift n j) = x by apply/val_eqP/eqP.
+case: tsplitP => [j | k kE J1x]; first by rewrite irH.
+have xE : (tlshift n k) = x by apply/val_eqP/eqP.
 rewrite -xE in H3x H4x.
-exists j; split => //; try by apply: on_top_mergel_inv; eassumption.
+exists k; split => //; try by apply: on_top_mergel_inv; eassumption.
 move=> d2 kDd2.
-have := H2x (lshift n d2).
-rewrite !ffunE split_lshift => H.
+have := H2x (tlshift n d2).
+rewrite !ffunE tsplit_tlshift => H.
 apply: H.
 apply: contra kDd2 => /eqP/val_eqP /=.
-by rewrite jE.
+by rewrite kE eqn_add2r.
 Qed.
 
 Lemma move_mergel_inv m n (c1 c2 : configuration m) 
@@ -340,48 +334,166 @@ Lemma move_mergel_inv m n (c1 c2 : configuration m)
   move c1 c2 -> move (cmerge c1 c) (cmerge c2 c).
 Proof.
 move=> c1Dc c2Dc /moveP[x [H1x H2x H3x H4x]]; apply/moveP.
-exists (lshift n x); split => //; try by apply/on_top_mergel.
-  by rewrite !ffunE /= split_lshift.
-move=> d2; rewrite !ffunE; case: splitP => // k d2E H.
+exists (tlshift n x); split => //; try by apply/on_top_mergel.
+  by rewrite !ffunE /= tsplit_tlshift.
+move=> d2; rewrite !ffunE; case: tsplitP => // k d2E H.
 apply: H2x => //; apply: contra H => /eqP->.
 by apply/eqP/val_eqP/eqP.
 Qed.
 
 Lemma path_mergel m n (c1 : configuration m)
          (c2 : configuration n) (cs : seq (configuration _)) :
-    path move (cmerge c1 c2) (map (fun c => cmerge c c2) cs) -> 
+    path move (cmerge c1 c2) [seq cmerge i c2 | i <- cs] -> 
     path move c1 cs.
 Proof. by elim: cs c1 => //= c3 cs IH c1 /andP[/move_mergel-> /IH]. Qed.
 
 Lemma path_mergel_inv m n (c1 : configuration m)
          (c2 : configuration n) (cs : seq (configuration _)) :
-    all (fun c1 => cdisjoint c1 c2) (c1 :: cs) ->
+    all (fun i => cdisjoint i c2) (c1 :: cs) ->
     path move c1 cs ->
-    path move (cmerge c1 c2) (map (fun c => cmerge c c2) cs).
+    path move (cmerge c1 c2) [seq cmerge i c2 | i <- cs].
 Proof.
 elim: cs c1 => //= c3 cs IH c1 /and3P[c1Dc2 c3Dc2 Dcs] 
                                /andP[/move_mergel_inv ->// /IH->//].
 by rewrite c3Dc2.
 Qed.
 
+Lemma on_top_shift m n (c : configuration (m + n)) d :
+  on_top d c -> 
+  match tsplit d with
+  | inl d1 => on_top d1 (clshift c)
+  | inr d2 => on_top d2 (crshift c)
+  end.
+Proof.
+rewrite -{1}[d](tsplitK d).
+case: tsplitP => /= j dE /on_topP /= dT; 
+    apply/on_topP => d1; rewrite !ffunE /= => H.
+ by apply: dT H.
+by have /= := dT _ H; rewrite leq_add2r.
+Qed.
+
+Lemma move_clshift m n (c1 c2 : configuration (m + n)) : 
+  move c1 c2 -> (clshift c1) != (clshift c2) ->
+  move (clshift c1) (clshift c2).
+Proof.
+move=> /moveP [x].
+rewrite -(tsplitK x).
+have := @on_top_shift _ _ c1 x.
+have := @on_top_shift _ _ c2 x.
+case: tsplitP => /= [j xE c2H c1H [H1j H2j H3j H4j] c1Dc2|
+                      k xE c2H c1H [H1k H2k H3k H4k] c1Dc2].
+  case/eqP: c1Dc2; apply/ffunP => i.
+  rewrite !ffunE.
+  apply/H2j/eqP/val_eqP; rewrite eqn_leq /= negb_and.
+  by rewrite orbC -ltnNge (leq_trans (ltn_ord _)) // leq_addl.
+apply/moveP; exists k; split=> [|d2 kDd2||]; rewrite ?ffunE //.
+- apply: H2k => /=.
+  by apply/eqP/val_eqP; rewrite /= eqn_add2r; apply/val_eqP/eqP.
+- apply: c1H; rewrite (_ : x = (tlshift n k)) //.
+  by apply/val_eqP/eqP => /=.
+apply: c2H; rewrite (_ : x = (tlshift n k)) //.
+by apply/val_eqP/eqP => /=.
+Qed.
+
+Lemma move_crshift m n (c1 c2 : configuration (m + n)) : 
+  move c1 c2 -> (crshift c1) != (crshift c2) ->
+  move (crshift c1) (crshift c2).
+Proof.
+move=> /moveP [x].
+rewrite -(tsplitK x).
+have := @on_top_shift _ _ c1 x.
+have := @on_top_shift _ _ c2 x.
+case: tsplitP => /= [j xE c2H c1H [H1j H2j H3j H4j] c1Dc2|
+                      k xE c2H c1H [H1k H2k H3k H4k] c1Dc2]; last first.
+  case/eqP: c1Dc2; apply/ffunP => i.
+  rewrite !ffunE.
+  apply/H2k/eqP/val_eqP; rewrite eqn_leq /= negb_and.
+  by rewrite -ltnNge  (leq_trans (ltn_ord _)) // leq_addl.
+apply/moveP; exists j; split=> [|d2 kDd2||]; rewrite ?ffunE //.
+- by apply: H2j.
+- apply: c1H; rewrite (_ : x = (trshift m j)) //.
+  by apply/val_eqP/eqP => /=.
+apply: c2H; rewrite (_ : x = (trshift m j)) //.
+by apply/val_eqP/eqP => /=.
+Qed.
+
+Fixpoint rm_dup (A : eqType) (a : A) (s : seq A) := 
+  if s is b :: s1 then 
+    if a == b then rm_dup b s1 else b :: rm_dup b s1 
+  else [::].
+
+Lemma size_rm_dup (A : eqType) (a : A) s : size (rm_dup a s) <= size s.
+Proof.
+elim: s a => //= b l IH a; case: (_ == _); first by apply: leq_trans (IH _) _.
+by apply: IH.
+Qed.
+
+Lemma last_rm_dup (A : eqType) (a : A) s : last a (rm_dup a s) = last a s.
+Proof.
+by elim: s a => //= b l IH a; case: (_ =P _) => /= [->|_]; apply: IH.
+Qed.
+
+Lemma path_clshift m n (c : configuration (m + n)) cs :
+    path move c cs ->
+    path move (clshift c) (rm_dup (clshift c) [seq (clshift i) | i <- cs]).
+Proof.
+elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
+case: eqP => [->|/eqP cDc1 /=]; first by apply: IH.
+by rewrite move_clshift //=; apply: IH.
+Qed.
+
+Lemma path_crshift m n (c : configuration (m + n)) cs :
+    path move c cs ->
+    path move (crshift c) (rm_dup (crshift c) [seq (crshift i) | i <- cs]).
+Proof.
+elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
+case: eqP => [->|/eqP cDc1 /=]; first by apply: IH.
+by rewrite move_crshift //=; apply: IH.
+Qed.
+
+Lemma gdist_clshift n m (c1 c2 : configuration (m + n)) : 
+  connect move c1 c2 ->
+  `d[clshift c1, clshift c2]_move <= `d[c1, c2]_move.
+Proof.
+move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
+have := size_rm_dup (clshift c1) [seq (clshift i) | i <- p1].
+rewrite size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply: path_clshift.
+by rewrite last_rm_dup last_map H2p1.
+Qed.
+
+Lemma gdist_crshift n m (c1 c2 : configuration (m + n)) : 
+  connect move c1 c2 ->
+  `d[crshift c1, crshift c2]_move <= `d[c1, c2]_move.
+Proof.
+move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
+have := size_rm_dup (crshift c1) [seq (crshift i) | i <- p1].
+rewrite size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply: path_crshift.
+by rewrite last_rm_dup last_map H2p1.
+Qed.
+
+
 Definition cliftrn m n p (c : configuration n) : configuration (m + n) :=
   cmerge (perfect m p) c.
 Definition cliftr n : _ -> _ -> configuration n.+1 := @cliftrn 1 n.
-
+Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
 
 Definition cliftln m n p (c : configuration m) : configuration (m + n) :=
   cmerge c (perfect n p).
 
-Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
+Definition cliftl n c p : configuration (n + 1) := (@cliftln n 1 c p).
 
-Definition cliftl n : _ -> _ -> configuration (n + 1) := @cliftln n 1.
-
-Lemma cliftr_ldisk n p (c : configuration n) : ↑[c]_p ldisk  = p.
-Proof. by rewrite ffunE; case: splitP => [j|//]; rewrite ffunE. Qed.
+Lemma cliftr_ldisk n p (c : configuration n) : ↑[c]_p ldisk = p.
+Proof. 
+rewrite ffunE; case: tsplitP => /= [j nE|t].
+  by have := ltn_ord j; rewrite {2}nE ltnn.
+by rewrite ffunE.
+Qed.
 
 Lemma on_top_liftrn n m p x (c : configuration n) : 
-  on_top (rshift m x) (cliftrn m p c) = on_top x c.
-Proof. by exact: on_top_merger. Qed.
+  on_top (trshift m x) (cliftrn m p c) = on_top x c.
+Proof. exact: on_top_merger. Qed.
 
 Lemma move_liftrn n m p (c1 c2 : configuration n) :
     move (cliftrn m p c1) (cliftrn m p c2) = move c1 c2.
@@ -408,7 +520,7 @@ Proof. by exact: move_liftrn 1 p c1 c2. Qed.
 Lemma perfect_liftr n p : ↑[perfect n p]_p = perfect n.+1 p.
 Proof.
 apply/ffunP => i; rewrite !ffunE.
-by case: splitP => [j|k]; rewrite !ffunE.
+by case: tsplitP => [j|k]; rewrite !ffunE.
 Qed.
 
 Definition cunliftr {n} (c : configuration n.+1) : configuration n :=
@@ -417,12 +529,12 @@ Definition cunliftr {n} (c : configuration n.+1) : configuration n :=
 Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
 
 Lemma cliftrK n p : cancel (cliftr p) (cunliftr : _ -> configuration n).
-Proof. by move=> c; apply/ffunP => i; rewrite !ffunE split_rshift. Qed.
+Proof. by move=> c; apply/ffunP => i; rewrite !ffunE tsplit_trshift. Qed.
 
 Lemma cunliftrK n (c : configuration n.+1) : ↑[↓[c]]_(c ldisk) = c.
 Proof.
 apply/ffunP => i; rewrite !ffunE.
-case: splitP => [] j iE; rewrite !ffunE; congr fun_of_fin;
+case: tsplitP => [] j iE; rewrite !ffunE; congr fun_of_fin;
   apply/val_eqP/eqP => //=.
 by rewrite iE; case: (j) => [] [].
 Qed.
@@ -451,9 +563,10 @@ Lemma move_ldisk n (c1 c2 : configuration n.+1) :
   move c1 c2 -> c1 ldisk != c2 ldisk -> ↓[c1] = ↓[c2].
 Proof.
 move=> c1Mc2 c10Dc20.
-apply/ffunP=> i; rewrite !ffunE.
+apply/ffunP=> i; rewrite !ffunE /=.
 apply: move_disk1 c1Mc2 c10Dc20 _.
-by apply/eqP/val_eqP.
+apply/eqP/val_eqP => /=.
+by rewrite eqn_leq negb_and -ltnNge ltn_ord.
 Qed.
 
 Lemma move_unliftr n (c1 c2 : configuration n.+1) :
@@ -480,7 +593,7 @@ Lemma gdist_liftr n p (c1 c2 : configuration n) :
   connect move c1 c2 ->  `d[↑[c1]_p, ↑[c2]_p]_move <= `d[c1, c2]_move .
 Proof. by apply: (@gdist_merger 1). Qed.
 
-Lemma path_unlift n (c : configuration n.+1) (cs : seq (configuration _)) :
+Lemma path_unlift_eq n (c : configuration n.+1) (cs : seq (configuration _)) :
    (forall c1, c1 \in cs -> c1 ldisk = c ldisk)-> 
     path move ↓[c] [seq ↓[i] | i <- cs] = path move c cs.
 Proof.
@@ -494,9 +607,18 @@ rewrite -{1}(H a).
 by rewrite inE eqxx.
 Qed.
 
+Lemma path_unlift n (c : configuration n.+1) (cs : seq (configuration _)) :
+  path move c cs ->
+  path move ↓[c] (rm_dup ↓[c] [seq ↓[i] | i <- cs]).
+Proof. by move=> H; apply: path_crshift. Qed.
+
+Lemma gdist_unlift n (c1 c2 : configuration n.+1) : 
+  connect move c1 c2 -> `d[↓[c1], ↓[c2]]_move <= `d[c1, c2]_move.
+Proof. by move=> H; apply: gdist_crshift. Qed.
+
 Lemma perfect_liftrn m n p : cliftrn m p (perfect n p) = perfect (m + n) p.
 Proof.
-by apply/ffunP => i; rewrite !ffunE; case: splitP => j; rewrite !ffunE.
+by apply/ffunP => i; rewrite !ffunE; case: tsplitP => j; rewrite !ffunE.
 Qed.
 
 (* case distinction that depends if the largest disk has move                 *)
@@ -531,7 +653,7 @@ have [Hh|/hasPn Hn] := boolP (has f cs); last first.
     apply/eq_in_map => x /Hn; rewrite negbK => /eqP <-/=.
     by rewrite cunliftrK.
   apply: pathS_specW csE _.
-  by rewrite path_unlift // => c1 /Hn; rewrite negbK => /eqP.
+  by rewrite path_unlift_eq // => c1 /Hn; rewrite negbK => /eqP.
 pose n1 := find f cs; pose lc1 := nth c cs n1.
 pose p1 := c ldisk; pose p2 := lc1 ldisk.
 have p1Dp2 : p1 != p2.
@@ -563,7 +685,8 @@ have lc1E : lc1 = cliftr p2 (last c1 cs1).
   congr cliftr.
   apply/ffunP=> i; rewrite !ffunE /=.
   apply/sym_equal/(move_disk1 Hm Hd).
-  by apply/eqP/val_eqP/neq_bump.
+  apply/eqP/val_eqP => /=.
+  by rewrite eqn_leq negb_and -ltnNge ltn_ord.
 have Hm1 : move ↑[last c1 cs1]_p1 ↑[last c1 cs1]_p2.
   have ->: ↑[last ↓[c] cs1]_p1 = last c lcs1.
     by rewrite -[in LHS]last_map -lcs1E cunliftrK.
@@ -572,7 +695,7 @@ apply: pathS_spec_move (p1Dp2) _ _ _ (Hm1) _ => //.
 -  have := @move_diskr _ ldisk _ _ Hm1.
    by rewrite !cliftr_ldisk; apply.
 - by rewrite csE lc1E lcs1E.
-- rewrite path_unlift => //.
+- rewrite path_unlift_eq => //.
   by move: Hp; rewrite -[cs](cat_take_drop n1) cat_path => /andP[].
 rewrite -lc1E.
 by move: Hp; rewrite csE cat_path /= => /and3P[].
@@ -594,9 +717,7 @@ have [/eqP c1dEcd|c1dDcd] := boolP (c ldisk == c1 ldisk).
   exists (cunliftr c1 :: cs1); split=> //=.
     by rewrite move_unliftr // cMc1.
   by rewrite eqseq_cons c1dEcd cunliftrK eqxx.
-have -> : cunliftr c = cunliftr c1.
-  apply/ffunP=> d1; rewrite !ffunE.
-  by apply: move_disk1 c1dDcd _.
+have -> : cunliftr c = cunliftr c1 by apply: move_ldisk.
 exists cs1; split=> //=.
 apply/leqifP; case: eqP=> [H|/= _]; last by rewrite ltnS S.
 by rewrite -[_.+1]/(size (c1 :: cs)) H size_map.
@@ -638,7 +759,7 @@ Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
 Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
 
 Lemma on_top1 k (d : disk 1) (c : configuration k 1) : on_top d c.
-Proof. by apply/on_topP=> [] [] []. Qed.
+Proof. by apply/on_topP=> [] [] [] //=; case: d => [] []. Qed.
 
 Section PLift.
 
@@ -764,7 +885,7 @@ End Crlift.
 (******************************************************************************)
 
 Definition opeg n (p1 p2 : peg n.+1) :=
-  odflt ldisk [pick i | (i != p1) && (i != p2)].
+  odflt ord0 [pick i | (i != p1) && (i != p2)].
 
 Lemma opeg_sym n (p1 p2 : peg n.+1) : opeg p1 p2 = opeg p2 p1.
 Proof. by congr odflt; apply: eq_pick => p; rewrite andbC. Qed.

@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Import gdist ghanoi ghanoi3.
+Require Import tsplit gdist ghanoi ghanoi3.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -448,14 +448,14 @@ case: leqP => _; rewrite !cat_path !last_cat {IH}/= ?cat_path ?last_cat /=.
     apply/moveP; exists ldisk.
     split => // [|d dmDd||].
     - by rewrite !cliftr_ldisk.
-    - rewrite !ffunE; case: splitP => [j jE|j]; last by rewrite !ffunE.
+    - rewrite !ffunE; case: tsplitP => [j|j jE]; first by rewrite !ffunE.
       by case/eqP: dmDd; apply/val_eqP; rewrite /= jE; case: (j) => [] [].
     - apply/on_topP=> d; rewrite !cliftr_ldisk !ffunE.
-      case: splitP => [j jE|j _ /eqP].
-        by rewrite /dlarger /= !ffunE jE /=; case: (j) => //. 
-      by rewrite !ffunE -/p1 eq_sym (negPf (opegDl _ _)).
-    apply/on_topP=> d; rewrite /dlarger /= !cliftr_ldisk !ffunE.
-    case: splitP => [j ->|j _ /eqP]; first by case: j => [] [].
+      case: tsplitP => [j _ /eqP|j jE].
+        by rewrite !ffunE -/p1 eq_sym (negPf (opegDl _ _)).
+      by rewrite /= !ffunE jE /= leq_addl. 
+    apply/on_topP=> d; rewrite /= !cliftr_ldisk !ffunE.
+    case: tsplitP => [j _ /eqP|j ->]; last by case: j => [] [].
     by rewrite !ffunE eq_sym (negPf (opegDr _ _)).  
   - have [cPl Hlc2lEc2] := lpeg_correct (↓[c2]) p.
     by rewrite -[c3]cunliftrK !cliftr_ldisk /= path_liftr // cliftrK.
@@ -472,15 +472,15 @@ split; first (apply/and5P; split).
   apply/moveP; exists ldisk; split => // [|d2||]; 
          rewrite ?cliftr_ldisk ?ffunE //=.
   - by rewrite /drel /= eq_sym opegDl.
-  - case: splitP => //= j d2E /eqP[].
+  - case: tsplitP => //= j d2E /eqP[].
     by apply/val_eqP; rewrite /= d2E; case: (j) => [] [].
   - apply/on_topP=> d2.
-    rewrite cliftr_ldisk /dlarger /= !ffunE.
-    case: splitP => [[[]] // j -> //| k _ /eqP].
+    rewrite cliftr_ldisk /= !ffunE.
+    case: tsplitP => [k _ /eqP | [[]] // j -> //].
     by rewrite ?ffunE (negPf p1Dp2).
   apply/on_topP=> d2.
-  rewrite cliftr_ldisk /dlarger /= !ffunE.
-  case: splitP => [[[]] // j -> //| k _ /eqP].
+  rewrite cliftr_ldisk /= !ffunE.
+  case: tsplitP => [k _ /eqP | [[]] // j -> //].
   by rewrite !ffunE (negPf (opegDr _ _)).
 - have [c4Pr lc4rEp1] := rpeg_correct (↓[c4]) p1.
   by rewrite path_liftr //; rewrite cliftrK in c4Pr.
@@ -490,15 +490,15 @@ split; first (apply/and5P; split).
   apply/moveP; exists ldisk; split => // [|d2||]; 
          rewrite ?cliftr_ldisk ?ffunE /=.
   - by rewrite /drel /= opegDr.
-  - case: splitP => [j d2E /eqP[] |j] //=.
+  - case: tsplitP => [j | j d2E /eqP[]] //=.
     by apply/val_eqP => /=; rewrite d2E; case: (j) => [] [].
   - apply/on_topP=> d2.
-    rewrite cliftr_ldisk /dlarger /= !ffunE.
-    case: splitP => [[[]] // j -> //| k _ /eqP].
+    rewrite cliftr_ldisk /= !ffunE.
+    case: tsplitP => [k _ /eqP | [[]] // j -> //].
     by rewrite !ffunE (negPf (opegDl _ _)).
   apply/on_topP=> d2.
-  rewrite cliftr_ldisk /dlarger /= !ffunE.
-  case: splitP => [[[]] // j -> //| k _ /eqP].
+  rewrite cliftr_ldisk /= !ffunE.
+  case: tsplitP => [k _ /eqP | [[]] // j -> //].
   by rewrite !ffunE eq_sym (negPf p1Dp2).
 - have [p1Pl lc2lEc2] := lpeg_correct (↓[c2]) p1.
   by rewrite path_liftr.

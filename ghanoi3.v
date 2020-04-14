@@ -68,9 +68,11 @@ apply/ffunP => i; rewrite !ffunE.
 have /ffunP/(_ i) := move_ldisk c1Mc2 c1lDc2l; rewrite !ffunE => c1Ec2.
 apply/sym_equal/eqP; rewrite opeg3E //; apply/andP; split.
   rewrite -c1Ec2 /=; apply/eqP => c1lEc1r.
-  by have /on_topP /(_ _ c1lEc1r) := move_on_topl c1Mc2 c1lDc2l.
+  have /on_topP /(_ _ c1lEc1r) := move_on_topl c1Mc2 c1lDc2l.
+  by rewrite /= leqNgt ltn_ord.
 apply/eqP => c2lEc2r.
-by have /on_topP /(_ _ c2lEc2r):= move_on_topr c1Mc2 c1lDc2l.
+have /on_topP /(_ _ c2lEc2r):= move_on_topr c1Mc2 c1lDc2l.
+by rewrite /= leqNgt ltn_ord.
 Qed.
 
 Lemma move_perfectl n (c1 c2 : configuration 3 n.+1) : 
