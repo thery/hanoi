@@ -612,7 +612,7 @@ Lemma path_unlift n (c : configuration n.+1) (cs : seq (configuration _)) :
   path move ↓[c] (rm_dup ↓[c] [seq ↓[i] | i <- cs]).
 Proof. by move=> H; apply: path_crshift. Qed.
 
-Lemma gdist_unlift n (c1 c2 : configuration n.+1) : 
+Lemma gdist_cunlift n (c1 c2 : configuration n.+1) : 
   connect move c1 c2 -> `d[↓[c1], ↓[c2]]_move <= `d[c1, c2]_move.
 Proof. by move=> H; apply: gdist_crshift. Qed.
 

@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Import gdist ghanoi triangular phi hanoi3 psi.
+Require Import tsplit gdist ghanoi triangular phi hanoi3 psi.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -119,7 +119,38 @@ elim: n u v E => // [u v E cH |n IH u v E cH].
   by apply/setP=> [] [].
 pose N : disk n.+1 := ord_max.
 have [NiE|NniE] := boolP (N \in E); last first.
-
+  have->: E = E :\ N.
+    apply/setP=> i; rewrite !inE.
+    case: eqP => // ->.
+    by rewrite (negPf NniE).
+  rewrite psi_ord_max.
+  apply: leq_trans (gdist_cunlift (connect_move _ _)).
+  apply: IH.
+  apply/subsetP=> i /codomP[j]; rewrite !ffunE !inE => ->.
+  have /subsetP /(_  (v (trshift 1 j))) := cH.
+  rewrite !inE; apply.
+  by apply: codom_f.
+(* maybe I should do a wlog *)
+pose npeg2 : peg _ := v N.
+pose npeg3 : peg _ := if npeg2 == peg2 then peg3 else peg2.
+have [np2Dp0 np2Dp1] : (npeg2 != peg0) /\ (npeg2 != peg1).
+  have /subsetP /(_  (v N)) := cH.
+  by rewrite /npeg2 /peg2 !inE => /(_ (codom_f v N))/orP[]/eqP->; 
+     split; apply/eqP/val_eqP; rewrite /= ?inordK.
+have [np3Dp0 np3Dp1 np3Dp3] :
+   [/\ npeg3 != peg0,  npeg3 != peg1 & npeg3 != npeg2].
+  rewrite /npeg3; case: (_ =P peg2) => [->|/eqP].
+    by split; apply/eqP/val_eqP; rewrite /= ?inordK.
+  rewrite eq_sym => ->.
+  by split=> //; apply/eqP/val_eqP; rewrite /= ?inordK.
+have npeg4E p : [\/ p = peg0, p = peg1, p = npeg2 | p = npeg3].
+  have /subsetP /(_  (v N)) := cH.
+  rewrite /npeg3 /npeg2 !inE => /(_ (codom_f v N))/orP[]/eqP->.
+    by rewrite eqxx; apply: peg4E.
+  rewrite ifN; last by apply/eqP/val_eqP; rewrite /= !inordK.
+  by have [] := (peg4E p) => ->; 
+    [apply: Or41 | apply: Or42| apply: Or44 | apply: Or43].
+Admitted.
 
 End Hanoi4.
 
