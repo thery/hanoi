@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Import gdist ghanoi triangular phi hanoi3.
+Require Import gdist ghanoi triangular phi hanoi3 psi.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -14,12 +14,12 @@ Section Hanoi4.
 
 Implicit Type p : peg 4.
 
-Let peg1 : peg 4 := ord0.
-Let peg2 : peg 4 := inord 1.
-Let peg3 : peg 4 := inord 2.
-Let peg4 : peg 4 := inord 3.
+Let peg0 : peg 4 := ord0.
+Let peg1 : peg 4 := inord 1.
+Let peg2 : peg 4 := inord 2.
+Let peg3 : peg 4 := inord 3.
 
-Lemma peg4E p : [\/ p = peg1, p = peg2, p = peg3 | p = peg4].
+Lemma peg4E p : [\/ p = peg0, p = peg1, p = peg2 | p = peg3].
 Proof.
 by case: p => [] [|[|[|[|]]]] // H; 
    [apply: Or41|apply: Or42|apply: Or43|apply: Or44];
@@ -109,6 +109,25 @@ apply: gdist_liftln => // [i j|].
   by (apply/idP/idP; apply: contra => /eqP) => [/lift_inj->|->].
 by apply: move_connect.
 Qed.
+Check psi.
+
+(* This is theorem 2.9 *)
+Lemma phi_2_9 n (u v : configuration 4 n) (E := [set i | u i == peg0 ]) : 
+  (codom v) \subset [:: peg2 ; peg3] -> psi E  <= `d[u, v]_hmove.
+Proof.
+elim: n u v E => // [u v E cH |n IH u v E cH].
+  suff ->: E = set0 by rewrite psi_set0.
+  by apply/setP=> [] [].
+pose N : disk n.+1 := ord_max.
+have [NiE|NniE] := boolP (N \in E); last first.
+  
+  Search psi.
+Search gdist cliftrn.
+Check cliftrn.
+
+Check plift.
+
+Search psi.
 
 End Hanoi4.
 
