@@ -1044,3 +1044,196 @@ apply: leq_trans.
   by apply: connect_move.
 by apply: IH.
 Qed.
+
+Section ISet.
+
+Definition sorted (s : seq nat) := 
+  forall i j, i < size s -> j < size s -> (nth 0 s i < nth 0 s j) = (i < j).
+
+Lemma sorted_cons a s : sorted (a :: s) -> sorted s.
+Proof. by move=> H i j iH jH; rewrite -[in RHS]ltnS -[in RHS]H.
+Qed.
+
+Lemma sorted_iota i j : sorted (iota i j).
+Proof.
+move=> i1 j1; rewrite size_iota => i1Lj j1Lj.
+by rewrite !nth_iota // ltn_add2l.
+Qed.
+
+Lemma sorted_skip a b s : sorted (a :: b :: s) -> sorted (a :: s).
+Proof.
+move=> Hs [|i] [|j] iH jH //=; first by rewrite ltnn.
+- by rewrite (Hs 0 j.+2).
+- by rewrite (Hs i.+2 0).
+by rewrite (Hs i.+2 j.+2).
+Qed.
+
+Lemma sorted_filter (s : seq nat) (p : pred nat) :
+  sorted s -> sorted (filter p s).
+Proof.
+have F a s1 i :
+   sorted (a :: s1) -> i < size (filter p s1) -> a < nth 0 (filter p s1) i.
+  elim: s1 i => //= b s1 IH i abS.
+  have [pbT|pbF] := boolP (p b).
+    case: i => [|i1] /= sH; first by rewrite (abS 0 1).
+    apply: IH => //.
+    by apply: sorted_skip abS.
+  apply: IH.
+  by apply: sorted_skip abS.
+elim: s => //= a s IH aS.
+have sS := sorted_cons aS.
+have [paT|paF] := boolP (p a); last by apply: IH.
+move=> [|i] [|j] iH jH /=.
+- by rewrite ltnn.
+- by rewrite F.
+- by rewrite ltnNge ltnW // F.
+by rewrite ltnS (IH sS).
+Qed.
+
+
+
+(* Number of disks *)
+Variable n : nat.
+(* Subset of disks *)
+Variable sd : {set disk n}.
+(* Number of pegs *)
+Variable k : nat.
+(* Subset of pegs *)
+Variable sp : {set peg k}.
+(* The subset is non empty *)
+Variable p0 : peg k.
+Variable p0Isp : p0 \in sp.
+
+(* relations on peg *)
+Variable rel1 : rel (peg k). 
+Variable rel2 : rel (peg #|sp|). 
+Hypothesis rel_compat : 
+  forall p1 p2, p1 \in sp -> p2 \in sp ->
+    rel1 p1 p2 -> rel2 (enum_rank_in p0Isp p1) (enum_rank_in p0Isp p2).
+
+(* Valid conf : disk in sd are on pegs in sp *)
+Definition cvalid (c : configuration k n) :=
+  [forall i, (i \in sd) ==> (c i \in sp)].
+
+Lemma cvalidP (c : configuration k n) :
+  reflect (forall i, i \in sd -> c i \in sp)
+          (cvalid c).
+Proof.
+apply: (iffP forallP) => [H d|H d]; first by have /implyP := H d.
+by apply/implyP/H.
+Qed.
+
+Lemma enum_ord_inord m : (enum 'I_m.+1) = [seq inord i | i <- iota 0 m.+1].
+Proof.
+rewrite -val_ord_enum -map_comp /=.
+rewrite enumT unlock /=.
+elim: (ord_enum _) => //= a l <-.
+by rewrite inord_val.
+Qed.
+
+(* To be reworked ! *)
+Lemma sorted_enum_val (m : nat) (s : {set 'I_m}) (i j : 'I_#|s|) :
+   (enum_val i) < (enum_val j) = (i < j).
+Proof.
+case: m s i j => [s|m s i j].
+  rewrite (_ : s = set0).
+    case=> m H j; apply: False_ind.
+    by rewrite cards0 in H.
+  by apply/setP=> [] []. 
+have := ltn_ord i; have := ltn_ord j; rewrite {2 4}cardE.
+rewrite /enum_val /= /(enum _) -enumT enum_ord_inord => iL jL.
+have <-// := @nth_map ('I_m.+1) (enum_default i) nat 0 (@nat_of_ord m.+1).
+have <-// := @nth_map ('I_m.+1) (enum_default j) nat 0 (@nat_of_ord m.+1).
+have F k1 k2 :  k1 + k2 <= m.+1 ->
+  [seq (nat_of_ord i) | i <- [seq inord i0 | i0 <- iota k1 k2] & mem s i] =
+  (filter (fun i0 => mem s (inord i0))  (iota k1 k2)).
+  elim: k2 k1 => //= k2 IH k1 k1k2Lm.
+  case: (_ \in _) => //=.
+  rewrite inordK //.
+  rewrite IH //.
+  by rewrite addSnnS.
+  by apply: leq_trans k1k2Lm; rewrite -addSnnS leq_addr.
+  apply: IH.
+  by rewrite addSnnS.
+rewrite F //.
+have : j < size ([seq i0 <- iota 0 m.+1 | mem s (inord i0)]).
+  by move: iL; rewrite -F // size_map.
+have : i < size ([seq i0 <- iota 0 m.+1 | mem s (inord i0)])
+  by move: jL; rewrite -F // size_map.
+apply: sorted_filter => //.
+by apply: sorted_iota.
+Qed.
+
+Definition cproj (c : configuration k n) : configuration #|sp| #|sd| := 
+  [ffun i => enum_rank_in p0Isp (c (enum_val i))].
+
+Lemma on_top_cproj c d (dIsd : d \in sd) : 
+  cvalid c -> on_top d c -> on_top (enum_rank_in dIsd d) (cproj c).
+Proof.
+move=> /= /cvalidP cV /on_topP dO.
+apply/on_topP => /= d1 H.
+rewrite leq_eqVlt; case: eqP => //= /eqP dDd1.
+rewrite -[d1](enum_valK_in dIsd) -sorted_enum_val !enum_rankK_in //; last first.
+  by apply: enum_valP.
+rewrite ltn_neqAle.
+case: eqP => [/eqP /val_eqP dEd1 | /eqP dDd1' /=].
+  by case/eqP: dDd1; rewrite {2}dEd1 enum_valK_in.
+rewrite !ffunE enum_rankK_in // in H.
+apply: dO.
+apply: (@enum_rank_in_inj _ _ _ _ p0Isp p0Isp) => //.
+  by apply: cV.
+by apply/cV/enum_valP.
+Qed.
+
+Lemma move_cproj(c1 c2 : configuration k n) : 
+  all cvalid [::c1; c2] ->
+  move rel1 c1 c2 -> (cproj c1) != (cproj c2) ->
+  move rel2 (cproj c1) (cproj c2).
+Proof.
+rewrite /=.
+move=> /= /and3P[c1V c2V _]  /moveP [d [dH1 dH2 dH3 dH4]] c1Dc2.
+have [dIsd|dNIsd] := boolP (d \in sd); last first.
+  case/eqP: c1Dc2.
+  apply/ffunP => i; rewrite !ffunE.
+  apply: enum_val_inj.
+  rewrite !enum_rankK_in ?(cvalidP _ c1V) ?(cvalidP _ c2V) ?enum_valP //.
+  apply: dH2.
+  apply: contra dNIsd => /eqP->.
+  by apply: enum_valP.
+apply/moveP; exists (enum_rank_in dIsd d); split => /=.
+- rewrite !ffunE !enum_rankK_in //.
+  by apply: rel_compat=> //; [apply: (cvalidP _ c1V) | 
+                              apply: (cvalidP _ c2V)].
+- move=> /= d2 dDd2.
+  rewrite !ffunE.
+  congr (enum_rank_in _ _).
+  apply: dH2.
+  rewrite -[d](enum_rankK_in dIsd) //.
+  by apply /eqP => /enum_val_inj /eqP; rewrite (negPf dDd2).
+- by apply: on_top_cproj.
+by apply: on_top_cproj.
+Qed.
+
+Lemma path_cproj (c : configuration _ _) cs :
+    all cvalid (c :: cs) ->
+    path (move rel1) c cs ->
+    path (move rel2) (cproj c) (rm_dup (cproj c) [seq (cproj i) | i <- cs]).
+Proof.
+elim: cs c => //= c1 cs IH c => /and3P[c1V c2V c3V] /andP[cMc1 c1Pcs].
+case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
+rewrite move_cproj => //=; first by apply: IH; rewrite ?c2V.
+by rewrite c1V c2V.
+Qed.
+
+Lemma gdist_cproj c1 c2 cs : 
+    all cvalid (c1 :: cs) -> last c1 cs = c2 -> path (move rel1) c1 cs ->
+   `d[cproj c1, cproj c2]_(move rel2) <= size cs.
+Proof.
+move=> cV cL cPcs.
+have := size_rm_dup (cproj c1) [seq (cproj i) | i <- cs].
+rewrite size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply: path_cproj.
+by rewrite last_rm_dup last_map cL.
+Qed.
+
+End ISet.
