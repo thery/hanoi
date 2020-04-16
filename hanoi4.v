@@ -110,21 +110,30 @@ apply: gdist_liftln => // [i j|].
 by apply: move_connect.
 Qed.
 
+Lemma trshift_lift n (i : 'I_ n) : trshift 1 i = lift ord_max i.
+Proof.
+apply/val_eqP=> /=.
+by rewrite /bump leqNgt ltn_ord.
+Qed.
+
 (* This is theorem 2.9 *)
 Lemma phi_2_9 n (u v : configuration 4 n) (E := [set i | u i == peg0 ]) : 
   (codom v) \subset [:: peg2 ; peg3] -> psi E  <= `d[u, v]_hmove.
 Proof.
-elim: n u v E => // [u v E cH |n IH u v E cH].
+revert E.
+elim: n u v => // [u v E cH |n IH u v E cH].
   suff ->: E = set0 by rewrite psi_set0.
   by apply/setP=> [] [].
 pose N : disk n.+1 := ord_max.
 have [NiE|NniE] := boolP (N \in E); last first.
   have->: E = E :\ N.
-    apply/setP=> i; rewrite !inE.
+    apply/setP=> i; rewrite 2![in RHS]inE.
     case: eqP => // ->.
     by rewrite (negPf NniE).
   rewrite psi_ord_max.
   apply: leq_trans (gdist_cunlift (connect_move _ _)).
+  have -> : [set i | lift ord_max i \in E] = [set i | ↓[u] i == peg0].
+    by apply/setP => i; rewrite !inE /= !ffunE // trshift_lift.
   apply: IH.
   apply/subsetP=> i /codomP[j]; rewrite !ffunE !inE => ->.
   have /subsetP /(_  (v (trshift 1 j))) := cH.
@@ -137,7 +146,7 @@ have [np2Dp0 np2Dp1] : (npeg2 != peg0) /\ (npeg2 != peg1).
   have /subsetP /(_  (v N)) := cH.
   by rewrite /npeg2 /peg2 !inE => /(_ (codom_f v N))/orP[]/eqP->; 
      split; apply/eqP/val_eqP; rewrite /= ?inordK.
-have [np3Dp0 np3Dp1 np3Dp3] :
+have [np3Dp0 np3Dp1 np3Dp2] :
    [/\ npeg3 != peg0,  npeg3 != peg1 & npeg3 != npeg2].
   rewrite /npeg3; case: (_ =P peg2) => [->|/eqP].
     by split; apply/eqP/val_eqP; rewrite /= ?inordK.
@@ -150,6 +159,55 @@ have npeg4E p : [\/ p = peg0, p = peg1, p = npeg2 | p = npeg3].
   rewrite ifN; last by apply/eqP/val_eqP; rewrite /= !inordK.
   by have [] := (peg4E p) => ->; 
     [apply: Or41 | apply: Or42| apply: Or44 | apply: Or43].
+have {}cH : codom v \subset [:: npeg2; npeg3].
+  apply/subsetP=> i /(subsetP cH); rewrite /npeg3 /npeg2 !inE.
+  have := subsetP cH (v N); rewrite !inE codom_f => /(_ isT) /orP[] /eqP->.
+    by rewrite eqxx.
+  by rewrite orbC ifN // /peg2 /peg3; apply/eqP/val_eqP; rewrite /= !inordK.
+have /gdist_path [g [gH1 gH2 gH3 <-]] := connect_move u v.
+pose E' := [set i | [exists c, (c \in (u :: g)) && (c i == npeg3) ]] :&: E.
+have [Ez|EnZ] := boolP (E' == set0).
+  pose P := [set~ npeg3].
+  have aH : all (cvalid E P) (u :: g).
+    apply/allP => c cIg; apply/cvalidP => /= i iIE.
+    rewrite !inE; apply/eqP=> ciP3.
+    have /eqP/setP/(_ i) := Ez.
+    rewrite [in _ \in set0]inE => /idP[].
+    rewrite 2!inE iIE andbT.
+    by apply/existsP; exists c; rewrite cIg; apply/eqP.
+  have p0Isp : peg0 \in P by rewrite !inE eq_sym.
+  have F p1 p2 : p1 \in P -> p2 \in P -> drel p1 p2 -> 
+                    drel (enum_rank_in p0Isp p1) (enum_rank_in p0Isp p2).
+    rewrite !inE /drel /= => p1D3 p2Dp3 p1Dp2.
+    apply: contra_neq p1Dp2 => /enum_rank_in_inj.
+    by rewrite !inE; apply.
+  apply: leq_trans (gdist_cproj F aH gH2 gH1).
+  have -> : cproj E p0Isp u = `c[enum_rank_in p0Isp peg0].
+    apply/ffunP=> i.
+    rewrite !ffunE; congr (enum_rank_in _ _).
+    by have := enum_valP i; rewrite !inE; apply/eqP.
+  have -> : cproj E p0Isp v = `c[enum_rank_in p0Isp npeg2].
+    apply/ffunP=> i.
+    rewrite !ffunE; congr (enum_rank_in _ _).
+    have := subsetP cH (v (enum_val i)); rewrite !inE codom_f => /(_ isT).
+    case/orP=> /eqP //.
+    have /eqP/setP/(_ (enum_val i)) := Ez.
+    have := enum_valP i.
+    rewrite !inE => -> /idP/negP; rewrite andbT negb_exists.
+    by move=> /forallP/(_ v); rewrite -{1}gH2 mem_last => /= /eqP.
+  have : (enum_rank_in p0Isp peg0) != (enum_rank_in p0Isp npeg2).
+    rewrite eq_sym; apply/eqP => /enum_rank_in_inj.
+    rewrite !inE eq_sym np3Dp2 eq_sym np3Dp0 => /(_ isT isT) H.
+    by case/eqP: np2Dp0.
+  have U : #|P| = 3.
+    have := cardsC [set npeg3]; rewrite -/P.
+    by rewrite cards1 add1n card_ord => [] [].
+  move: (enum_rank_in p0Isp peg0) (enum_rank_in p0Isp npeg2).
+  rewrite U => u1 v1 u1Dv1.
+  rewrite gdist_perfect (negPf u1Dv1) muln1.
+  apply: psi_exp.
+  rewrite -{5}[n.+1]card_ord.
+  by apply: max_card.
 Admitted.
 
 End Hanoi4.
