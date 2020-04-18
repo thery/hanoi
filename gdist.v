@@ -127,6 +127,47 @@ apply/and3P; split=> //.
 by rewrite H2p.
 Qed.
 
+Lemma gdist_catl t1 t2 p1 p2 : 
+   size (p1 ++ p2) = `d[t1, t2] ->
+   path r t1 (p1 ++ p2) ->
+   last t1 (p1 ++ p2) = t2 ->
+   size p1 = `d[t1, last t1 p1].
+Proof.
+move => sp1p2D t1Pp1p2 t1p1p2Lt2.
+move: t1Pp1p2; rewrite cat_path => /andP[t1Pp1 tlLp1Pp2].
+have /gdist_path[p3 [t1Pp3 t1p3L _ p3SE]] : connect r t1 (last t1 p1).
+  by apply/connectP; exists p1.
+have : `d[t1, last t1 p1] <= size p1 by rewrite gdist_path_le.
+rewrite leq_eqVlt => /orP[/eqP//|dLSp1].
+have : size(p3 ++ p2) < `d[t1, t2] by rewrite -sp1p2D !size_cat ltn_add2r p3SE.
+rewrite ltnNge => /negP[].
+apply: gdist_path_le; first by rewrite cat_path t1Pp3 t1p3L.
+by rewrite last_cat t1p3L -last_cat.
+Qed.
+
+Lemma gdist_catr t1 t2 p1 p2 : 
+   size (p1 ++ p2) = `d[t1, t2] ->
+   path r t1 (p1 ++ p2) ->
+   last t1 (p1 ++ p2) = t2 ->
+   size p2 = `d[last t1 p1, t2].
+Proof.
+move => sp1p2D t1Pp1p2 t1p1p2Lt2.
+move: t1Pp1p2; rewrite cat_path => /andP[t1Pp1 tlLp1Pp2].
+have /gdist_path[p3 [t1Lp1Pp3 t1Lp1p3L _ p3SE]] : connect r (last t1 p1) t2.
+  by apply/connectP; exists p2 => //; rewrite -last_cat.
+have : `d[last t1 p1, t2] <= size p2 by rewrite gdist_path_le // -last_cat.
+rewrite leq_eqVlt => /orP[/eqP//|dLSp1].
+have : size(p1 ++ p3) < `d[t1, t2] by rewrite -sp1p2D !size_cat ltn_add2l p3SE.
+rewrite ltnNge => /negP[].
+apply: gdist_path_le; first by rewrite cat_path t1Pp1.
+by rewrite last_cat.
+Qed.
+
+Lemma gdist_cons t1 t2 a p  : 
+  size (a :: p) = `d[t1, t2] -> path r t1 (a :: p) -> 
+  last a p = t2 -> size p = `d[a, t2].
+Proof. by exact: (@gdist_catr t1 t2 [::a]). Qed. 
+
 Lemma gdist_triangular t1 t2 t3 : `d[t1, t2] <= `d[t1, t3] + `d[t3, t2].
 Proof.
 have [/gdist_path[p1 [H1p1 H2p1 H3p1 <-]] |/gdist_nconnect->] 
@@ -201,7 +242,7 @@ Qed.
 End gdist.
 
 Notation " `d[ t1 , t2 ]_ r " := (gdist r t1 t2) (at level 10,
-  format " `d[ t1 ,  t2 ]_ r ").
+  format "`d[ t1 ,  t2 ]_ r").
 
 Section gdistProp.
 
