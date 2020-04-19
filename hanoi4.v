@@ -3,8 +3,6 @@ Require Import tsplit gdist ghanoi triangular phi hanoi3 psi.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
-Unset Printing Implicit Defensive.
-
 
 Section Hanoi4.
 
@@ -18,6 +16,7 @@ Let peg0 : peg 4 := ord0.
 Let peg1 : peg 4 := inord 1.
 Let peg2 : peg 4 := inord 2.
 Let peg3 : peg 4 := inord 3.
+
 
 Lemma peg4E p : [\/ p = peg0, p = peg1, p = peg2 | p = peg3].
 Proof.
@@ -212,7 +211,7 @@ Qed.
 (* initial section of an ordinal *)
 Definition isO n t := [set i | (i : 'I_n) < t].
 
-Lemma is0E n t : isO n t = sint n 0 t.
+Lemma isOE n t : isO n t = sint n 0 t.
 Proof. by apply/setP => i; rewrite !inE. Qed.
 
 Lemma mem_isO n t i : (i \in isO n t) = (i < t).
@@ -603,6 +602,95 @@ have [KLT|TLK] := leqP (delta K) T; last first.
   rewrite U => u1 v1 u1Dv1.
   rewrite gdist_perfect (negPf u1Dv1) muln1 /K.
   by rewrite (cardsD1 N) inE NiE TLN.
+pose s := ∇((T + K).+1).
+(* This is 3.7 *)
+have psiDN : psi E - psi (E :\ N) <= 2 ^ s.-1. 
+  apply: psi_delta => //.
+  rewrite -isOE.
+  set tS1 := isO _ _; pose tS2 := isO n.+1 T.+1. 
+  apply: leq_trans (_ : #| E'' :|: (tS2 :\: tS1) | <= s).
+    apply/subset_leq_card/subsetP => i.
+    by rewrite !inE ltnS => /andP[-> ->]; case: (leqP i T).
+  apply: leq_trans (_ : #| E''|  + #| tS2 :\:  tS1 | <= s).
+    by rewrite cardsU leq_subr.
+  rewrite -/K.
+  case: (leqP T.+1 (delta s)) => [TLd|dLT].
+    rewrite (_ : _ :\: _ = set0) ?cards0 ?addn0.
+      apply: leq_trans (_ : ∇ T <= _); first by rewrite root_delta_le.
+      by apply: troot_le; rewrite -addnS leq_addr.
+    apply/setP=> i; rewrite !inE.
+    case: leqP => //= H.
+    by rewrite ltnS leqNgt (leq_trans TLd).
+  rewrite (_ : tS2 :\: tS1 = sint n.+1 (delta s) T.+1). 
+    rewrite card_sint //.
+    rewrite -(@leq_add2r (delta s)) -addnA subnK; last by rewrite ltnW.
+    rewrite [s + _]addnC -ltnS -!addnS -deltaS !addnS.
+    by rewrite -root_delta_lt [K + _]addnC -/s.
+  by apply/setP => i; rewrite !inE -leqNgt.
+(* This is 3. 8 *)
+have duz0_leq2 : psi E - 2 ^ s.-1 <= `d[u, z0]_hmove.
+  apply: leq_trans duz0_leq. 
+  by rewrite leq_subCl.
+have [|K_gt0] := leqP K 0.
+  rewrite leqn0 => /eqP KE0.
+  have TE : T = N.
+    apply/val_inj/eqP; rewrite eqn_leq [T <= _](ltn_ord T) /=.
+    suff : N \notin E'' by rewrite inE NiE -leqNgt.
+    suff -> : E'' = set0 by rewrite inE.
+    by apply: cards0_eq.
+  pose c := z2p N.
+  case: (@peg4comp3 p0 np2 np3) => [|||p1 [[p1Dnp3 p1Dnp2 p1Dp0] Hz]];
+      try by rewrite eq_sym.
+  have cDnp2 : c != np2 by rewrite /c.
+  have /peg4comp2[pp2 [pp3 [[H1 H2 H3] [H4 H5] H6]]] := cDnp2.
+  pose a := if (pp2 \in [:: p0 ; np3]) && (pp3 \in [:: p0 ; p1])
+            then pp2 else pp3.
+  pose b := if (pp2 \in [:: p0 ; np3]) && (pp3 \in [:: p0 ; p1]) 
+            then pp3 else pp2.
+  have [aDc aD2 aDb bDc bDnp2] :
+       [/\ a != c, a != np2, a != b, b != c & b != np2]. 
+    by rewrite /a /b; case: (_ && _); split; rewrite // eq_sym.
+  have /andP[aI bI] : (a \in [:: p0; np3]) && (b \in [:: p0; p1]).
+    rewrite  /a /b !inE;
+       case: (Hz c) cDnp2 H5 H4 H3 H2 H1 => ->; 
+           rewrite /= ?(eqxx, andbT, andbF, orbT, orbF);
+       case: (Hz pp2) => ->; rewrite /= ?(eqxx, andbT, andbF, orbT, orbF) ;
+       case: (Hz pp3) => ->; rewrite /= ?(eqxx, andbT, andbF, orbT,orbF) //;
+       rewrite ?[_ == p1]eq_sym ?[_ == np2]eq_sym ?[_ == np3]eq_sym;
+       do 6 (case: eqP; rewrite ?eqxx ?orbT //=).
+  have Hz1 p : [\/ p = np2, p = c, p = a | p = b].
+    by rewrite /a /b; case: (_ && _); case: (H6 p);
+       (exact: Or41 ||exact: Or42 || exact: Or43 || exact: Or44).
+pose A := [set i in isO n n| ↓[z2] i == a].
+pose B := [set i in isO n n| ↓[z2] i == b].
+case/moveP : z2pMz2 => d [_ dH1 /on_topP dH2 /on_topP dH3].
+have dE : d = N.
+  apply/eqP; rewrite -[_ == _]negbK.
+  have : z2p N != z2 N by rewrite z2N2.
+  by apply: contra => H; apply/eqP/dH1.
+have z2iD2 i : ↓[z2] i != np2.
+  rewrite -z2N2 -dE ffunE.
+  have: ~~ (d <= (trshift 1 i)) by rewrite -ltnNge dE /=.
+  by apply: contra  =>  /eqP H; apply: dH3.
+have z2iDc i : ↓[z2] i != c.
+  rewrite /c ffunE.
+  have: ~~ (d <= trshift 1 i) by rewrite -ltnNge dE /=.
+  move=> iLN; rewrite -dE eq_sym -dH1.
+    have: ~~ (d <=  trshift 1 i) by rewrite -ltnNge dE /=.
+    by apply: contra  =>  /eqP H; apply: dH2.
+  by rewrite neq_ltn dE /= ltn_ord orbT.
+have ABE : A :|: B = sint n 0 n.
+  apply/setP=> i; rewrite !inE.
+  case: leqP => //= iLn.
+  by case: (Hz1 (↓[z2] i)) (z2iD2 i) (z2iDc i) => ->; rewrite eqxx ?orbT.
+  (* This is 3.9 *)
+  have psiAB_le :  2 ^ ∇(T + K + 1) + psi (isO N N) <= (psi A + psi B).+1.*2.
+    rewrite -leq_double -(leq_add2r 1) !doubleS !addSnnS.
+    have := @psi_cap_ge n A B.
+    rewrite ABE card_sint // subn0 => /(_ (leqnn _)) /(leq_trans _)-> //.
+    rewrite (@phi_3_5_4_phi N) // !addnS ltnS addn0 isOE doubleD // leq_add2r.
+    rewrite KE0 addn0 TE addn0 /= -addnn leq_add2r.
+    by rewrite leq_pexp2l // troot_le.
 Admitted.
 
 End Hanoi4.

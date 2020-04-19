@@ -37,6 +37,9 @@ rewrite leq_eqVlt => /orP[/eqP->//|/IH /leq_trans->//].
 by rewrite phiS leq_addr.
 Qed.
 
+Lemma phi_gt0 n : (0 < phi n) = (0 < n).
+Proof. by case: n. Qed.
+
 Lemma phi_deltaD n p :
   p <= n.+1 -> phi (delta n + p) = 1 + (n + p) * 2 ^ n - 2 ^ n.
 Proof.

@@ -426,11 +426,12 @@ by rewrite ltnS -!subn1 leq_sub2r // leq_subr.
 Qed.
 
 (* This is 2.2 *)
-Lemma psi_sint_phi n : n <= N -> psi `[n] = (phi n.+1).-1./2.
+Lemma psi_sint_phi n : n <= N -> (psi `[n]).*2 = (phi n.+1).-1.
 Proof.
 move=> nLN.
 have [|nP] := leqP n 0; first by case: (n)=> //; rewrite psi_sint0.
 apply/eqP; rewrite -(eqr_nat int_numDomainType).
+rewrite -muln2 natrM mulr_natr.
 rewrite psi_aux_sint // psi_auxE_lt.
 rewrite (_ : [set _ | _] = [set i in `[n] | delta (troot n) <= i]);
    last first.
@@ -466,11 +467,10 @@ rewrite addnS -addSn prednK; last first.
 rewrite -{3}[m]prednK ?troot_gt0 //.
 rewrite expnS mul2n -addnn mulnDr addnA natrD addrK.
 rewrite mulnC -mulnDl addSnnS prednK ?troot_gt0 //.
-rewrite eqr_nat.
+rewrite -mulr_natr -natrM muln2 eqr_nat.
 rewrite phi_modSE -/m -/p.
 rewrite add1n -pred_Sn addnC -{4}[m]prednK ?troot_gt0 //.
-rewrite expnS mulnCA mul2n.
-by rewrite (half_bit_double _ false).
+by rewrite expnS mulnCA mul2n.
 Qed.
 
 Lemma psi_sint_leq a b : a <= b <= N -> psi `[a] <= psi `[b].
@@ -485,15 +485,10 @@ Proof.
 move=> nLN.
 have F : 0 < phi n.+1.
   by apply: phi_le (_ : 1 <= _).
+apply: double_inj; rewrite doubleD.
 rewrite !psi_sint_phi //; last by apply: ltnW.
-rewrite phiE big_ord_recr -phiE prednDl //.
-rewrite halfD.
-have := phi_odd n.+1.
-case: phi => // k.
-rewrite [odd _]/= => /negPf->.
-have := troot_gt0 (isT : 0 < n.+1).
-case: troot => // k1 _.
-by rewrite expnS odd_mul add0n mul2n (half_bit_double _ false).
+rewrite -mul2n -expnS prednK ?troot_gt0 //.
+by rewrite phiE big_ord_recr -phiE prednDl.
 Qed.
 
 (* This is 2.2 *)
@@ -501,29 +496,13 @@ Lemma psi_leD a b :
   a + b <= N -> psi `[a + b] <= (psi `[a]).*2 + 2 ^ (b.-1).
 Proof.
 case: b => [abLN|b abLN]; first by rewrite addn0 -addnn -addnA leq_addr.
+rewrite -leq_double doubleD [_.+1.-1]/=.
 rewrite !psi_sint_phi //; last first.
   by apply: leq_trans abLN; rewrite leq_addr.
-rewrite -addSn -pred_Sn.
-set x := phi _.+1.
-have xP : 0 < x by apply: (@phi_le 1).
-have <- : ((x.-1).*2 + 2 ^ b.+1)./2 = (x.-1)./2.*2 + 2 ^ b.
-  rewrite halfD -mul2n odd_mul add0n expnS !mul2n.
-  rewrite !(half_bit_double _ false).
-  suff <- : x.-1 = (x.-1)./2.*2 by []. 
-  rewrite -[X in X = _]odd_double_half.
-  suff /negPf-> : ~~ odd x.-1 by [].
-  rewrite /x.
-  by case: phi xP (phi_odd a.+1) => //= n; case: odd.
-apply: half_leq.
-rewrite -ltnS prednK ?(phi_le 1) //.
-rewrite -subn1 doubleB !subnS subn0 -!prednDl ?prednK ?prednDr.
-- by have := phi_leD a.+1 b.+1.
-- by rewrite expn_gt0.
-- by rewrite addn_gt0 double_gt0 xP.
-- by rewrite expn_gt0.
-- by rewrite double_gt0 xP.
-rewrite -subn1 ltn_subRL.
-by apply: (leq_double 1).
+rewrite -addSn -ltnS prednK ?phi_gt0 //.
+apply: leq_trans (phi_leD _ _) _.
+rewrite -{1}[phi (a.+1)]prednK ?phi_gt0 // doubleS.
+by rewrite expnS mul2n -prednDr ?double_gt0 ?expn_gt0.
 Qed.
 
 (* This is 2.3 *)
@@ -538,7 +517,7 @@ have thLN : 3 <= N by apply: leq_trans n2LN; rewrite addSnnS leq_addl.
 have [|tLs] := leqP s 1.
   case: s => [|[|]] //; first by rewrite psi_sint2 ?(leq_trans _ thLN).
   by rewrite psi_sint3.
-rewrite psi_sint_phi; last first.
+rewrite -leq_double psi_sint_phi; last first.
   apply: leq_trans n2LN.
   by rewrite leq_add2r -root_delta_le.
 rewrite phi_modSE.
@@ -546,10 +525,7 @@ have tE : troot (delta s + 2) = s.
   by apply/eqP; rewrite trootE deltaS leq_addr ltn_add2l.
 rewrite tE.
 have->: tmod (delta s + 2) = 2 by rewrite /tmod tE addnC addnK.
-rewrite add1n /=.
-have -> : 2 ^ s.+1 = (4 * 2 ^ s)./2.
-  by rewrite -[4]/(2 * 2) -mulnA mul2n [RHS](half_bit_double _ false) expnS.
-by apply: half_leq; rewrite leq_mul2r ?(leq_add2r 2 2) ?tLs ?orbT.
+by rewrite -mul2n expnS mulnA /= leq_mul2r (leq_add2r 2 2) tLs orbT.
 Qed.
 
 Lemma psi_aux0_sint n : n <= N -> psi_aux 0 `[n] = n.
@@ -816,10 +792,11 @@ Qed.
 (* This is 2.8 *)
 Lemma psi_cap_ge e1 e2 :
  #|e1 :|: e2| <= N ->
- psi e1 + psi e2 >= (phi (#|e1 :|: e2|.+3) - 5)./2./2.
+ phi (#|e1 :|: e2|.+3) <= (psi e1 + psi e2).*2.*2 + 5.
 Proof.
 move=> cLN.
 rewrite -(ler_nat int_numDomainType) natrD.
+rewrite -!muln2 !natrM !mulr_natr -mulrnA natrD.
 set n := #|_|.
 pose m := troot (n.+3).
 pose p := tmod (n.+3).
@@ -831,7 +808,9 @@ have nG : n >= delta l.
   rewrite -[n]/(n.+3.-2.-1) [n.+3]tmodE /l -/m.
   case: (m) mG2 => // [] [|] // m1 _.
   by rewrite deltaS deltaS /= !(addSn, addnS, subSS, subn0) -!addnA leq_addr.
-apply: ler_trans (_ : (psi_aux l `[0] + psi_aux l `[n] <= _))%R; last first.
+apply: ler_trans (_ : ((psi_aux l `[0] + psi_aux l `[n]) *+ 4 + 5%:R <= _))%R; 
+     last first.
+  rewrite ler_add2r ler_muln2r orFb.
   apply: ler_trans (_ : psi_aux l e1 + psi_aux l e2 <= _)%R; last first.
     by apply: ler_add; apply: psi_max.
   apply: ler_trans (_ : psi_aux l (e1 :&: e2) + psi_aux l (e1 :|: e2) <= _)%R.
@@ -861,7 +840,7 @@ have pdE : ((phi (delta l))%:R = 1 + (l%:R - 1) * (2 ^ l)%:R :> int)%R.
   rewrite phi_deltaE natrB; last first.
     by case: (l) => // l1; rewrite mulSn addnCA leq_addr.
   by rewrite natrD /= mulrBl mul1r addrA -natrM.
-have ->// : forall a b : int, a = b -> (a <= b)%R by move => a b ->.
+rewrite ler_eqVlt; apply/orP; left; apply/eqP.
 (* right part *)
 rewrite psi_aux_sintE // psi_auxE_le.
 pose f i := 2 ^ minn (∇i) l.
@@ -883,47 +862,47 @@ rewrite (_ : \sum_(_ in _ | _) _  = phi (delta l)); last first.
   case: (leqP _ l); rewrite ?andbF //.
   by rewrite root_delta_lt => /leq_trans->.
 (* right part *)
-rewrite !natrD pdE -subn1 !natrB ?expn_gt0 //.
-rewrite [(_ - 1%:R)%R]addrC -!addrA addrC !addrA.
-rewrite -subn1 natrB ?muln_gt0 ?expn_gt0 // !addrA subrK !natrM.
-rewrite  -{1}[(2 ^ _)%:R%R]mul1r ![(_ * (2 ^ _)%:R)%R]mulrC.
-rewrite -!(mulrBr, mulrDr).
-rewrite -[(_ - 1)%R]opprB [((1 - _) + _)%R]addrC addrK.
-rewrite -{2}[n]/(n.+3.-2.-1)  {2}[n.+3]tmodE -/m -/p.
-rewrite -(subnK mG2) !(addnS, addn0) !deltaS !(subnS, subn0) -/l.
-rewrite !(addnS, addSn) -!addnA [delta _ + _]addnC addnK.
-rewrite -addnS natrD [(l%:R + _)%R]addrC addrK -addSn.
-rewrite prednK; last by case: (m) mG2.
+apply: etrans
+ (_ : ((2 ^ l)%:R * (m.-1 + p)%:R - 1%:R) *+4 + 5%:R = _)%R; last first.
+ congr (_ *+ _ + _)%R.
+rewrite -!subn1 ![in RHS](natrD, natrM, natrB) ?muln_gt0 ?expn_gt0 //.
+rewrite pdE !addrA addrK; set u := (2 ^ l)%:R%R.
+rewrite [(u - 1)%R]addrC -![in RHS]addrA [RHS]addrC; congr (_ - _)%R.
+rewrite -{2}[u]mul1r ![(u * _)%R]mulrC -![(-(_ * u))%R]mulNr -!mulrDl.
+congr (_ * _)%R.
+rewrite {u}!addrA addrAC addrK.
+rewrite -[(_ - _).+1]addn1 [in RHS]natrD !addrA addrK.
+rewrite -[n]/(n.+3.-2.-1) [n.+3]tmodE -/m -/p.
+rewrite -[in RHS](subnK mG2) ![in RHS](addnS, addn0) !deltaS !(subnS, subn0).
+rewrite ![in RHS](addnS, addSn) -!addnA [delta _ + _]addnC addnK -/l.
+by rewrite ![in RHS]natrD !addrA subrK /l -(natrD _ 1%nat) -natrD.
 (* left part *)
-rewrite pE -pred_Sn -{2}(subnK mG2) expnD-2!subn2 -subnDA.
-rewrite mulnA -[2 + 2]/(1 * 4) -mulnBl.
-rewrite -[2 ^ 2]/(2 * 2) mulnA !muln2 !(half_bit_double _ false).
-rewrite [m + _ - _]subn1 prednDl // natrB; last first.
-  by rewrite muln_gt0 expn_gt0; case: (m) mG2 => // [] [].
-by rewrite natrM mulrC subn2.
+rewrite pE /l.
+case: (m) mG2 => // [] [|m1] //= _.
+rewrite addSn subn1 /=.
+rewrite (_ : 5%:R = 1 *+ 4 + 1)%R // addrA -mulrnDl.
+rewrite subrK -addn1 natrD; congr (_ + _)%R.
+rewrite -[in RHS]mulr_natr -!natrM [in RHS]mulnAC mulnC.
+congr (_ * _)%:R%R.
+by rewrite mulnC !expnS !mulnA.
 Qed.
 
 Lemma phi_3_5_4_phi n :
-   n.+1 < N -> (phi (n.+3) - 5)./2./2 = (psi `[n.+2])./2 - 1.
+   n <= N -> phi (n.+3) = 
+    (2^(troot n.+2)) + (2^(troot n.+1)) + (psi `[n]).*2.+1.
 Proof.
 move=> nLN.
-rewrite psi_sint_phi // subn1.
-rewrite (_ : (phi (n.+3)).-1 = (phi (n.+3) - 5).+4) //.
-have : phi 3 <= phi (n.+3) by apply: phi_le.
-  rewrite -[phi 3]/5.
-by case: (phi _)=> //; do 5 (case => //).
+rewrite psi_sint_phi // phiS phiS prednK ?phi_gt0 //.
+by rewrite [RHS]addnC !addnA addnAC.
 Qed.
 
 Lemma phi_3_5_4_sum n :
-   (phi (n.+3) - 5)./2./2 = (\sum_(1 <= i < n.+3) 2 ^ troot i)./2./2 - 1.
+   phi (n.+3) = (\sum_(1 <= i < n.+3) 2 ^ troot i).+1.
 Proof.
 rewrite phiE.
 rewrite -(big_mkord xpredT (fun i => 2 ^ troot i)).
 rewrite (big_cat_nat _ _ _ (_ : 0 <= 1)) //=.
-rewrite big_nat_recl //= big_mkord big_ord0 addn0 add1n.
-set s := \sum_(_ <= _ < _) _.
-have /subnK {2}<-: 3 < s by rewrite /s 2?big_nat_recl //.
-by rewrite !halfD !andbF !add0n addn1 subn1.
+by rewrite big_nat_recl //= big_mkord big_ord0 addn0 add1n.
 Qed.
 End PsiDef.
 
