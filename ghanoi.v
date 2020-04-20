@@ -433,6 +433,14 @@ Proof.
 by elim: s a => //= b l IH a; case: (_ =P _) => /= [->|_]; apply: IH.
 Qed.
 
+Lemma cat_rm_dup (A : eqType) (a : A) s1 s2 : 
+  rm_dup a (s1 ++ s2) = rm_dup a s1 ++ rm_dup (last a s1) s2.
+Proof.
+elim: s1 s2 a => //= b s1 IH s2 a.
+case: eqP => [aEb|aDb] /=; first by apply: IH.
+by congr (_ :: _); apply: IH.
+Qed.
+
 Lemma path_clshift m n (c : configuration (m + n)) cs :
     path move c cs ->
     path move (clshift c) (rm_dup (clshift c) [seq (clshift i) | i <- cs]).
@@ -451,6 +459,35 @@ case: eqP => [->|/eqP cDc1 /=]; first by apply: IH.
 by rewrite move_crshift //=; apply: IH.
 Qed.
 
+Lemma path_shift  m n (c : configuration (m + n)) cs :
+    path move c cs ->
+    size cs = size (rm_dup (clshift c) [seq (clshift i) | i <- cs]) +
+               size(rm_dup (crshift c) [seq (crshift i) | i <- cs]).
+Proof.
+elim: cs c => //= c1 cs IH c /andP[/moveP[d [d2H d2H1 d2H2 d2H3]] c1Pcs].
+case: (tsplitP d) => [j dE | k dE].
+  rewrite ifT; last first.
+    apply/eqP/ffunP=> i; rewrite !ffunE.
+    apply: d2H1; apply/eqP => /val_eqP /=.
+    by rewrite dE eqn_leq andbC leqNgt (leq_trans (ltn_ord _)) ?leq_addl.
+  rewrite ifN /=; last first.
+    apply/eqP => /ffunP /(_ j); rewrite !ffunE => cE.
+    move: d2H; rewrite (_ : c d = c1 d) ?(irH) //.
+    by rewrite (_ : d = (trshift m j)) //=; apply/val_eqP/eqP.
+  rewrite addnS; congr _.+1.
+  by apply: IH.
+rewrite ifN /=; last first.
+  apply/eqP => /ffunP /(_ k); rewrite !ffunE => cE.
+  move: d2H; rewrite (_ : c d = c1 d) ?(irH) //.
+  by rewrite (_ : d = (tlshift n k)) //=; apply/val_eqP/eqP.
+rewrite ifT; last first.
+  apply/eqP/ffunP=> i; rewrite !ffunE.
+  apply: d2H1; apply/eqP => /val_eqP /=.
+  by rewrite dE eqn_leq leqNgt (leq_trans (ltn_ord _)) ?leq_addl.
+congr _.+1.
+by apply: IH.
+Qed.
+    
 Lemma gdist_clshift n m (c1 c2 : configuration (m + n)) : 
   connect move c1 c2 ->
   `d[clshift c1, clshift c2]_move <= `d[c1, c2]_move.
@@ -473,6 +510,20 @@ apply: gdist_path_le; first by apply: path_crshift.
 by rewrite last_rm_dup last_map H2p1.
 Qed.
 
+    
+Lemma gdist_cshift n m (c1 c2 : configuration (m + n)) : 
+  connect move c1 c2 ->
+  `d[clshift c1, clshift c2]_move + `d[crshift c1, crshift c2]_move 
+       <= `d[c1, c2]_move.
+Proof.
+move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
+rewrite (path_shift H1p1).
+apply: leq_add.
+  apply: gdist_path_le; first by apply: path_clshift.
+    by rewrite last_rm_dup last_map H2p1.
+apply: gdist_path_le; first by apply: path_crshift.
+ by rewrite last_rm_dup last_map H2p1.
+ Qed.
 
 Definition cliftrn m n p (c : configuration n) : configuration (m + n) :=
   cmerge (perfect m p) c.
@@ -1237,3 +1288,89 @@ by rewrite last_rm_dup last_map cL.
 Qed.
 
 End ISet.
+
+Section ISet2.
+
+(* Number of disks *)
+Variable n : nat.
+(* Subset of disks *)
+Variable sd : {set disk n}.
+(* Number of pegs *)
+Variable k : nat.
+(* Subsets of pegs *)
+Variables sp1 sp2 : {set peg k}.
+(* The subsets are non empty *)
+Variable p1 p2 : peg k.
+Variable p1Isp1 : p1 \in sp1.
+Variable p2Isp2 : p2 \in sp2.
+
+(* relations on peg *)
+Variable rel1 : rel (peg k). 
+Variable rel2 : rel (peg #|sp1|). 
+Variable rel3 : rel (peg #|sp2|). 
+Hypothesis irH : irreflexive rel1.
+Hypothesis rel2_compat : 
+  forall pi pj, pi \in sp1 -> pj \in sp1 ->
+    rel1 pi pj -> rel2 (enum_rank_in p1Isp1 pi) (enum_rank_in p1Isp1 pj).
+Hypothesis rel3_compat : 
+  forall pi pj, pi \in sp2 -> pj \in sp2 ->
+    rel1 pi pj -> rel3 (enum_rank_in p2Isp2 pi) (enum_rank_in p2Isp2 pj).
+
+Lemma size_cproj (c : configuration _ _) cs :
+    all (cvalid sd sp1) (c :: cs) ->
+    all (cvalid (~: sd) sp2) (c :: cs) ->
+    path (move rel1) c cs ->
+    size cs = 
+      size (rm_dup (cproj sd p1Isp1 c) [seq (cproj sd  p1Isp1 i) | i <- cs]) +
+      size (rm_dup (cproj (~: sd) p2Isp2 c)
+             [seq (cproj (~: sd) p2Isp2 i) | i <- cs]).
+    
+Proof.
+elim: cs c => //= c1 cs IH c => /and3P[c1V1 c2V1 c3V1] 
+                                /and3P[c1V2 c2V2 c3V2] 
+                                /andP[/moveP[d [dH1 dH2 dH3 dH4]] c1Pcs].
+have cdDc1d : c d != c1 d.
+  by have /idP/negP := irH (c d); apply: contra => /eqP {2}->.
+have [dIsd|dNIsd] := boolP (d \in sd).
+  rewrite ifN /= ?addSn; last first.
+    apply/eqP => /ffunP /(_ (enum_rank_in dIsd d)).
+    rewrite !ffunE enum_rankK_in // => /enum_rank_in_inj => H.
+    case/eqP : cdDc1d; apply: H; first by have /cvalidP := c1V1; apply.
+    by have /cvalidP := c2V1; apply.
+  rewrite ifT; last first.
+    apply/eqP/ffunP=> i; rewrite !ffunE dH2 //.
+    have := enum_valP i; rewrite inE.
+    by apply: contra => /eqP<-.
+  by congr (_.+1); apply: IH; rewrite ?c2V1 ?c2V2.
+rewrite ifT; last first.
+  apply/eqP/ffunP=> i; rewrite !ffunE dH2 //.
+  apply: contra dNIsd => /eqP->.
+  by have := enum_valP i.
+have dd : d \in ~: sd by rewrite inE.
+rewrite ifN /= ?addSn; last first.
+  apply/eqP => /ffunP /(_ (enum_rank_in dd d)).
+  rewrite !ffunE enum_rankK_in // => /enum_rank_in_inj => H.
+  case/eqP : cdDc1d; apply: H.
+    by have /cvalidP := c1V2; apply.
+  by have /cvalidP := c2V2; apply.
+by rewrite addnS; congr (_.+1); apply: IH; rewrite ?c2V1 ?c2V2.
+Qed.
+
+Lemma gdist_cproj2 c1 c2 cs : 
+    all (cvalid sd sp1) (c1 :: cs) -> all (cvalid (~: sd) sp2) (c1 :: cs) ->
+    last c1 cs = c2 -> path (move rel1) c1 cs ->
+   `d[cproj sd p1Isp1 c1, cproj sd p1Isp1 c2]_(move rel2) +
+   `d[cproj (~: sd) p2Isp2 c1, cproj (~: sd) p2Isp2  c2]_(move rel3)
+      <= size cs.
+Proof.
+move=> cV1 cV2 cL cPcs.
+rewrite (size_cproj cV1 cV2) //.
+apply: leq_add.
+  apply: gdist_path_le; first by apply: path_cproj rel2_compat _ _ _ _.
+  by rewrite last_rm_dup last_map cL.
+apply: gdist_path_le; first by apply: path_cproj rel3_compat _ _ _ _.
+by rewrite last_rm_dup last_map cL.
+Qed.
+
+End ISet2.
+
