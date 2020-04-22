@@ -56,6 +56,9 @@ rewrite (iota_add _ 1) /= inE [t2 == _]eq_sym.
 by case: (t1 =P t2).
 Qed.
 
+Lemma gdist_gt0 t1 t2 : (0 < `d[t1, t2]) = (t1 != t2).
+Proof. by rewrite ltnNge leqn0 gdist_eq0. Qed.
+
 Lemma gdist0 t : `d[t, t] = 0.
 Proof. by apply/eqP; rewrite gdist_eq0. Qed.
 
@@ -98,88 +101,171 @@ have := gdist_card_le t1 t2.
 by rewrite leq_eqVlt -gdist_connect (negPf H) orbF.
 Qed.
 
-Lemma gdist_path t1 t2 : 
-  connect r t1 t2 -> {p |  [/\  path r t1 p,
-                                last t1 p = t2,
-                                uniq (t1 :: p) &
-                                size p = `d[t1, t2]]}. 
+(* geodesic path *)
+Definition gpath t1 t2 p :=
+  [&& path r t1 p, last t1 p == t2 & `d[t1, t2] == size p].
+
+Lemma gpathP t1 t2 p :
+  reflect ([/\ path r t1 p, last t1 p = t2 & `d[t1, t2] = size p])
+          (gpath t1 t2 p).
+Proof.
+apply: (iffP and3P) => [[t1Pp /eqP t1pLt2 /eqP t1t2D]|
+                        [t1Pp t1pLt2 t1t2D]]; first by split.
+by split => //; apply/eqP.
+Qed.
+
+Lemma gpath_connect t1 t2 : connect r t1 t2 -> {p | gpath t1 t2 p}.
 Proof.
 move=> t1Ct2.
-case: (pickP [pred p |
-        [&& path r t1 (p : `d[t1, t2].-tuple T), 
-            uniq (t1 :: p) & last t1 p == t2]]) =>
-      [p /and3P[H1P H2P /eqP H3P]|HC].
-  exists p; split => //.
-  by rewrite size_tuple.
+case: (pickP [pred p | gpath t1 t2 (p : `d[t1, t2].-tuple T)]) => [p Hp|HC].
+  by exists p.
 move: (t1Ct2); rewrite gdist_connect => dLT.
 absurd False => //.
 move: (dLT); rewrite -[#|_|](size_iota 0) -has_find.
 move => /(nth_find 0).
 rewrite -[find _ _]/`d[t1, t2].
-rewrite nth_iota // add0n => /sconnect_nP[p [H1p H2p H3p]].
-case/shortenP: H1p H2p  => p' H1p' H2p' H3p' H2p.
-have Hs : size p' == `d[t1, t2].
-  rewrite eqn_leq gdist_path_le // andbT -H3p.
-  apply: uniq_leq_size => //.
-  by case/andP: H2p'.
-have /idP[] := HC (Tuple Hs).
-apply/and3P; split=> //.
-by rewrite H2p.
+rewrite nth_iota // add0n => /sconnect_nP[p [H1p H2p /eqP H3p]].
+have /idP[] := HC (Tuple H3p).
+by apply/and3P; split=> //=; apply/eqP=> //; rewrite (eqP H3p).
 Qed.
 
-Lemma gdist_catl t1 t2 p1 p2 : 
-   size (p1 ++ p2) = `d[t1, t2] ->
-   path r t1 (p1 ++ p2) ->
-   last t1 (p1 ++ p2) = t2 ->
-   size p1 = `d[t1, last t1 p1].
+Lemma gpath_last t1 t2 p : gpath t1 t2 p -> last t1 p = t2.
+Proof. by case/gpathP. Qed.
+
+Lemma gpath_dist t1 t2 p : gpath t1 t2 p -> `d[t1, t2] = size p.
+Proof. by case/gpathP. Qed.
+
+Lemma gpath_path t1 t2 p : gpath t1 t2 p -> path r t1 p.
+Proof. by case/gpathP. Qed.
+
+Lemma last_take (A : Type) (p : seq A) t t1 j : 
+  j <= size p -> last t1 (take j p) = nth t (t1 :: p) j.
 Proof.
-move => sp1p2D t1Pp1p2 t1p1p2Lt2.
-move: t1Pp1p2; rewrite cat_path => /andP[t1Pp1 tlLp1Pp2].
-have /gdist_path[p3 [t1Pp3 t1p3L _ p3SE]] : connect r t1 (last t1 p1).
-  by apply/connectP; exists p1.
+elim: p t1 j => [t1 [|] //| a l IH t1 [|j]] //= H.
+by apply: IH.
+Qed.
+
+(* ugly proof !! *)
+Lemma gpath_uniq t1 t2 p : gpath t1 t2 p ->  uniq (t1 :: p).
+Proof.
+move=> gH; apply/(uniqP t1) => i j iH jH.
+wlog : i j iH jH / i <= j.
+  move=> H; case: (leqP i j) => [iLj|jLi]; first by apply: H.
+  by move=> /(@sym_equal _ _ _) /H->; rewrite // ltnW.
+rewrite leq_eqVlt => /orP[/eqP->//|iLj].
+case/gpathP : gH  => t1Pp t1pLt2 dt1t2E.
+case: j jH iLj => j // jH iLj.
+case: i iH iLj => [_ _ t1E | ] //.
+  pose p1 := drop j.+1 p.
+  have t1Pp1 : path r t1 p1.
+    move: (t1Pp); rewrite -[p](cat_take_drop j.+1) cat_path.
+    rewrite /= in t1E.
+    by rewrite (last_take t1) //= -t1E => /andP[].
+  have t1p1L : last t1 p1 = t2.
+    move: (t1pLt2); rewrite -[p](cat_take_drop j.+1) last_cat.
+    rewrite /= in t1E.
+    by rewrite (last_take t1) //= -t1E.
+  have [] := boolP (`d[t1, t2] <= size p1) => [|/negP[]]; last first.
+    by apply: gdist_path_le.
+  rewrite leqNgt => /negP[]. 
+  rewrite size_drop dt1t2E.
+  rewrite /= in t1E.
+  by rewrite -{2}[size p](subnK (_ : j < size p)) // addnS ltnS leq_addr.
+move=> i iH; rewrite ltnS => iLj nE.
+pose p1 := take i.+1 p ++ drop j.+1 p.
+have [] := boolP (`d[t1, t2] <= size p1) => [|/negP[]].
+  rewrite leqNgt => /negP[].
+  rewrite size_cat size_take size_drop ifT //; last first.
+    by rewrite -ltnS in iLj; apply: leq_trans iLj _.
+  rewrite dt1t2E -{2}[size p](subnK (_ : j < size _)) //.
+  by rewrite addnC ltn_add2l.
+apply: gdist_path_le.
+  move: t1Pp; rewrite -[p](cat_take_drop i.+1).
+  rewrite -[drop _ _](cat_take_drop (j - i)) !cat_path.
+  case/and3P => [-> _] /=.
+  rewrite !(last_take t1) /=; last first.
+  - rewrite size_drop -subSS.
+    by apply: leq_sub2r.
+  - by apply: leq_trans iLj _; rewrite ltnW //.
+  rewrite drop_drop addnS subnK; last by rewrite ltnW.
+  congr path.
+  move: (nE) => /= ->.
+  rewrite -[j - i]prednK //.
+  by rewrite /= nth_drop -subnS addnC subnK //.
+  by rewrite subn_gt0.
+rewrite last_cat (last_take t1) // nE.
+by rewrite -t1pLt2 -{3}[p](cat_take_drop j.+1) last_cat (last_take t1).
+Qed.
+
+
+Lemma gpath_catl t1 t2 p1 p2 : 
+   gpath t1 t2 (p1 ++ p2) -> gpath t1 (last t1 p1) p1.
+Proof.
+move=> /gpathP[].
+rewrite cat_path last_cat => /andP[t1Pp1 t1p1LPp2] t1p1Lp2Lt2 dt1t2E.
+apply/gpathP; split => //. 
 have : `d[t1, last t1 p1] <= size p1 by rewrite gdist_path_le.
 rewrite leq_eqVlt => /orP[/eqP//|dLSp1].
-have : size(p3 ++ p2) < `d[t1, t2] by rewrite -sp1p2D !size_cat ltn_add2r p3SE.
+have /gpath_connect[p3 /gpathP[H1 H2 H3]] : 
+   connect r t1 (last t1 p1) by apply/connectP; exists p1.
+have : size (p3 ++ p2) < `d[t1, t2] by rewrite dt1t2E !size_cat -H3 ltn_add2r.
 rewrite ltnNge => /negP[].
-apply: gdist_path_le; first by rewrite cat_path t1Pp3 t1p3L.
-by rewrite last_cat t1p3L -last_cat.
+apply: gdist_path_le; first by rewrite cat_path H1 // H2.
+by rewrite last_cat H2.
 Qed.
 
-Lemma gdist_catr t1 t2 p1 p2 : 
-   size (p1 ++ p2) = `d[t1, t2] ->
-   path r t1 (p1 ++ p2) ->
-   last t1 (p1 ++ p2) = t2 ->
-   size p2 = `d[last t1 p1, t2].
+Lemma gpath_catr t1 t2 p1 p2 : 
+   gpath t1 t2 (p1 ++ p2) -> gpath (last t1 p1) t2 p2.
 Proof.
-move => sp1p2D t1Pp1p2 t1p1p2Lt2.
-move: t1Pp1p2; rewrite cat_path => /andP[t1Pp1 tlLp1Pp2].
-have /gdist_path[p3 [t1Lp1Pp3 t1Lp1p3L _ p3SE]] : connect r (last t1 p1) t2.
-  by apply/connectP; exists p2 => //; rewrite -last_cat.
-have : `d[last t1 p1, t2] <= size p2 by rewrite gdist_path_le // -last_cat.
+move=> /gpathP[].
+rewrite cat_path last_cat => /andP[t1Pp1 t1p1LPp2] t1p1Lp2Lt2 dt1t2E.
+apply/gpathP; split => //. 
+have : `d[last t1 p1, t2] <= size p2 by rewrite gdist_path_le.
 rewrite leq_eqVlt => /orP[/eqP//|dLSp1].
-have : size(p1 ++ p3) < `d[t1, t2] by rewrite -sp1p2D !size_cat ltn_add2l p3SE.
+have /gpath_connect[p3 /gpathP[H1 H2 H3]] : 
+   connect r (last t1 p1) t2 by apply/connectP; exists p2.
+have : size (p1 ++ p3) < `d[t1, t2] by rewrite dt1t2E !size_cat -H3 ltn_add2l.
 rewrite ltnNge => /negP[].
-apply: gdist_path_le; first by rewrite cat_path t1Pp1.
+apply: gdist_path_le; first by rewrite cat_path H1 andbT.
 by rewrite last_cat.
 Qed.
 
-Lemma gdist_cons t1 t2 a p  : 
-  size (a :: p) = `d[t1, t2] -> path r t1 (a :: p) -> 
-  last a p = t2 -> size p = `d[a, t2].
-Proof. by exact: (@gdist_catr t1 t2 [::a]). Qed. 
+Lemma gdist_cat t1 t2 p1 p2 : 
+   gpath t1 t2 (p1 ++ p2) -> 
+   `d[t1,t2] = `d[t1, last t1 p1] + `d[last t1 p1, t2].
+Proof.
+move=> gH.
+rewrite (gpath_dist gH).
+rewrite (gpath_dist (gpath_catl gH)) (gpath_dist (gpath_catr gH)) //.
+by rewrite size_cat.
+Qed. 
+
+Lemma gpath_consl t1 t2 t3 p :  gpath t1 t2 (t3 :: p) -> `d[t1, t3] = 1.
+Proof. by move=> /(@gpath_catl _ _ [::t3]) /= /gpathP[]. Qed.
+
+Lemma gpath_consr t1 t2 t3 p : gpath t1 t2 (t3 :: p) -> gpath t3 t2 p.
+Proof. by move=> /(@gpath_catr _ _ [::t3]). Qed.
+
+Lemma gdist_cons t1 t2 t3 p : 
+   gpath t1 t2 (t3 :: p) -> `d[t1,t2] = `d[t3, t2].+1.
+Proof.
+move=> gH.
+by rewrite (@gdist_cat _ _ [::t3] p) // (gpath_consl gH).
+Qed. 
 
 Lemma gdist_triangular t1 t2 t3 : `d[t1, t2] <= `d[t1, t3] + `d[t3, t2].
 Proof.
-have [/gdist_path[p1 [H1p1 H2p1 H3p1 <-]] |/gdist_nconnect->] 
+have [/gpath_connect[p pH]|/gdist_nconnect->] 
          := boolP (connect r t1 t3); last first.
   by apply: leq_trans (gdist_card_le _ _) (leq_addr _ _).
-have [/gdist_path[p2 [H1p2 H2p2 H3p2 <-]] |/gdist_nconnect->] 
+have [/gpath_connect [p2 p2H] |/gdist_nconnect->] 
          := boolP (connect r t3 t2); last first.
   by apply: leq_trans (gdist_card_le _ _) (leq_addl _ _).
-rewrite -size_cat.
+rewrite (gpath_dist pH) (gpath_dist p2H) -size_cat.
 apply: gdist_path_le.
-  by rewrite cat_path H1p1 H2p1.
-by rewrite last_cat H2p1.
+  rewrite cat_path (gpath_path pH).
+  by rewrite (gpath_last pH) (gpath_path p2H).
+by rewrite last_cat (gpath_last pH) (gpath_last p2H).
 Qed.
 
 Lemma gdist1 t1 t2 : r t1 t2 -> `d[t1, t2] = (t1 != t2).
@@ -195,16 +281,11 @@ Lemma gdist_succ t1 t2 :
 Proof.
 case/andP => dP dT.
 move: dT dP.
-rewrite -gdist_connect => /gdist_path[[|t3 p] [H1p H2p H3p H4p]].
-  by rewrite -H4p.
-exists t3; split; first by case/andP: H1p.
-apply/eqP; rewrite eqn_leq; apply/andP; split; last first.
- rewrite -subn1 leq_subLR (_ : 1 = `d[t1, t3]).
-   by apply: gdist_triangular.
- rewrite gdist1; last by case/andP: H1p.
- by case/andP: H3p; rewrite inE negb_or => /andP[->].
-rewrite (_ : _.-1 = size p); last by rewrite -H4p.
-by apply: gdist_path_le => //; case/andP: H1p.
+rewrite -gdist_connect => /gpath_connect[[|t3 p] pH].
+  by rewrite (gpath_dist pH).
+exists t3; split.
+  by have /andP[] := gpath_path (@gpath_catl _ _ [::t3] _ pH).
+by rewrite (gdist_cons pH). 
 Qed.
 
 Lemma gdist_neighboor t1 t2 t3 : r t1 t2 ->
