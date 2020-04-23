@@ -512,9 +512,9 @@ Proof.
 apply/eqP; rewrite eqn_leq [size_lhanoi _ _]size_lhanoiE.
 have [H1 H2] := lhanoi_correct c1 c2.
 rewrite gdist_path_le //.
-have /gdist_path[p1 [H1p1 H2p1 H3p1 <-]] : hconnect c1 c2.
-  by apply: move_lconnect.
-by rewrite lhanoi_min.
+have /gpath_connect[p1 p1H] : hconnect c1 c2 by apply: move_lconnect.
+rewrite (gpath_dist p1H) lhanoi_min //; first by apply: gpath_path p1H.
+by apply: gpath_last p1H.
 Qed.
 
 Lemma gdist_lhanoi_p n p1 p2 :

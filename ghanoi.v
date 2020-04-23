@@ -185,6 +185,41 @@ have [/eqP d3Ed1|d3Dd1] := boolP (d3 == d1); last first.
 by apply: H2; rewrite d3Ed1.
 Qed.
 
+Lemma move_on_toplDl n (d d1 : disk n) (c1 c2 : configuration n) : 
+  move c1 c2 -> c1 d != c2 d -> d1 < d -> c1 d1 != c1 d.
+Proof.
+move=> c1Mc2 c1Dc2; rewrite  eq_sym ltnNge; apply: contra => /eqP.
+by have /on_topP := move_on_topl c1Mc2 c1Dc2; apply.
+Qed.
+
+Lemma move_on_toplDr n (d d1 : disk n) (c1 c2 : configuration n) : 
+  move c1 c2 -> c1 d != c2 d -> d1 <= d -> c1 d1 != c2 d.
+Proof.
+move=> c1Mc2 c1Dc2; rewrite leq_eqVlt => /orP[/val_eqP->//|dLd1].
+move: (dLd1); rewrite eq_sym ltnNge (move_disk1 c1Mc2 c1Dc2) //; last first.
+  by rewrite neq_ltn dLd1 orbT.
+apply: contra => /eqP.
+by have /on_topP := move_on_topr c1Mc2 c1Dc2; apply.
+Qed.
+
+Lemma move_on_toprDr n (d d1 : disk n) (c1 c2 : configuration n) : 
+  move c1 c2 -> c1 d != c2 d -> d1 < d -> c2 d1 != c2 d.
+Proof.
+move=> c1Mc2 c1Dc2; rewrite  eq_sym ltnNge; apply: contra => /eqP.
+by have /on_topP := move_on_topr c1Mc2 c1Dc2; apply.
+Qed.
+
+Lemma move_on_toprDl n (d d1 : disk n) (c1 c2 : configuration n) : 
+  move c1 c2 -> c1 d != c2 d -> d1 <= d -> c2 d1 != c1 d.
+Proof.
+move=> c1Mc2 c1Dc2; rewrite leq_eqVlt => /orP[/val_eqP->//|dLd1].
+  by rewrite eq_sym.
+move: (dLd1); rewrite ltnNge -(move_disk1 c1Mc2 c1Dc2) eq_sym //; last first.
+  by rewrite neq_ltn dLd1.
+apply: contra => /eqP.
+have /on_topP := move_on_topl c1Mc2 c1Dc2; apply.
+Qed.
+
 (* configuration on different pegs *)
 Definition cdisjoint m n (c1 : configuration m) (c2 : configuration n) :=
   [forall i, [forall j, c1 i != c2 j]].
@@ -287,10 +322,10 @@ Lemma gdist_merger m n (c: configuration m) (c1 c2 : configuration n) :
   connect move c1 c2 ->
   `d[cmerge c c1, cmerge c c2]_move <= `d[c1, c2]_move.
 Proof.
-move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
-rewrite -(size_map (cmerge c)).
-apply: gdist_path_le; first by rewrite path_merger.
-by rewrite [LHS]last_map H2p1.
+move=> /gpath_connect[p1 p1H].
+rewrite (gpath_dist p1H) -(size_map (cmerge c)).
+apply: gdist_path_le; first by rewrite path_merger (gpath_path p1H).
+by rewrite [LHS]last_map (gpath_last p1H).
 Qed.
 
 Lemma on_top_mergel m n (c1 : configuration m) (c2 : configuration n) d :
@@ -428,6 +463,26 @@ elim: s a => //= b l IH a; case: (_ == _); first by apply: leq_trans (IH _) _.
 by apply: IH.
 Qed.
 
+Lemma size_rm_dup_subset  (A : finType) (a : A) (s1 : {set A}) (s2 : seq A) : 
+  {subset s1 <= s2} -> a \notin s1 -> #|s1| <= size (rm_dup a s2).
+Proof.
+elim: s2 s1 a => /= [s1 a aS _|b s2 IH s1 a s1S aNIs1].
+  rewrite leqn0 cards_eq0; apply/eqP/setP=> i.
+  by rewrite inE; apply/idP => /aS.
+case: eqP=> [aEb|aDb].
+  rewrite -aEb; apply: IH => //.
+  move=> i is1; have := is1; have := s1S _ is1; rewrite inE.
+  by case/orP=> [/eqP->|//]; rewrite -aEb => aIs1; case/negP: aNIs1. 
+have [bIs1|bNIs1]/= := boolP (b \in s1); last first.
+  apply: leq_trans (IH _ _ _ bNIs1) _ => //.
+  move=> i is1; have := is1; have := s1S _ is1; rewrite inE.
+  by case/orP=> [/eqP->|//] => bIs1; case/negP: bNIs1.
+rewrite (cardsD1 b) bIs1 ltnS.
+apply: IH => [i|].
+  by rewrite !inE => /andP[iDb1 /s1S]; rewrite inE (negPf iDb1).
+by rewrite !inE eqxx.
+Qed.
+
 Lemma last_rm_dup (A : eqType) (a : A) s : last a (rm_dup a s) = last a s.
 Proof.
 by elim: s a => //= b l IH a; case: (_ =P _) => /= [->|_]; apply: IH.
@@ -492,38 +547,37 @@ Lemma gdist_clshift n m (c1 c2 : configuration (m + n)) :
   connect move c1 c2 ->
   `d[clshift c1, clshift c2]_move <= `d[c1, c2]_move.
 Proof.
-move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
-have := size_rm_dup (clshift c1) [seq (clshift i) | i <- p1].
-rewrite size_map; move/(leq_trans _); apply.
-apply: gdist_path_le; first by apply: path_clshift.
-by rewrite last_rm_dup last_map H2p1.
+move=> /gpath_connect[p pH].
+have := size_rm_dup (clshift c1) [seq (clshift i) | i <- p].
+rewrite (gpath_dist pH) size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply/path_clshift/(gpath_path pH).
+by rewrite last_rm_dup last_map (gpath_last pH).
 Qed.
 
 Lemma gdist_crshift n m (c1 c2 : configuration (m + n)) : 
   connect move c1 c2 ->
   `d[crshift c1, crshift c2]_move <= `d[c1, c2]_move.
 Proof.
-move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
-have := size_rm_dup (crshift c1) [seq (crshift i) | i <- p1].
-rewrite size_map; move/(leq_trans _); apply.
-apply: gdist_path_le; first by apply: path_crshift.
-by rewrite last_rm_dup last_map H2p1.
+move=> /gpath_connect[p pH].
+have := size_rm_dup (crshift c1) [seq (crshift i) | i <- p].
+rewrite (gpath_dist pH) size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply/path_crshift/(gpath_path pH).
+by rewrite last_rm_dup last_map (gpath_last pH).
 Qed.
 
-    
 Lemma gdist_cshift n m (c1 c2 : configuration (m + n)) : 
   connect move c1 c2 ->
   `d[clshift c1, clshift c2]_move + `d[crshift c1, crshift c2]_move 
        <= `d[c1, c2]_move.
 Proof.
-move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
-rewrite (path_shift H1p1).
+move=> /gpath_connect[p pH].
+rewrite (gpath_dist pH) (path_shift (gpath_path pH)).
 apply: leq_add.
-  apply: gdist_path_le; first by apply: path_clshift.
-    by rewrite last_rm_dup last_map H2p1.
-apply: gdist_path_le; first by apply: path_crshift.
- by rewrite last_rm_dup last_map H2p1.
- Qed.
+  apply: gdist_path_le; first by apply/path_clshift/(gpath_path pH).
+    by rewrite last_rm_dup last_map (gpath_last pH).
+apply: gdist_path_le; first by apply/path_crshift/(gpath_path pH).
+by rewrite last_rm_dup last_map (gpath_last pH).
+Qed.
 
 Definition cliftrn m n p (c : configuration n) : configuration (m + n) :=
   cmerge (perfect m p) c.
@@ -859,10 +913,10 @@ Lemma gdist_plift (c1 c2 : configuration q n) :
  connect (move r1) c1 c2 ->
   `d[plift c1, plift c2]_(move r2)  <=  `d[c1, c2]_(move r1).
 Proof.
-move=> /gdist_path [p1 [c1Pp1 lc1p2Ec2 Uc1p1 <-]].
-rewrite -(size_map plift).
-apply: gdist_path_le; first by rewrite plift_path.
-by rewrite last_map lc1p2Ec2.
+move=> /gpath_connect [p1 p1H].
+rewrite (gpath_dist p1H) -(size_map plift).
+apply: gdist_path_le; first by rewrite plift_path (gpath_path p1H).
+by rewrite last_map (gpath_last p1H).
 Qed.
 
 Lemma plift_perfect p1 : plift (perfect p1) = perfect (lift i p1).
@@ -919,10 +973,10 @@ Lemma gdist_liftln m n (c1 c2 : configuration q m) :
   gdist (move r2) (cliftln n p (plift p c1)) (cliftln n p (plift p c2)) <= 
   gdist (move r1) c1 c2.
 Proof.
-move=> /gdist_path[p1 [H1p1 H2p1 H3p1 <-]].
-rewrite -(size_map (cliftln n p \o plift p)).
-apply: gdist_path_le; first by rewrite path_liftln.
-by rewrite [LHS]last_map H2p1.
+move=> /gpath_connect[p1 p1H].
+rewrite (gpath_dist p1H) -(size_map (cliftln n p \o plift p)).
+apply: gdist_path_le; first by rewrite path_liftln (gpath_path p1H).
+by rewrite [LHS]last_map (gpath_last p1H).
 Qed.
 
 Lemma crliftn_perfect n m p1 :
@@ -1287,6 +1341,15 @@ apply: gdist_path_le; first by apply: path_cproj.
 by rewrite last_rm_dup last_map cL.
 Qed.
 
+Lemma gpath_cproj c1 c2 cs : 
+    all cvalid (c1 :: cs) -> gpath (move rel1) c1 c2 cs ->
+   `d[cproj c1, cproj c2]_(move rel2) <= `d[c1, c2]_(move rel1).
+Proof.
+move=> cV gH.
+rewrite (gpath_dist gH); apply: gdist_cproj => //; first apply: gpath_last gH.
+by apply: gpath_path gH.
+Qed.
+
 End ISet.
 
 Section ISet2.
@@ -1370,6 +1433,19 @@ apply: leq_add.
   by rewrite last_rm_dup last_map cL.
 apply: gdist_path_le; first by apply: path_cproj rel3_compat _ _ _ _.
 by rewrite last_rm_dup last_map cL.
+Qed.
+
+Lemma gpath_cproj2 c1 c2 cs : 
+    all (cvalid sd sp1) (c1 :: cs) -> all (cvalid (~: sd) sp2) (c1 :: cs) ->
+    gpath (move rel1) c1 c2 cs ->
+   `d[cproj sd p1Isp1 c1, cproj sd p1Isp1 c2]_(move rel2) +
+   `d[cproj (~: sd) p2Isp2 c1, cproj (~: sd) p2Isp2  c2]_(move rel3)
+      <= `d[c1,c2]_(move rel1).
+Proof.
+move=> cV1 cV2 gH.
+rewrite (gpath_dist gH).
+apply: gdist_cproj2 => //; first apply: gpath_last gH.
+by apply: gpath_path gH. 
 Qed.
 
 End ISet2.

@@ -330,11 +330,11 @@ Proof.
 apply/eqP; rewrite eqn_leq [size_rpeg _ _]size_rpegE.
 have [H1 H2] := rpeg_correct c1 p.
 rewrite gdist_path_le //.
-have /gdist_path[p1 [H1p1 H2p1 H3p1 <-]] : 
-        hconnect c1 (`c[p]).
+have /gpath_connect [p1 p1H] : hconnect c1 (`c[p]).
   by apply: move_connect_rpeg.
-rewrite -size_rpegE.
-by apply: rpeg_min.
+rewrite -size_rpegE (gpath_dist p1H) /=.
+apply: (rpeg_min (gpath_path p1H)) => //.
+by apply: gpath_last p1H.
 Qed.
 
 Lemma gdist_perfect n p1 p2 :
@@ -659,9 +659,9 @@ Proof.
 apply/eqP; rewrite eqn_leq.
 have [H1 H2] := hanoi_correct c1 c2.
 rewrite [size_hanoi _ _]size_hanoiE gdist_path_le //.
-have /gdist_path[p1 [H1p1 H2p1 H3p1 <-]] : hconnect c1 c2.
-  by apply:  move_connect.
-by rewrite hanoi_min.
+have /gpath_connect [p1 p1H] : hconnect c1 c2 by apply:  move_connect.
+rewrite (gpath_dist p1H) hanoi_min //; first apply: gpath_path p1H.
+by apply: gpath_last p1H.
 Qed.
 
 End Hanoi3.
