@@ -507,25 +507,50 @@ Qed.
 
 (* This is 2.3 *)
 Lemma psi_SS_le n :
-  n + 2 <= N -> psi `[n + 2] >= 2 ^(troot n).+1.
+  n.+1 < N -> psi `[n.+2] >= 2 ^(troot n).+1.
 Proof.
 case: n => [|n] n2LN; first by rewrite psi_sint2.
-have /psi_sint_leq/(leq_trans _)->// : delta (troot n.+1) + 2 <= n.+1 + 2 <= N.
-  by rewrite n2LN andbT leq_add2r -root_delta_le.
+have /psi_sint_leq/(leq_trans _)->// : (delta (troot n.+1)).+2 <= n.+3 <= N.
+  by rewrite n2LN andbT !ltnS -root_delta_le.
 set s := troot _.
-have thLN : 3 <= N by apply: leq_trans n2LN; rewrite addSnnS leq_addl.
+have thLN : 3 <= N by apply: leq_trans n2LN.
 have [|tLs] := leqP s 1.
   case: s => [|[|]] //; first by rewrite psi_sint2 ?(leq_trans _ thLN).
   by rewrite psi_sint3.
 rewrite -leq_double psi_sint_phi; last first.
   apply: leq_trans n2LN.
-  by rewrite leq_add2r -root_delta_le.
+  by rewrite !ltnS -root_delta_le.
 rewrite phi_modSE.
-have tE : troot (delta s + 2) = s.
-  by apply/eqP; rewrite trootE deltaS leq_addr ltn_add2l.
+have tE : troot (delta s).+2 = s.
+  by apply/eqP; rewrite trootE deltaS ltnW //= -addn2 addSnnS leq_add2l.
 rewrite tE.
-have->: tmod (delta s + 2) = 2 by rewrite /tmod tE addnC addnK.
+have->: tmod (delta s).+2 = 2 by rewrite /tmod tE -addn2 addnC addnK.
 by rewrite -mul2n expnS mulnA /= leq_mul2r (leq_add2r 2 2) tLs orbT.
+Qed.
+
+(* This is a fix of 2.3 *)
+Lemma psi_SS_le_aux n :
+  n <= N -> psi `[n] + 2 ^ (∇n.+1).-1 + 2 ^ (∇n.+2).-1 >= 2 ^(troot n).+1.
+Proof.
+case: n => [|[|n]] nLN; first by rewrite psi_sint0 add0n expn0 expn1.
+  by rewrite psi_sint1 //.
+rewrite -addnA; apply: leq_trans (leq_add (psi_SS_le nLN) (leqnn _)).
+have /orP[/andP[/eqP<- /eqP tE]|/and3P[/eqP<- /eqP tE1 /eqP tM1]] :=
+       troot_mod_case n.
+  have /orP[/andP[/eqP<- /eqP tE1]|/and3P[/eqP<- /eqP tE2 /eqP tM2]] :=
+       troot_mod_case n.+1.
+    by rewrite leq_addr.
+  rewrite expnS mul2n -addnn leq_add2l.
+  apply: leq_trans (_ : 2 ^ (∇n.+3) <= _).
+    by rewrite leq_exp2l // troot_le.
+  rewrite -{1}[troot (_.+3)]prednK ?troot_gt0 // expnS mul2n -addnn.
+  by rewrite leq_add2l leq_exp2l // -ltnS !prednK // troot_le.
+have /orP[/andP[/eqP<- tE2] | /and3P[_ /eqP tE2 /eqP tM2]] :=
+     troot_mod_case n.+1.
+  rewrite expnS mul2n -addnn leq_add2l.
+  rewrite -{1}[troot (_.+2)]prednK ?troot_gt0 // expnS mul2n -addnn.
+  by apply: leq_add; rewrite leq_exp2l // -ltnS !prednK // troot_le // ltnW.
+by rewrite tE1 in tM2.
 Qed.
 
 Lemma psi_aux0_sint n : n <= N -> psi_aux 0 `[n] = n.

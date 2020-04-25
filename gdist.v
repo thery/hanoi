@@ -361,10 +361,33 @@ exists (rev (belast t2 p)); split => //.
 by rewrite size_rev size_belast.
 Qed.
 
+Lemma gpath_rev t1 t2 p : gpath r t1 t2 p -> gpath (fun z : T => r^~ z) t2 t1 (rev (belast t1 p)).
+Proof.
+move=> /gpathP[H1 H2] H3.
+apply/gpathP; split => //.
+- by rewrite -rev_path H2 in H1.
+- case: (p) H2 => //= a p1.
+  by rewrite /= rev_cons last_rcons.
+by rewrite size_rev size_belast -gdist_sym.
+Qed.
+
 Lemma gdistC t1 t2 : symmetric r -> `d[t1, t2]_r  =  `d[t2, t1]_r.
 Proof.
 move=> rSym; rewrite gdist_sym.
 by apply: eq_dist.
+Qed.
+
+Lemma eq_gpath (e1 e2 : rel T) t1 t2 c :
+    e1 =2 e2 -> gpath e1 t1 t2 c = gpath e2 t1 t2 c.
+Proof.
+by move=> e1Ee2; apply/gpathP/gpathP; rewrite (eq_path e1Ee2) (eq_dist e1Ee2).
+Qed.
+
+Lemma gpathC t1 t2 p : 
+ symmetric r -> gpath r t1 t2 p -> gpath r t2 t1 (rev (belast t1 p)).
+Proof.
+move=> hIrr /gpath_rev.
+by rewrite (@eq_gpath _ _ _ _ _ (_ : _ =2 r)).
 Qed.
 
 End gdistProp.

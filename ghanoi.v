@@ -1150,8 +1150,6 @@ apply: leq_trans.
 by apply: IH.
 Qed.
 
-Section ISet.
-
 Definition sorted (s : seq nat) := 
   forall i j, i < size s -> j < size s -> (nth 0 s i < nth 0 s j) = (i < j).
 
@@ -1195,39 +1193,6 @@ move=> [|i] [|j] iH jH /=.
 by rewrite ltnS (IH sS).
 Qed.
 
-
-
-(* Number of disks *)
-Variable n : nat.
-(* Subset of disks *)
-Variable sd : {set disk n}.
-(* Number of pegs *)
-Variable k : nat.
-(* Subset of pegs *)
-Variable sp : {set peg k}.
-(* The subset is non empty *)
-Variable p0 : peg k.
-Variable p0Isp : p0 \in sp.
-
-(* relations on peg *)
-Variable rel1 : rel (peg k). 
-Variable rel2 : rel (peg #|sp|). 
-Hypothesis rel_compat : 
-  forall p1 p2, p1 \in sp -> p2 \in sp ->
-    rel1 p1 p2 -> rel2 (enum_rank_in p0Isp p1) (enum_rank_in p0Isp p2).
-
-(* Valid conf : disk in sd are on pegs in sp *)
-Definition cvalid (c : configuration k n) :=
-  [forall i, (i \in sd) ==> (c i \in sp)].
-
-Lemma cvalidP (c : configuration k n) :
-  reflect (forall i, i \in sd -> c i \in sp)
-          (cvalid c).
-Proof.
-apply: (iffP forallP) => [H d|H d]; first by have /implyP := H d.
-by apply/implyP/H.
-Qed.
-
 Lemma enum_ord_inord m : (enum 'I_m.+1) = [seq inord i | i <- iota 0 m.+1].
 Proof.
 rewrite -val_ord_enum -map_comp /=.
@@ -1268,6 +1233,124 @@ have : i < size ([seq i0 <- iota 0 m.+1 | mem s (inord i0)])
 apply: sorted_filter => //.
 by apply: sorted_iota.
 Qed.
+
+Section ISetd.
+
+(* Number of disks *)
+Variable n : nat.
+(* Subset of disks *)
+Variable sd : {set disk n}.
+(* Number of pegs *)
+Variable k : nat.
+
+(* relations on peg *)
+Variable rel : rel (peg k). 
+
+Definition cprojd (c : configuration k n) : configuration k #|sd| := 
+  [ffun i => c (enum_val i)].
+
+Lemma on_top_cprojd c d (dIsd : d \in sd) : 
+  on_top d c -> on_top (enum_rank_in dIsd d) (cprojd c).
+Proof.
+move=> /= /on_topP dO.
+apply/on_topP => /= d1 H.
+rewrite leq_eqVlt; case: eqP => //= /eqP dDd1.
+rewrite -[d1](enum_valK_in dIsd) -sorted_enum_val !enum_rankK_in //; last first.
+  by apply: enum_valP.
+rewrite ltn_neqAle.
+case: eqP => [/eqP /val_eqP dEd1 | /eqP dDd1' /=].
+  by case/eqP: dDd1; rewrite {2}dEd1 enum_valK_in.
+rewrite !ffunE enum_rankK_in // in H.
+by apply: dO.
+Qed.
+
+Lemma move_cprojd (c1 c2 : configuration k n) : 
+  move rel c1 c2 -> (cprojd c1) != (cprojd c2) ->
+  move rel (cprojd c1) (cprojd c2).
+Proof.
+move => /moveP [d [dH1 dH2 dH3 dH4]] c1Dc2.
+have [dIsd|dNIsd] := boolP (d \in sd); last first.
+  case/eqP: c1Dc2.
+  apply/ffunP => i; rewrite !ffunE.
+  apply: dH2.
+  apply: contra dNIsd => /eqP->.
+  by apply: enum_valP.
+apply/moveP; exists (enum_rank_in dIsd d); split => /=.
+- by rewrite !ffunE !enum_rankK_in //.
+- move=> /= d2 dDd2.
+  rewrite !ffunE.
+  apply: dH2.
+  rewrite -[d](enum_rankK_in dIsd) //.
+  by apply /eqP => /enum_val_inj /eqP; rewrite (negPf dDd2).
+- by apply: on_top_cprojd.
+by apply: on_top_cprojd.
+Qed.
+
+Lemma path_cprojd (c : configuration _ _) cs :
+    path (move rel) c cs ->
+    path (move rel) (cprojd c) (rm_dup (cprojd c) [seq (cprojd i) | i <- cs]).
+Proof.
+elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
+case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
+by rewrite move_cprojd => //=; first by apply: IH; rewrite ?c2V.
+Qed.
+
+Lemma gdist_cprojd c1 c2 cs : 
+    last c1 cs = c2 -> path (move rel) c1 cs ->
+   `d[cprojd c1, cprojd c2]_(move rel) <= size cs.
+Proof.
+move=> cL cPcs.
+have := size_rm_dup (cprojd c1) [seq (cprojd i) | i <- cs].
+rewrite size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply: path_cprojd.
+by rewrite last_rm_dup last_map cL.
+Qed.
+
+Lemma gpath_cprojd c1 c2 cs : 
+    gpath (move rel) c1 c2 cs ->
+   `d[cprojd c1, cprojd c2]_(move rel) <= `d[c1, c2]_(move rel).
+Proof.
+move=> gH.
+rewrite (gpath_dist gH); apply: gdist_cprojd => //; first apply: gpath_last gH.
+by apply: gpath_path gH.
+Qed.
+
+End ISetd.
+
+Section ISet.
+
+
+(* Number of disks *)
+Variable n : nat.
+(* Subset of disks *)
+Variable sd : {set disk n}.
+(* Number of pegs *)
+Variable k : nat.
+(* Subset of pegs *)
+Variable sp : {set peg k}.
+(* The subset is non empty *)
+Variable p0 : peg k.
+Variable p0Isp : p0 \in sp.
+
+(* relations on peg *)
+Variable rel1 : rel (peg k). 
+Variable rel2 : rel (peg #|sp|). 
+Hypothesis rel_compat : 
+  forall p1 p2, p1 \in sp -> p2 \in sp ->
+    rel1 p1 p2 -> rel2 (enum_rank_in p0Isp p1) (enum_rank_in p0Isp p2).
+
+(* Valid conf : disk in sd are on pegs in sp *)
+Definition cvalid (c : configuration k n) :=
+  [forall i, (i \in sd) ==> (c i \in sp)].
+
+Lemma cvalidP (c : configuration k n) :
+  reflect (forall i, i \in sd -> c i \in sp)
+          (cvalid c).
+Proof.
+apply: (iffP forallP) => [H d|H d]; first by have /implyP := H d.
+by apply/implyP/H.
+Qed.
+
 
 Definition cproj (c : configuration k n) : configuration #|sp| #|sd| := 
   [ffun i => enum_rank_in p0Isp (c (enum_val i))].
