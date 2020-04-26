@@ -1317,6 +1317,86 @@ Qed.
 
 End ISetd.
 
+Section CSet.
+
+(* Number of disks *)
+Variable n : nat.
+(* cut limit *)
+Variable t : nat.
+Variable tLn : t <= n.
+(* Number of pegs *)
+Variable k : nat.
+
+(* relations on peg *)
+Variable rel : rel (peg k).
+
+Definition ccut (c : configuration k n) : configuration k t := 
+  [ffun i => c (widen_ord tLn i)].
+
+Lemma ordinalK (d : disk n) (dLt : d < t) : widen_ord tLn (Ordinal dLt) = d.
+Proof. by apply: val_inj. Qed.
+
+Lemma on_top_ccut c (d : disk n) (dLr : d < t) : 
+  on_top d c -> on_top (Ordinal dLr) (ccut c).
+Proof.
+move=> /= /on_topP dO.
+apply/on_topP => /= d1 H.
+rewrite leq_eqVlt; case: eqP => //= /eqP dDd1.
+rewrite ltn_neqAle dDd1 /=.
+apply: (dO (widen_ord tLn d1)) => //.
+by move: H; rewrite !ffunE ordinalK.
+Qed.
+
+Lemma move_ccut (c1 c2 : configuration k n) : 
+  move rel c1 c2 -> (ccut c1) != (ccut c2) ->
+  move rel (ccut c1) (ccut c2).
+Proof.
+move => /moveP [d [dH1 dH2 dH3 dH4]] c1Dc2.
+have [dLt|tLd] := leqP t d.
+  case/eqP: c1Dc2.
+  apply/ffunP => i; rewrite !ffunE.
+  apply: dH2.
+  by rewrite -val_eqE /= neq_ltn (leq_trans _ dLt) // orbT.
+apply/moveP; exists (Ordinal tLd); split => /=.
+- by rewrite !ffunE // ordinalK.
+- move=> /= d2; rewrite !ffunE -val_eqE /= => dDd2.
+  by apply: dH2; rewrite -val_eqE /=.
+- by apply: on_top_ccut.
+by apply: on_top_ccut.
+Qed.
+
+Lemma path_ccut (c : configuration _ _) cs :
+    path (move rel) c cs ->
+    path (move rel) (ccut c) (rm_dup (ccut c) [seq (ccut i) | i <- cs]).
+Proof.
+elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
+case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
+by rewrite move_ccut => //=; first by apply: IH; rewrite ?c2V.
+Qed.
+
+Lemma gdist_ccut c1 c2 cs : 
+    last c1 cs = c2 -> path (move rel) c1 cs ->
+   `d[ccut c1, ccut c2]_(move rel) <= size cs.
+Proof.
+move=> cL cPcs.
+have := size_rm_dup (ccut c1) [seq (ccut i) | i <- cs].
+rewrite size_map; move/(leq_trans _); apply.
+apply: gdist_path_le; first by apply: path_ccut.
+by rewrite last_rm_dup last_map cL.
+Qed.
+
+Lemma gpath_ccut c1 c2 cs : 
+    gpath (move rel) c1 c2 cs ->
+   `d[ccut c1, ccut c2]_(move rel) <= `d[c1, c2]_(move rel).
+Proof.
+move=> gH.
+rewrite (gpath_dist gH); apply: gdist_ccut => //; first apply: gpath_last gH.
+by apply: gpath_path gH.
+Qed.
+
+End CSet.
+
+
 Section ISet.
 
 
@@ -1434,6 +1514,7 @@ by apply: gpath_path gH.
 Qed.
 
 End ISet.
+
 
 Section ISet2.
 

@@ -47,21 +47,6 @@ rewrite addnC -leq_subLR.
 by apply: leq_sub2l; apply: ltnW.
 Qed.
 
-Lemma sum_set_diff (I : finType) (P : I -> nat) (e1 e2 : {set I}) :
-   \sum_(i in e1 :\: e2) P i = \sum_(i in e1 | i \notin e2) P i.
-Proof.
-rewrite big_mkcond [RHS]big_mkcond /=.
-apply: eq_bigr => i _.
-by rewrite !inE andbC.
-Qed.
-
-Lemma sum_set_swap (I : finType) (P : I -> nat) (e1 e2 : {set I}) :
-   \sum_(i in e1 | i \in e2) P i = \sum_(i in e2 | i \in e1) P i.
-Proof.
-rewrite big_mkcond [RHS]big_mkcond /=.
-by apply: eq_bigr => i _; rewrite andbC.
-Qed.
-
 (******************************************************************************)
 (*                                                                            *)
 (*                               Triangular number                            *)
