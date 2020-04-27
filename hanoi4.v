@@ -953,10 +953,10 @@ rewrite !cat_rcons !catA => /split_tail[[lE z2Ex3 _]|[zz z2aE]|[zz z2aE]];
       rewrite ffunE /d.
       by apply: (move_on_toprDl x3pMx3) => //; rewrite ltnW /=.
     by case: (Hza (ccut tln x3 i)); rewrite !ffunE => ->; rewrite ?(eqxx, orbT).
-    have dz2x3_leq : psi (s2f A) <= `d[z2, x3]_hmove.
-      rewrite gdistC //.
-      have cDnp2 : c != np2 by rewrite /c.
-      have /peg4comp2[pp1 [pp2 [[H1 H2 H3] [H4 H5] H6]]] := cDnp2.
+  have dz2x3_leq : psi (s2f A) <= `d[z2, x3]_hmove.
+    rewrite gdistC //.
+    have cDnp2 : c != np2 by rewrite /c.
+    have /peg4comp2[pp1 [pp2 [[H1 H2 H3] [H4 H5] H6]]] := cDnp2.
     have cH1 : codom (ccut tln z2) \subset [:: pp1; pp2].
       apply/subsetP=> i /codomP[j]; rewrite !ffunE !inE => ->.
         case: (H6 (z2 (widen_ord tln j))) => /eqP; try by move->; rewrite ?orbT.
@@ -1025,11 +1025,114 @@ rewrite !cat_rcons !catA => /split_tail[[lE z2Ex3 _]|[zz z2aE]|[zz z2aE]];
     by rewrite last_cat last_rcons.
   have /(move_disk1 z2pMz2 z2pNDz2N)/eqP : N != T by rewrite neq_ltn TLN orbT.
   by rewrite z2pEx3 z2Ex3 (negPf x3pTDx3T).
-pose A : {set disk T} := [set i | (ccut tln z2) i == np3].
+pose sd : {set disk n.+1} := isO n.+1 T.
+have card_sdE : #|sd| = T.
+  by rewrite card_isO /minn ifN // -leqNgt -ltnS ltnW // ltnW.
+pose u'' := ccut tln u.
+pose x0'' := ccut tln x0.
+pose z2'' := ccut tln z2.
+pose x3'' := ccut tln x3.
+clear b bI01 dDb bD3 bDa Hza.
+pose b := if c == p0 then p1 else p0.
+have np3Dc : np3 != c.
+  by move: cI01; rewrite !inE => /orP[] /eqP->; rewrite // eq_sym.
+have np3Db : np3 != b.
+  by move: cI01; rewrite /b !inE => /orP[] /eqP->; 
+     rewrite ?(eqxx, negPf p1Dp0) // eq_sym.
+have np2Dc : np2 != c.
+  by move: cI01; rewrite !inE => /orP[] /eqP->; rewrite // eq_sym.
+have np2Db : np2 != b.
+  by move: cI01; rewrite /b !inE => /orP[] /eqP->; 
+     rewrite ?(eqxx, negPf p1Dp0) // eq_sym.
+have cDb : c != b.
+  by move: cI01; rewrite /b !inE => /orP[] /eqP->; 
+     rewrite ?(eqxx, negPf p1Dp0) // eq_sym.
+have Hzb i : [\/ i = np3, i = np2, i = c | i = b].
+  by  move: cI01; rewrite /b !inE => /orP[] /eqP->;
+      rewrite ?(eqxx, negPf p1Dp0); case: (Hz i) => ->; 
+     (try by apply: Or41); (try by apply: Or42);
+     (try by apply: Or43); (try by apply: Or44).
+have bI01 : b \in [:: p0; p1].
+  by move: cI01; rewrite /b !inE => /orP[] /eqP->; 
+     rewrite ?(eqxx, negPf p1Dp0) // eq_sym.
+pose A : {set disk T} := [set i | z2'' i == np3].
 pose B : {set disk n} := [set i | ↓[z2] i == b].
-
+have cH2 : codom ↓[z2] \subset [:: np3; b].
+  apply/subsetP=> i /codomP[j]; rewrite !ffunE !inE => ->.
+  case: (Hzb (z2 (trshift 1 j))) => /eqP; try by move->; rewrite ?orbT.
+    rewrite -[_ == np2]negbK -z2N2 => /negP[].
+    by apply: (move_on_toprDr z2pMz2) => /=.
+  rewrite -[_ == c]negbK /c => /negP[].
+  by apply: (move_on_toprDl z2pMz2) => //=; apply: ltnW.
+have bsI (i : disk n.+1) : i \in E'' :\ N -> z2 i = b.
+  rewrite 2!inE; rewrite -val_eqE /= => /andP[iDn iIE'']; apply/eqP.
+  have iLn : i < n.
+    by move: (ltn_ord i); rewrite leq_eqVlt eqSS (negPf iDn).
+  have /subsetP := cH2.
+  move=> /(_ (↓[z2] (Ordinal iLn))(codom_f _ _)).
+  rewrite !inE !ffunE /= (_ : trshift _ _ = (i : 'I_(1 + n))); last first.
+    by apply: val_inj.
+  rewrite (negPf (memE'' _ _ _ _)) //=.
+  by rewrite gE' z0sz0saE !(inE, mem_cat, mem_rcons, eqxx, orbT).
+have dz2''x3''_leq : psi (s2f A) <= `d[z2'', x3'']_hmove.
+  pose a1 : peg 4 := x3p T.
+  have a1Dnp3 : a1 != np3 by [].
+  have /peg4comp2[pp1 [pp2 [[H1 H2 H3] [H4 H5] H6]]] := a1Dnp3.
+  have cH3 : codom x3'' \subset [:: pp1; pp2].
+    apply/subsetP=> i /codomP[j]; rewrite !ffunE !inE => ->.
+    case: (H6 (x3 (widen_ord tln j))) => /eqP; try by move->; rewrite ?orbT.
+      rewrite -[_ == a1]negbK => /negP[].
+      by apply: (move_on_toprDl x3pMx3) => //=; apply: ltnW.
+    rewrite -[_ == np3]negbK -x3T3 => /negP[].
+    by apply: (move_on_toprDr x3pMx3) => /=.
+  by apply: IH cH3 => //; apply/(leq_trans TLN)/ltnW.
+have du''x0''_leq : psi (s2f E `&` `[T]) <= `d[u'', x0'']_hmove.
+  have -> : s2f E `&` `[T] = s2f [set i | u'' i == p0].
+    by rewrite -(@isOE n.+1) // -s2fI -s2f_ccut.
+  have /peg4comp2[pp2 [pp3 [[H1 H2 H3] [H4 H5] H6]]] := x0sTD0.
+  have cH1 : codom x0'' \subset [:: pp2; pp3].
+    apply/subsetP=> i /codomP[j]; rewrite !inE !ffunE => ->.
+    case: (H6 (x0 (widen_ord tln j))) => /eqP; try by move->; rewrite ?orbT.
+      rewrite -[_ == x0s T]negbK => /negP[].
+      by apply: (move_on_toplDr x0Mx0s) => //=; apply: ltnW.
+    rewrite -[_ == p0]negbK -x0T0 => /negP[].
+    by apply: (move_on_toplDl x0Mx0s) => /=.
+  by apply: IH cH1=> //; apply/(leq_trans TLN _)/ltnW.
+have psiAB_leq : psi `[T + K + 1] <= (psi (s2f A) + psi (s2f B)).+1.*2.
+  rewrite -leq_double psi_sint_phi -ltnS prednK ?phi_gt0 //.
+  have ->: (T + K + 1).+1 = (T + K).-1.+3.
+    rewrite -{1}[T + K]prednK ?addn1 ?addnS ?addn_gt0 ?K_gt0 ?orbT //.
+  have : (T + K).-1 <= #|` (s2f A) `|` (s2f B)|.
+     have : (`[T] `|` (s2f (E'' :\ N))) `<=` ((s2f A) `|` (s2f B)).
+      apply/fsubsetP => i; rewrite inE mem_sint /=.
+      case/orP => [iLT|iIEN]; last first.
+        have iLn : i < n.
+          move: iIEN; rewrite s2fD !inE s2f1 //= in_fset1.
+          case/andP=> iDn /imfsetP[/= j _ iEj].
+          by have := ltn_ord j; rewrite -iEj leq_eqVlt eqSS (negPf iDn).
+        rewrite inE; apply/orP; right.
+        rewrite (@mem_s2f _ _ (Ordinal iLn)) inE !ffunE; apply/eqP.
+        by apply: bsI; rewrite -mem_s2f.
+      have iLn : i < n by apply: leq_trans iLT (ltnW _).
+      have /subsetP/(_ (↓[z2] (Ordinal iLn))(codom_f _ _)) := cH2.
+      rewrite !inE !ffunE /=.
+      rewrite (@mem_s2f _ _ (Ordinal iLn)) inE ffunE.
+      rewrite (@mem_s2f _ _ (Ordinal iLT)) inE ffunE.
+      rewrite (_ : trshift _ _ = widen_ord tln (Ordinal iLT) :> 'I_(1 + n)) //.
+      by apply: val_inj.
+    move => /fsubset_leq_card /(leq_trans _)->//.
+    rewrite -(leq_add2r 0) addn0.
+    suff {2}<- : #|` `[T] `&` s2f (n:=n.+1) (E'' :\ N)| = 0.
+      rewrite cardfsUI card_sint subn0 card_s2f /K (cardsD1 N).
+      by rewrite NiE'' addnS.
+    apply/eqP; rewrite cardfs_eq0; apply/eqP/fsetP => i.
+    rewrite !inE mem_sint; apply/idP => /= /andP[iLT /imfsetP[j /=]].
+    rewrite !inE => /and3P[_ _ TLj] iEj.
+    by move: iLT; rewrite ltnNge ltnW // iEj.
+  rewrite -3!ltnS => /phi_le/leq_trans-> //.
+  rewrite !doubleS -[_.+4]addn1 !addSnnS.
+  by apply: psi_cap_ge.
 Admitted.
-
 
 End Hanoi4.
 
