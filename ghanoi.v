@@ -463,6 +463,10 @@ elim: s a => //= b l IH a; case: (_ == _); first by apply: leq_trans (IH _) _.
 by apply: IH.
 Qed.
 
+Lemma size_rm_dup_cons (A : eqType) (a b : A) s : 
+  size (rm_dup b s) <= size (rm_dup a (b :: s)).
+Proof. by rewrite /=; case: (_ == _) => //=. Qed.
+
 Lemma size_rm_dup_subset  (A : finType) (a : A) (s1 : {set A}) (s2 : seq A) : 
   {subset s1 <= s2} -> a \notin s1 -> #|s1| <= size (rm_dup a s2).
 Proof.
@@ -494,6 +498,15 @@ Proof.
 elim: s1 s2 a => //= b s1 IH s2 a.
 case: eqP => [aEb|aDb] /=; first by apply: IH.
 by congr (_ :: _); apply: IH.
+Qed.
+
+Lemma mem_rm_dup (A : eqType) (a b: A) s : 
+   b != a -> b \in s -> b \in rm_dup a s.
+Proof.
+elim: s a => //= c s IH a bDa; rewrite inE.  
+case: (boolP (b == c)) => /= [/eqP<- _|bDc bIs].
+  by rewrite eq_sym (negPf bDa) inE eqxx.
+by have := IH _ bDc bIs; case: (_ == _); rewrite // inE orbC => ->.
 Qed.
 
 Lemma path_clshift m n (c : configuration (m + n)) cs :
