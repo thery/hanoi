@@ -1,6 +1,7 @@
 -R . hanoi
 -arg -w -arg -notation-overridden
 
+extra.v
 gdist.v
 ghanoi.v
 ghanoi3.v
@@ -10,4 +11,3 @@ triangular.v
 phi.v
 psi.v
 hanoi4.v
-tsplit.v

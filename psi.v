@@ -9,7 +9,7 @@
 (******************************************************************************)
 
 From mathcomp Require Import all_ssreflect all_algebra finmap.
-Require Import triangular phi.
+Require Import extra triangular phi.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -287,64 +287,6 @@ rewrite (psiE_leq (leq_maxr _ _ : _ <= e)).
 elim: e => [|e IH]; first by rewrite !big_ord0.
 by rewrite !big_ord_recr /= geq_max !leq_max IH /= rnz_ler // orbT.
 Qed.
-
-Definition sint a b : {fset nat} :=
-   [fset @nat_of_ord _ i | i in 'I_b & a <= i].
-
-Lemma mem_sint a b i : i \in sint a b = (a <= i < b).
-Proof.
-apply/imfsetP/idP => [[j /= aLj ->]|/andP[aLi iLb]].
-  by rewrite ltn_ord andbT.
-by exists (Ordinal iLb).
-Qed.
-
-Lemma sint_sub a b c : a <= c ->
-   [fset i in  (sint a b) | c <= i] = sint c b.
-Proof.
-move=> aLc.
-apply/fsetP => i.
-rewrite mem_sint.
-apply/imfsetP/idP => [[j /=]|/andP[cLi iLb]].
-  rewrite inE mem_sint => /andP[/andP[aLj jLb] cLj] ->.
-  by rewrite cLj.
-by exists i; rewrite //= inE mem_sint cLi iLb (leq_trans aLc).
-Qed.
-
-Lemma sintSl a b : sint a.+1 b = sint a b `\ a.
-Proof.
-apply/fsetP => /= i; rewrite !inE !mem_sint.
-by do 2 case: ltngtP.
-Qed.
-
-Lemma sintSr a b : sint a b.+1 `\ b = sint a b.
-Proof.
-apply/fsetP => /= i; rewrite !inE !mem_sint ltnS.
-by do 2 case: ltngtP.
-Qed.
-
-Lemma sint_split a b : sint a b = sint 0 b `\` sint 0 a.
-Proof.
-by apply/fsetP => /= i; rewrite !inE !mem_sint /= -leqNgt.
-Qed.
-
-Lemma card_sint a b : #|`sint a b| = (b - a).
-Proof.
-elim: b => [|b IH].
-  apply/eqP; rewrite cardfs_eq0; apply/eqP/fsetP=> i.
-  by rewrite mem_sint andbF inE.
-have [aLb|bLa] := leqP a b; last first.
-  rewrite (_ : _ - _ =  0); last first.
-    by apply/eqP; rewrite subn_eq0.
-  apply/eqP; rewrite cardfs_eq0; apply/eqP/fsetP=> i; rewrite mem_sint inE ltnS.
-  by apply/idP => /andP[H1 /(leq_trans H1)]; rewrite leqNgt bLa.
-rewrite (cardfsD1 b) (_ : _ \in _); last by rewrite mem_sint aLb /=.
-by rewrite sintSr IH subSn.
-Qed.
-
-Notation "`[ n ]" := (sint 0 n) (format "`[ n ]").
-
-Lemma sint0_set0 : `[0] = fset0.
-Proof.  by apply/fsetP=> i; rewrite mem_sint inE; case: ltngtP. Qed.
 
 Lemma psi_auxb_sint n : psi_auxb `[n] = n.+1.
 Proof.

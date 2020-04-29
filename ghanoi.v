@@ -48,8 +48,8 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_ssreflect.
-Require Import tsplit gdist.
+From mathcomp Require Import all_ssreflect finmap.
+Require Import extra gdist.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -537,8 +537,8 @@ Qed.
 
 Lemma path_shift  m n (c : configuration (m + n)) cs :
     path move c cs ->
-    size cs = size (rm_dup (clshift c) [seq (clshift i) | i <- cs]) +
-               size(rm_dup (crshift c) [seq (crshift i) | i <- cs]).
+    size cs = (size (rm_dup (clshift c) [seq (clshift i) | i <- cs]) +
+               size(rm_dup (crshift c) [seq (crshift i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /andP[/moveP[d [d2H d2H1 d2H2 d2H3]] c1Pcs].
 case: (tsplitP d) => [j dE | k dE].
@@ -684,6 +684,28 @@ Proof. by apply/map_eqr/cliftr_inj. Qed.
 
 Lemma perfect_unliftr n p : ↓[perfect n.+1 p] = perfect n p.
 Proof. by apply/ffunP => i; rewrite !ffunE. Qed.
+
+Lemma s2f_liftr n (c : configuration n.+1) (p : peg) :
+  s2f ([set i | c i == p] :\ ord_max) = s2f [set i | cunliftr c i == p].
+Proof.
+apply/fsetP=> i.
+apply/imfsetP/imfsetP => [] [/= j].
+  rewrite !inE => /andP[jDn /eqP cjEp] jEi.
+  have jLn : j < n.
+    rewrite -val_eqE /= in jDn.
+    by have := ltn_ord j; rewrite ltnS leq_eqVlt (negPf jDn).
+  exists (Ordinal jLn) => //=; rewrite !inE ffunE; apply/eqP.
+  by rewrite -cjEp; congr (c _); apply: val_eqP.
+rewrite inE ffunE => /eqP cjEp iEj; exists (trshift 1 j) => //.
+by rewrite !inE cjEp -val_eqE //= neq_ltn ltn_ord /=.
+Qed.
+
+Lemma codom_liftr n (c : configuration n.+1) (s : seq peg) :
+  codom c \subset s -> codom ↓[c] \subset s.
+Proof.
+move=> H; apply/subsetP => i /mapP[j _ ->].
+by rewrite ffunE; apply: (subsetP H); apply: codom_f.
+Qed.
 
 Lemma move_ldisk n (c1 c2 : configuration n.+1) : 
   move c1 c2 -> c1 ldisk != c2 ldisk -> ↓[c1] = ↓[c2].
@@ -1358,7 +1380,26 @@ Definition ccut (c : configuration k n) : configuration k t :=
 Lemma ordinalK (d : disk n) (dLt : d < t) : widen_ord tLn (Ordinal dLt) = d.
 Proof. by apply: val_inj. Qed.
 
-Lemma on_top_ccut c (d : disk n) (dLr : d < t) : 
+Lemma codom_cut (c : configuration k n) (s : seq (peg k)) :
+  codom c \subset s -> codom (ccut c) \subset s.
+Proof.
+move=> H; apply/subsetP => i /mapP[j _ ->].
+by rewrite ffunE; apply: (subsetP H); apply: codom_f.
+Qed.
+
+Lemma s2f_cut (c : configuration k n) (p : disk k) : 
+  s2f ([set i | c i == p] :&: isO n t) =
+  s2f [set i | ccut c i == p].
+Proof.
+apply/fsetP=> /= i.
+apply/imfsetP/imfsetP => [] /= [j]; rewrite !inE.
+  case/andP => cjEp jLt ->.
+  by exists (Ordinal jLt); rewrite //= inE !ffunE ordinalK.
+rewrite !ffunE => cjEp ->; exists (widen_ord tLn j) => //=.
+by rewrite !inE /= cjEp /=.
+Qed.
+
+Lemma on_top_cut c (d : disk n) (dLr : d < t) : 
   on_top d c -> on_top (Ordinal dLr) (ccut c).
 Proof.
 move=> /= /on_topP dO.
@@ -1369,7 +1410,7 @@ apply: (dO (widen_ord tLn d1)) => //.
 by move: H; rewrite !ffunE ordinalK.
 Qed.
 
-Lemma move_ccut (c1 c2 : configuration k n) : 
+Lemma move_cut (c1 c2 : configuration k n) : 
   move rel c1 c2 -> (ccut c1) != (ccut c2) ->
   move rel (ccut c1) (ccut c2).
 Proof.
@@ -1383,36 +1424,36 @@ apply/moveP; exists (Ordinal tLd); split => /=.
 - by rewrite !ffunE // ordinalK.
 - move=> /= d2; rewrite !ffunE -val_eqE /= => dDd2.
   by apply: dH2; rewrite -val_eqE /=.
-- by apply: on_top_ccut.
-by apply: on_top_ccut.
+- by apply: on_top_cut.
+by apply: on_top_cut.
 Qed.
 
-Lemma path_ccut (c : configuration _ _) cs :
+Lemma path_cut (c : configuration _ _) cs :
     path (move rel) c cs ->
     path (move rel) (ccut c) (rm_dup (ccut c) [seq (ccut i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
-by rewrite move_ccut => //=; first by apply: IH; rewrite ?c2V.
+by rewrite move_cut => //=; first by apply: IH; rewrite ?c2V.
 Qed.
 
-Lemma gdist_ccut c1 c2 cs : 
+Lemma gdist_cut c1 c2 cs : 
     last c1 cs = c2 -> path (move rel) c1 cs ->
    `d[ccut c1, ccut c2]_(move rel) <= size cs.
 Proof.
 move=> cL cPcs.
 have := size_rm_dup (ccut c1) [seq (ccut i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
-apply: gdist_path_le; first by apply: path_ccut.
+apply: gdist_path_le; first by apply: path_cut.
 by rewrite last_rm_dup last_map cL.
 Qed.
 
-Lemma gpath_ccut c1 c2 cs : 
+Lemma gpath_cut c1 c2 cs : 
     gpath (move rel) c1 c2 cs ->
    `d[ccut c1, ccut c2]_(move rel) <= `d[c1, c2]_(move rel).
 Proof.
 move=> gH.
-rewrite (gpath_dist gH); apply: gdist_ccut => //; first apply: gpath_last gH.
+rewrite (gpath_dist gH); apply: gdist_cut => //; first apply: gpath_last gH.
 by apply: gpath_path gH.
 Qed.
 
@@ -1437,7 +1478,7 @@ Proof. by apply: val_inj; rewrite /= subnK. Qed.
 Definition ctuc (c : configuration k n) : configuration k (n - t) := 
   [ffun i => c (tuc_ord i)].
 
-Lemma on_top_ctuc c (d : disk n) (dLr : t <= d) : 
+Lemma on_top_tuc c (d : disk n) (dLr : t <= d) : 
   on_top d c -> on_top (otuc dLr) (ctuc c).
 Proof.
 move=> /= /on_topP dO.
@@ -1448,7 +1489,7 @@ apply: (dO (tuc_ord d1)) => //.
 by move: H; rewrite !ffunE otucK.
 Qed.
 
-Lemma move_ctuc (c1 c2 : configuration k n) : 
+Lemma move_tuc (c1 c2 : configuration k n) : 
   move rel c1 c2 -> (ctuc c1) != (ctuc c2) ->
   move rel (ctuc c1) (ctuc c2).
 Proof.
@@ -1462,44 +1503,44 @@ apply/moveP; exists (otuc dLt); split => /=.
 - by rewrite !ffunE // otucK.
 - move=> /= d2; rewrite !ffunE -val_eqE /= => dDd2.
   by apply: dH2; rewrite -val_eqE /= -(subnK dLt) eqn_add2r.
-- by apply: on_top_ctuc.
-by apply: on_top_ctuc.
+- by apply: on_top_tuc.
+by apply: on_top_tuc.
 Qed.
 
-Lemma path_ctuc (c : configuration _ _) cs :
+Lemma path_tuc (c : configuration _ _) cs :
     path (move rel) c cs ->
     path (move rel) (ctuc c) (rm_dup (ctuc c) [seq (ctuc i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
-by rewrite move_ctuc => //=; first by apply: IH; rewrite ?c2V.
+by rewrite move_tuc => //=; first by apply: IH; rewrite ?c2V.
 Qed.
 
-Lemma gdist_ctuc c1 c2 cs : 
+Lemma gdist_tuc c1 c2 cs : 
     last c1 cs = c2 -> path (move rel) c1 cs ->
    `d[ctuc c1, ctuc c2]_(move rel) <= size cs.
 Proof.
 move=> cL cPcs.
 have := size_rm_dup (ctuc c1) [seq (ctuc i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
-apply: gdist_path_le; first by apply: path_ctuc.
+apply: gdist_path_le; first by apply: path_tuc.
 by rewrite last_rm_dup last_map cL.
 Qed.
 
-Lemma gpath_ctuc c1 c2 cs : 
+Lemma gpath_tuc c1 c2 cs : 
     gpath (move rel) c1 c2 cs ->
    `d[ctuc c1, ctuc c2]_(move rel) <= `d[c1, c2]_(move rel).
 Proof.
 move=> gH.
-rewrite (gpath_dist gH); apply: gdist_ctuc => //; first apply: gpath_last gH.
+rewrite (gpath_dist gH); apply: gdist_tuc => //; first apply: gpath_last gH.
 by apply: gpath_path gH.
 Qed.
 
 Lemma size_cut_tuc (c : configuration _ _) cs :
     path (move rel) c cs ->
     size cs = 
-      size (rm_dup (ccut c) [seq (ccut i) | i <- cs]) +
-      size (rm_dup (ctuc c) [seq (ctuc i) | i <- cs]).
+     (size (rm_dup (ccut c) [seq (ccut i) | i <- cs]) +
+      size (rm_dup (ctuc c) [seq (ctuc i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /andP[/moveP[d [dH1 dH2 dH3 dH4]] c1Pcs].
 have cdDc1d : c d != c1 d.
@@ -1529,9 +1570,9 @@ Proof.
 move=> cL cPcs.
 rewrite (@size_cut_tuc c1) //.
 apply: leq_add.
-  apply: gdist_path_le; first by apply: path_ccut.
+  apply: gdist_path_le; first by apply: path_cut.
   by rewrite last_rm_dup last_map cL.
-apply: gdist_path_le; first by apply: path_ctuc.
+apply: gdist_path_le; first by apply: path_tuc.
 by rewrite last_rm_dup last_map cL.
 Qed.
 
@@ -1700,9 +1741,9 @@ Lemma size_cproj (c : configuration _ _) cs :
     all (cvalid (~: sd) sp2) (c :: cs) ->
     path (move rel1) c cs ->
     size cs = 
-      size (rm_dup (cproj sd p1Isp1 c) [seq (cproj sd  p1Isp1 i) | i <- cs]) +
+     (size (rm_dup (cproj sd p1Isp1 c) [seq (cproj sd  p1Isp1 i) | i <- cs]) +
       size (rm_dup (cproj (~: sd) p2Isp2 c)
-             [seq (cproj (~: sd) p2Isp2 i) | i <- cs]).
+             [seq (cproj (~: sd) p2Isp2 i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /and3P[c1V1 c2V1 c3V1] 
                              /and3P[c1V2 c2V2 c3V2] 
