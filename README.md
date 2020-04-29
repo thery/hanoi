@@ -3,27 +3,7 @@
 ## Hanoi
 
 
-
-[![Build Status](https://travis-ci.org/thery/hanoi.svg?branch=master)](https://travis-ci.org/thery/hanoi)
-
-## Hanoi
-
 Hanoi towers in Coq
-
-  extra.v 
-  gdist.v  
-  ghanoi.v  
-  ghanoi3.v 
-  lhanoi3.v  
-  hanoi3.v  
-  triangular.v   triangular number
-  phi.v          
-  psi.v  
-  triangular.v
-  hanoi4.v  
-
-Hanoi towers in Coq
-
 
 
 | File                              |  Content                                 | 
@@ -37,7 +17,7 @@ Hanoi towers in Coq
 | [triangular](./triangular.v)      | Theorems about triangular numbers        |
 | [phi](./phi.v)                    | Theorems about the Φ function            |
 | [psi](./psi.v)                    | Theorems about the Ψ function            |
-| [hanoi4[(./hanoi4.v)              | Hanoi towers with 4 pegs                 |
+| [hanoi4](./hanoi4.v)              | Hanoi towers with 4 pegs                 |
 
 
 To buld the library, download the files and type ```make install```.
