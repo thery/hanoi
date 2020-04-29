@@ -333,12 +333,22 @@ apply/imfsetP/andP => /= [[k]|[jDi /imfsetP[/= k kIs jEk]]].
 by exists k => //; rewrite !inE kIs -mem_s2f -jEk jDi.
 Qed.
 
-Lemma s2f1 n (s : {set 'I_n}) (i : 'I_n) :
-  s2f [set i] = [fset (nat_of_ord i)].
+Lemma s2f1 n (i : 'I_n) : s2f [set i] = [fset (nat_of_ord i)].
 Proof.
 apply/fsetP => j; rewrite !inE.
 apply/imfsetP/eqP => /= [[k]|->]; first by rewrite inE => /eqP ->.
 by exists i; rewrite ?inE.
+Qed.
+
+Lemma s2f_pred n (s : {set 'I_n}) (P : pred nat) : 
+   s2f [set i in s | P i] = [fset i in (s2f s) | P i].
+Proof.
+apply/fsetP=> i; rewrite !inE /=.
+apply/imfsetP/andP => /= [[j]|].
+  rewrite !inE => /andP[jIs jP] ->; split => //.
+  by apply/imfsetP; exists j.
+move=> [/imfsetP[/= j jIs ->] jP]; exists j => //.
+by rewrite inE jIs.
 Qed.
 
 Lemma s2fD1 n (s : {set 'I_n}) i : s2f (s :\ i) = s2f s `\ (nat_of_ord i).
@@ -1169,7 +1179,7 @@ have psiAB_leq : psi `[T + K + 1] <= (psi (s2f A) + psi (s2f B)).+1.*2.
   rewrite -3!ltnS => /phi_le/leq_trans-> //.
   rewrite !doubleS -[_.+4]addn1 !addSnnS.
   by apply: psi_cap_ge.
-have : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_hmove.
+have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_hmove.
   have := (gHuv); rewrite gE' z0sz0saE catA => /gpath_catl.
   rewrite last_cat last_rcons => gH1.
   rewrite (gpath_dist gH1) (size_cut_tuc tln _ (gpath_path gH1)) //.
@@ -1337,7 +1347,31 @@ have : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_hmove.
   rewrite card_sd1 card_sp1 => /= cp1 cp2 cp1Dcp2.
   have := gdist_perfect K.-1 cp1 cp2.
   by rewrite eq_sym (negPf cp1Dcp2) muln1 => ->.
-Admitted.
+have dz2v_leq : psi (s2f B) <= `d[z2, v]_hmove.
+  have cH1 : codom ↓[v] \subset [:: np2; np3] by apply: codom_lift.
+  apply: leq_trans (gdist_cunlift (connect_move _ _)).
+  by apply: IH cH1.
+
+move: gHuv; rewrite gE' z0sz0saE catA => /gdist_cat-> /=.
+rewrite last_cat last_rcons -/hmove.
+apply: leq_trans (leq_add duz2_leq dz2v_leq).
+rewrite addSn addnAC addnC -!addnA -2!addnS addnA.
+have pH :  psi (s2f E) <= psi (s2f E `&` `[T]) + (psi `[(T + K).+1] - psi `[T]).
+  rewrite -leq_subLR -addnS.
+  have {1}->: s2f E = (s2f E `&` `[T]) `|` s2f (T |: E'').
+    apply/fsetP => i; rewrite !(inE, mem_sint, s2fU, s2f1, s2f_pred) /=.
+    case: (ltngtP i T); rewrite ?(andbT, andbF, orbT, orbF) // => ->.
+    by apply/idP; apply/imfsetP; exists T; rewrite // inE uT0.
+  apply: psi_add => //.
+    by apply/fsubsetP=> i; rewrite !inE => /andP[].
+  rewrite card_s2f (cardsD1 T) !inE eqxx /= ltnS /K.
+  by apply/subset_leq_card/subsetP => i; rewrite !inE; case: (_ == _).
+apply: leq_trans pH _; rewrite -leq_double !doubleD !doubleB /=.
+apply: leq_trans (leq_add (leqnn _) psiAB_leq).
+rewrite -addnA addnCA leq_add2l addn1 leq_subLR -addnn addnA leq_add2r.
+rewrite -addnS -[(2 ^ _).*2]mul2n -expnS prednK //.
+by apply: psi_leD.
+Qed.
 
 End Hanoi4.
 
