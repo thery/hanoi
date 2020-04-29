@@ -457,11 +457,19 @@ Fixpoint rm_dup (A : eqType) (a : A) (s : seq A) :=
     if a == b then rm_dup b s1 else b :: rm_dup b s1 
   else [::].
 
-Lemma size_rm_dup (A : eqType) (a : A) s : size (rm_dup a s) <= size s.
+Lemma subseq_rm_dup (A : eqType) (a : A) s : subseq (rm_dup a s) s.
 Proof.
-elim: s a => //= b l IH a; case: (_ == _); first by apply: leq_trans (IH _) _.
-by apply: IH.
+elim: s a => // b s IH a.
+rewrite [rm_dup _ _]/=; case: (a == b).
+  by apply: subseq_trans (IH _) (subseq_cons _ _).
+by rewrite /= eqxx IH.
 Qed.
+
+Lemma subset_rm_dup (A : eqType) (a : A) s : {subset rm_dup a s <= s}.
+Proof. by apply/mem_subseq/subseq_rm_dup. Qed.
+
+Lemma size_rm_dup (A : eqType) (a : A) s : size (rm_dup a s) <= size s.
+Proof. by apply/size_subseq/subseq_rm_dup. Qed.
 
 Lemma size_rm_dup_cons (A : eqType) (a b : A) s : 
   size (rm_dup b s) <= size (rm_dup a (b :: s)).
