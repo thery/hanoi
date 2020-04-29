@@ -101,10 +101,11 @@ Local Notation "`c[ p ] " := (perfect p )
     (format "`c[ p ]", at level 60).
 Local Notation "`cf[ p , n ] ":= (perfect p : configuration _ n).
 
-Local Notation " d[ a , b ] " := (gdist hmove a b).
+Local Notation " d[ a , b ] " := (gdist hmove a b)
+  (format " d[ a ,  b ]").
 
 Lemma gdist_leq (n : nat) (p1 p2 : peg 4) : 
-   `d[`cf[p1, n] , `cf[p2, n]]  <= ϕ(n).
+   d[`cf[p1, n], `cf[p2, n]]  <= ϕ(n).
 Proof.
 have [/eqP->|p1Dp2] := boolP (p1 == p2); first by rewrite gdist0.
 elim: {n}_.+1 {-2}n (ltnSn n) p1 p2 p1Dp2 => // n IH [_ |[_|m mLn]] p1 p2 p1Dp2.
