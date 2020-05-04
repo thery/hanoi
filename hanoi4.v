@@ -101,7 +101,7 @@ Notation " `tuc[ a , b ] " := (ctuc a b).
 Notation " `dup[ a , b ] " := (rm_rep a b).
 
 (* This is theorem 2.9 *)
-Lemma phi_2_9 n (u v : configuration 4 n) (p0 p2 p3 : peg 4) :
+Lemma gdist_le_psi n (u v : configuration 4 n) (p0 p2 p3 : peg 4) :
   [/\ p3 != p2, p3 != p0 & p2 != p0] ->
   (codom v) \subset [:: p2 ; p3] -> 
   psi (s2f [set i | u i == p0]) <= d[u, v].
@@ -158,12 +158,12 @@ have [Ez|EnZ] := boolP (E' == set0).
     rewrite !inE /drel /= => pg1Dp3 pg2Dpg3 pg1Dpg2.
     apply: contra_neq pg1Dpg2 => /enum_rank_in_inj.
     by rewrite !inE; apply.
-  apply: leq_trans (gpath_cproj F aH gHuv).
-  have -> : cproj E p0Isp u = `c[enum_rank_in p0Isp p0].
+  apply: leq_trans (gpath_cset2 F aH gHuv).
+  have -> : cset2 E p0Isp u = `c[enum_rank_in p0Isp p0].
     apply/ffunP=> i.
     rewrite !ffunE; congr (enum_rank_in _ _).
     by have := enum_valP i; rewrite !inE => /eqP.
-  have -> : cproj E p0Isp v = `c[enum_rank_in p0Isp np2].
+  have -> : cset2 E p0Isp v = `c[enum_rank_in p0Isp np2].
     apply/ffunP=> i.
     rewrite !ffunE; congr (enum_rank_in _ _).
     have := subsetP cH (v (enum_val i)); rewrite !inE codom_f => /(_ isT).
@@ -359,8 +359,8 @@ have [KLT|TLK] := leqP (delta K) T; last first.
       by rewrite -cat_cons -/z0 mem_cat (mem_last u z0sb).
     by rewrite !(inE, mem_cat, mem_rcons, eqxx, orbT).
   - by rewrite eq_sym.
-  apply: leq_trans (gpath_cproj F aH gHz2v).
-  have -> : cproj (E'' :\ N) p0Isp z2 = `c[enum_rank_in p0Isp p1].
+  apply: leq_trans (gpath_cset2 F aH gHz2v).
+  have -> : cset2 (E'' :\ N) p0Isp z2 = `c[enum_rank_in p0Isp p1].
     apply/ffunP=> i.
     rewrite !ffunE; congr (enum_rank_in _ _).
     case: (Hz (z2 (enum_val i))) => // /eqP; rewrite -[_ == _]negbK; case/negP.
@@ -371,7 +371,7 @@ have [KLT|TLK] := leqP (delta K) T; last first.
       by case: ltngtP.
     apply: memE''; first by rewrite inE z2Ig orbT.
     by have := enum_valP i; rewrite inE => /andP[].
-  have -> : cproj (E'' :\ N) p0Isp v = `c[enum_rank_in p0Isp np2].
+  have -> : cset2 (E'' :\ N) p0Isp v = `c[enum_rank_in p0Isp np2].
     apply/ffunP=> i.
     rewrite !ffunE; congr (enum_rank_in _ _).
     have := subsetP cH (v (enum_val i)); rewrite !inE codom_f => /(_ isT).
@@ -980,8 +980,8 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
       rewrite !ffunE -oprojE.
       apply: memE''; first by rewrite gE' !(inE, mem_cat, i3Iz0b, orbT).
       by rewrite !inE /= uEp0.
-    apply: leq_trans (gdist_cproj F1 csV csL path1).
-    have -> : cproj sd1 p0Isp u1 = perfect (enum_rank_in p0Isp p0).
+    apply: leq_trans (gdist_cset2 F1 csV csL path1).
+    have -> : cset2 sd1 p0Isp u1 = perfect (enum_rank_in p0Isp p0).
       apply/ffunP => i ; rewrite !ffunE /=.
       have := enum_valP i; rewrite !inE /=.
       rewrite  (_ : tuc_ord _ _  = oproj (enum_val i)).
@@ -991,7 +991,7 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
     - by [].
     - by apply: memE'' => //; rewrite gE' !(mem_cat, inE, eqxx, orbT).
     - by rewrite eq_sym.
-    have -> : cproj sd1 p0Isp (f z0) = perfect (enum_rank_in p0Isp np1).
+    have -> : cset2 sd1 p0Isp (f z0) = perfect (enum_rank_in p0Isp np1).
       apply/ffunP => i ; rewrite !ffunE /=.
       have := enum_valP i; rewrite !inE -val_eqE /= => /and3P[iTEN uEp0 TLiT].
       rewrite -oprojE; case: (Hnz (z0 (oproj (enum_val i)))) => // /eqP.
@@ -1108,7 +1108,7 @@ have dp1z0_leq :  psi `[N] <= d[`c[p1], z0].
       by apply: (move_on_toplDl z0Mz0s) => /=.
     move=> /eqP; rewrite -[_ == z0s N]negbK; case/negP.
     by apply: (move_on_toplDr z0Mz0s); rewrite //= ltnW.
-  by apply: phi_2_9 cH1; split => //; rewrite -z0N1.
+  by apply: gdist_le_psi cH1; split => //; rewrite -z0N1.
 have dp2z2_leq :  psi `[N] <= d[`c[p2], z2].
   have  -> : `[N] = s2f [set i | cunliftr (`cf[p2, n.+1]) i == p2].
     apply/fsetP => i; rewrite mem_sint.
@@ -1124,7 +1124,7 @@ have dp2z2_leq :  psi `[N] <= d[`c[p2], z2].
       by apply: (move_on_toprDl z2pMz2) => //=; rewrite ltnW.
     move=> /eqP; rewrite -[_ == z2 N]negbK; case/negP.
     by apply: (move_on_toprDr z2pMz2); rewrite /=.
-  by apply: phi_2_9 cH1; split => //; rewrite -z2N2.
+  by apply: gdist_le_psi cH1; split => //; rewrite -z2N2.
 rewrite dp1p2E; apply: leq_trans (leq_add dp1z0_leq (leqnn _)).
 rewrite dz0p2E [gdist _ z2 _]gdistC // addnA. 
 apply: leq_trans (leq_add (leqnn _) dp2z2_leq).
@@ -1136,7 +1136,7 @@ move/idP; case: gdist => // k _.
 by rewrite addSnnS prednK // leq_addl.
 Qed.
 
-Lemma gdist_eq (n : nat) (p1 p2 : peg 4) : 
+Lemma gdist_psi (n : nat) (p1 p2 : peg 4) : 
   p1 != p2 -> d[`cf[p1, n], `cf[p2, n]] = ϕ(n).
 Proof.
 by move=> p1Dp2; apply/eqP; rewrite eqn_leq gdist_leq // gdist_geq.

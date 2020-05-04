@@ -1297,11 +1297,11 @@ Variable k : nat.
 (* relations on peg *)
 Variable rel : rel (peg k). 
 
-Definition cprojd (c : configuration k n) : configuration k #|sd| := 
+Definition cset (c : configuration k n) : configuration k #|sd| := 
   [ffun i => c (enum_val i)].
 
-Lemma on_top_cprojd c d (dIsd : d \in sd) : 
-  on_top d c -> on_top (enum_rank_in dIsd d) (cprojd c).
+Lemma on_top_cset c d (dIsd : d \in sd) : 
+  on_top d c -> on_top (enum_rank_in dIsd d) (cset c).
 Proof.
 move=> /= /on_topP dO.
 apply/on_topP => /= d1 H.
@@ -1315,9 +1315,9 @@ rewrite !ffunE enum_rankK_in // in H.
 by apply: dO.
 Qed.
 
-Lemma move_cprojd (c1 c2 : configuration k n) : 
-  move rel c1 c2 -> (cprojd c1) != (cprojd c2) ->
-  move rel (cprojd c1) (cprojd c2).
+Lemma move_cset (c1 c2 : configuration k n) : 
+  move rel c1 c2 -> (cset c1) != (cset c2) ->
+  move rel (cset c1) (cset c2).
 Proof.
 move => /moveP [d [dH1 dH2 dH3 dH4]] c1Dc2.
 have [dIsd|dNIsd] := boolP (d \in sd); last first.
@@ -1333,36 +1333,36 @@ apply/moveP; exists (enum_rank_in dIsd d); split => /=.
   apply: dH2.
   rewrite -[d](enum_rankK_in dIsd) //.
   by apply /eqP => /enum_val_inj /eqP; rewrite (negPf dDd2).
-- by apply: on_top_cprojd.
-by apply: on_top_cprojd.
+- by apply: on_top_cset.
+by apply: on_top_cset.
 Qed.
 
-Lemma path_cprojd (c : configuration _ _) cs :
+Lemma path_cset (c : configuration _ _) cs :
     path (move rel) c cs ->
-    path (move rel) (cprojd c) (rm_rep (cprojd c) [seq (cprojd i) | i <- cs]).
+    path (move rel) (cset c) (rm_rep (cset c) [seq (cset i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
-by rewrite move_cprojd => //=; first by apply: IH; rewrite ?c2V.
+by rewrite move_cset => //=; first by apply: IH; rewrite ?c2V.
 Qed.
 
-Lemma gdist_cprojd c1 c2 cs : 
+Lemma gdist_cset c1 c2 cs : 
     last c1 cs = c2 -> path (move rel) c1 cs ->
-   `d[cprojd c1, cprojd c2]_(move rel) <= size cs.
+   `d[cset c1, cset c2]_(move rel) <= size cs.
 Proof.
 move=> cL cPcs.
-have := size_rm_rep (cprojd c1) [seq (cprojd i) | i <- cs].
+have := size_rm_rep (cset c1) [seq (cset i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
-apply: gdist_path_le; first by apply: path_cprojd.
+apply: gdist_path_le; first by apply: path_cset.
 by rewrite last_rm_rep last_map cL.
 Qed.
 
-Lemma gpath_cprojd c1 c2 cs : 
+Lemma gpath_cset c1 c2 cs : 
     gpath (move rel) c1 c2 cs ->
-   `d[cprojd c1, cprojd c2]_(move rel) <= `d[c1, c2]_(move rel).
+   `d[cset c1, cset c2]_(move rel) <= `d[c1, c2]_(move rel).
 Proof.
 move=> gH.
-rewrite (gpath_dist gH); apply: gdist_cprojd => //; first apply: gpath_last gH.
+rewrite (gpath_dist gH); apply: gdist_cset => //; first apply: gpath_last gH.
 by apply: gpath_path gH.
 Qed.
 
@@ -1633,11 +1633,11 @@ by apply/implyP/H.
 Qed.
 
 
-Definition cproj (c : configuration k n) : configuration #|sp| #|sd| := 
+Definition cset2 (c : configuration k n) : configuration #|sp| #|sd| := 
   [ffun i => enum_rank_in p0Isp (c (enum_val i))].
 
-Lemma on_top_cproj c d (dIsd : d \in sd) : 
-  cvalid c -> on_top d c -> on_top (enum_rank_in dIsd d) (cproj c).
+Lemma on_top_cset2 c d (dIsd : d \in sd) : 
+  cvalid c -> on_top d c -> on_top (enum_rank_in dIsd d) (cset2 c).
 Proof.
 move=> /= /cvalidP cV /on_topP dO.
 apply/on_topP => /= d1 H.
@@ -1654,10 +1654,10 @@ apply: (@enum_rank_in_inj _ _ _ _ p0Isp p0Isp) => //.
 by apply/cV/enum_valP.
 Qed.
 
-Lemma move_cproj(c1 c2 : configuration k n) : 
+Lemma move_cset2 (c1 c2 : configuration k n) : 
   all cvalid [::c1; c2] ->
-  move rel1 c1 c2 -> (cproj c1) != (cproj c2) ->
-  move rel2 (cproj c1) (cproj c2).
+  move rel1 c1 c2 -> (cset2 c1) != (cset2 c2) ->
+  move rel2 (cset2 c1) (cset2 c2).
 Proof.
 rewrite /=.
 move=> /= /and3P[c1V c2V _]  /moveP [d [dH1 dH2 dH3 dH4]] c1Dc2.
@@ -1679,38 +1679,38 @@ apply/moveP; exists (enum_rank_in dIsd d); split => /=.
   apply: dH2.
   rewrite -[d](enum_rankK_in dIsd) //.
   by apply /eqP => /enum_val_inj /eqP; rewrite (negPf dDd2).
-- by apply: on_top_cproj.
-by apply: on_top_cproj.
+- by apply: on_top_cset2.
+by apply: on_top_cset2.
 Qed.
 
-Lemma path_cproj (c : configuration _ _) cs :
+Lemma path_cset2 (c : configuration _ _) cs :
     all cvalid (c :: cs) ->
     path (move rel1) c cs ->
-    path (move rel2) (cproj c) (rm_rep (cproj c) [seq (cproj i) | i <- cs]).
+    path (move rel2) (cset2 c) (rm_rep (cset2 c) [seq (cset2 i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /and3P[c1V c2V c3V] /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
-rewrite move_cproj => //=; first by apply: IH; rewrite ?c2V.
+rewrite move_cset2 => //=; first by apply: IH; rewrite ?c2V.
 by rewrite c1V c2V.
 Qed.
 
-Lemma gdist_cproj c1 c2 cs : 
+Lemma gdist_cset2 c1 c2 cs : 
     all cvalid (c1 :: cs) -> last c1 cs = c2 -> path (move rel1) c1 cs ->
-   `d[cproj c1, cproj c2]_(move rel2) <= size cs.
+   `d[cset2 c1, cset2 c2]_(move rel2) <= size cs.
 Proof.
 move=> cV cL cPcs.
-have := size_rm_rep (cproj c1) [seq (cproj i) | i <- cs].
+have := size_rm_rep (cset2 c1) [seq (cset2 i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
-apply: gdist_path_le; first by apply: path_cproj.
+apply: gdist_path_le; first by apply: path_cset2.
 by rewrite last_rm_rep last_map cL.
 Qed.
 
-Lemma gpath_cproj c1 c2 cs : 
+Lemma gpath_cset2 c1 c2 cs : 
     all cvalid (c1 :: cs) -> gpath (move rel1) c1 c2 cs ->
-   `d[cproj c1, cproj c2]_(move rel2) <= `d[c1, c2]_(move rel1).
+   `d[cset2 c1, cset2 c2]_(move rel2) <= `d[c1, c2]_(move rel1).
 Proof.
 move=> cV gH.
-rewrite (gpath_dist gH); apply: gdist_cproj => //; first apply: gpath_last gH.
+rewrite (gpath_dist gH); apply: gdist_cset2 => //; first apply: gpath_last gH.
 by apply: gpath_path gH.
 Qed.
 
@@ -1744,14 +1744,14 @@ Hypothesis rel3_compat :
   forall pi pj, pi \in sp2 -> pj \in sp2 ->
     rel1 pi pj -> rel3 (enum_rank_in p2Isp2 pi) (enum_rank_in p2Isp2 pj).
 
-Lemma size_cproj (c : configuration _ _) cs :
+Lemma size_cset2 (c : configuration _ _) cs :
     all (cvalid sd sp1) (c :: cs) ->
     all (cvalid (~: sd) sp2) (c :: cs) ->
     path (move rel1) c cs ->
     size cs = 
-     (size (rm_rep (cproj sd p1Isp1 c) [seq (cproj sd  p1Isp1 i) | i <- cs]) +
-      size (rm_rep (cproj (~: sd) p2Isp2 c)
-             [seq (cproj (~: sd) p2Isp2 i) | i <- cs]))%nat.
+     (size (rm_rep (cset2 sd p1Isp1 c) [seq (cset2 sd  p1Isp1 i) | i <- cs]) +
+      size (rm_rep (cset2 (~: sd) p2Isp2 c)
+             [seq (cset2 (~: sd) p2Isp2 i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /and3P[c1V1 c2V1 c3V1] 
                              /and3P[c1V2 c2V2 c3V2] 
@@ -1783,32 +1783,32 @@ rewrite ifN /= ?addSn; last first.
 by rewrite addnS; congr (_.+1); apply: IH; rewrite ?c2V1 ?c2V2.
 Qed.
 
-Lemma gdist_cproj2 c1 c2 cs : 
+Lemma gdist_cset22 c1 c2 cs : 
     all (cvalid sd sp1) (c1 :: cs) -> all (cvalid (~: sd) sp2) (c1 :: cs) ->
     last c1 cs = c2 -> path (move rel1) c1 cs ->
-   `d[cproj sd p1Isp1 c1, cproj sd p1Isp1 c2]_(move rel2) +
-   `d[cproj (~: sd) p2Isp2 c1, cproj (~: sd) p2Isp2  c2]_(move rel3)
+   `d[cset2 sd p1Isp1 c1, cset2 sd p1Isp1 c2]_(move rel2) +
+   `d[cset2 (~: sd) p2Isp2 c1, cset2 (~: sd) p2Isp2  c2]_(move rel3)
       <= size cs.
 Proof.
 move=> cV1 cV2 cL cPcs.
-rewrite (size_cproj cV1 cV2) //.
+rewrite (size_cset2 cV1 cV2) //.
 apply: leq_add.
-  apply: gdist_path_le; first by apply: path_cproj rel2_compat _ _ _ _.
+  apply: gdist_path_le; first by apply: path_cset2 rel2_compat _ _ _ _.
   by rewrite last_rm_rep last_map cL.
-apply: gdist_path_le; first by apply: path_cproj rel3_compat _ _ _ _.
+apply: gdist_path_le; first by apply: path_cset2 rel3_compat _ _ _ _.
 by rewrite last_rm_rep last_map cL.
 Qed.
 
-Lemma gpath_cproj2 c1 c2 cs : 
+Lemma gpath_cset22 c1 c2 cs : 
     all (cvalid sd sp1) (c1 :: cs) -> all (cvalid (~: sd) sp2) (c1 :: cs) ->
     gpath (move rel1) c1 c2 cs ->
-   `d[cproj sd p1Isp1 c1, cproj sd p1Isp1 c2]_(move rel2) +
-   `d[cproj (~: sd) p2Isp2 c1, cproj (~: sd) p2Isp2  c2]_(move rel3)
+   `d[cset2 sd p1Isp1 c1, cset2 sd p1Isp1 c2]_(move rel2) +
+   `d[cset2 (~: sd) p2Isp2 c1, cset2 (~: sd) p2Isp2  c2]_(move rel3)
       <= `d[c1,c2]_(move rel1).
 Proof.
 move=> cV1 cV2 gH.
 rewrite (gpath_dist gH).
-apply: gdist_cproj2 => //; first apply: gpath_last gH.
+apply: gdist_cset22 => //; first apply: gpath_last gH.
 by apply: gpath_path gH. 
 Qed.
 
