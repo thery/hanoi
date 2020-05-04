@@ -2,7 +2,7 @@ From mathcomp Require Import all_ssreflect.
 
 (******************************************************************************)
 (*             Definition of a distance on graph                              *)
-(* sconnect_n r n x == the set of all the elements connected to x in n steps  *)
+(*   connectn r n x == the set of all the elements connected to x in n steps  *)
 (*                                                                            *)
 (*   `d[t1, t2]_r   == the distance between t1 and t2 in r                    *)
 (*                     if they are not connected returns the cardinal of the  *)
