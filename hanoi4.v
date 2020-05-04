@@ -1136,7 +1136,7 @@ move/idP; case: gdist => // k _.
 by rewrite addSnnS prednK // leq_addl.
 Qed.
 
-Lemma gdist_psi (n : nat) (p1 p2 : peg 4) : 
+Lemma gdist_phi (n : nat) (p1 p2 : peg 4) : 
   p1 != p2 -> d[`cf[p1, n], `cf[p2, n]] = ϕ(n).
 Proof.
 by move=> p1Dp2; apply/eqP; rewrite eqn_leq gdist_leq // gdist_geq.
