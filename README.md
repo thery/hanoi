@@ -20,5 +20,6 @@ Hanoi towers in Coq
 | [ghanoi4](./ghanoi4.v)            | General Hanoi framework with 4 pegs      |
 | [hanoi4](./hanoi4.v)              | Hanoi towers with 4 pegs                 |
 
+A note about this development is available [here](./Note.pdf).
 
 To buld the library, download the files and type ```make install```.
