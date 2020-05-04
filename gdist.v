@@ -18,15 +18,16 @@ Section gdist.
 Variable T : finType.
 Variable r : rel T.
 
-Fixpoint sconnect_n n x :=
+Fixpoint connectn n x :=
   if n is n1.+1 then
-    \bigcup_(y in (rgraph r x)) sconnect_n n1 y
+    \bigcup_(y in (rgraph r x)) connectn n1 y
   else [set x].
 
-Lemma sconnect_nP n x y :
+
+Lemma connectnP n x y :
   reflect 
     (exists p : seq T, [/\ path r x p, last x p = y & size p = n])
-    (y \in sconnect_n n x).
+    (y \in connectn n x).
 Proof.
 elim: n x y =>  [x y|n IH x y /=].
   rewrite inE; apply: (iffP idP) => [/eqP->|[[|a l] [] //= _ ->//]].
@@ -42,7 +43,7 @@ by apply/IH; exists p; split => //; case: H3.
 Qed.
 
 Definition gdist t1 t2 :=
-  find (fun n => t2 \in sconnect_n n t1) (iota 0 #|T|).
+  find (fun n => t2 \in connectn n t1) (iota 0 #|T|).
 
 Local Notation " `d[ t1 , t2 ] " := (gdist t1 t2)
   (format " `d[ t1 ,  t2 ] ").
@@ -75,8 +76,8 @@ move=> Hp Hl.
 have [tLp|pLt] := leqP #|T| (size p).
   apply: leq_trans tLp.
   by apply: gdist_card_le.
-have F : t2 \in sconnect_n (size p) t1.
-  by apply/sconnect_nP; exists p.
+have F : t2 \in connectn (size p) t1.
+  by apply/connectnP; exists p.
 case: leqP => // /(before_find _) // /(_ 0).
 by rewrite seq.nth_iota // F.
 Qed.
@@ -90,7 +91,7 @@ apply/connectP/idP=> [[p /shortenP[p' Hp' Hu _ Ht]]|].
   apply: uniq_leq_size => // i.
   by rewrite mem_enum.
 rewrite -[#|_|](size_iota 0) -has_find.
-move => /hasP[n _ /sconnect_nP [p [H1p H2p H3p]]].
+move => /hasP[n _ /connectnP [p [H1p H2p H3p]]].
 by exists p.
 Qed.
 
@@ -124,7 +125,7 @@ absurd False => //.
 move: (dLT); rewrite -[#|_|](size_iota 0) -has_find.
 move => /(nth_find 0).
 rewrite -[find _ _]/`d[t1, t2].
-rewrite nth_iota // add0n => /sconnect_nP[p [H1p H2p /eqP H3p]].
+rewrite nth_iota // add0n => /connectnP[p [H1p H2p /eqP H3p]].
 have /idP[] := HC (Tuple H3p).
 by apply/and3P; split=> //=; apply/eqP=> //; rewrite (eqP H3p).
 Qed.
@@ -330,7 +331,7 @@ Section gdistProp.
 Variable T : finType.
 Variable r : rel T.
 
-Lemma eq_sconnect (r1 r2 : rel T) : r1 =2 r2 -> sconnect_n r1 =2 sconnect_n r2.
+Lemma eq_connectn (r1 r2 : rel T) : r1 =2 r2 -> connectn r1 =2 connectn r2.
 Proof.
 move=> r1Er2.
 elim => //= n IH y; apply: eq_big => // i.
@@ -341,14 +342,14 @@ Lemma eq_dist (r1 r2 : rel T) : r1 =2 r2 -> gdist r1 =2 gdist r2.
 Proof.
 move=> r1Er2 t1 t2.
 apply: eq_find => n.
-by rewrite (eq_sconnect r1Er2).
+by rewrite (eq_connectn r1Er2).
 Qed.
 
 Lemma gdist_sym t1 t2 :
  `d[t1, t2]_r  =  `d[t2, t1]_(fun z : T => r^~ z).
 Proof.
 apply: eq_find => i.
-apply/sconnect_nP/sconnect_nP => /= [] [p [H1p H2p H3p]].
+apply/connectnP/connectnP => /= [] [p [H1p H2p H3p]].
   exists (rev (belast t1 p)); split => //.
   - by rewrite -H2p rev_path.
   - rewrite -H2p; case: (p) => //= a p1.

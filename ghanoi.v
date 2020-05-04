@@ -59,9 +59,9 @@ Section GHanoi.
 
 Variable q : nat.
 
-(*****************************************************************************)
-(*  The pegs are the elements of 'I_q                                        *)
-(*****************************************************************************)
+(******************************************************************************)
+(*  The pegs are the elements of 'I_q                                         *)
+(******************************************************************************)
 
 Definition peg := 'I_q.
 Variable r : rel peg.
@@ -70,10 +70,10 @@ Hypothesis symH : symmetric r.
 
 
 Section Disk.
-(*****************************************************************************)
-(* The disks are represented with the element of 'I_n with                   *)
-(* the idea that disk d1 is larger than disk d2 is d2 <= d1.                 *)
-(*****************************************************************************)
+(******************************************************************************)
+(* The disks are represented with the element of 'I_n with                    *)
+(* the idea that disk d1 is larger than disk d2 is d2 <= d1.                  *)
+(******************************************************************************)
 
 Variable n : nat.
 Definition disk := 'I_n.
@@ -167,7 +167,7 @@ by apply/moveP/moveP=> [] [d [H1 H2 H3 H4]];
    exists d; split; rewrite 1?symH 1?eq_sym // => e dDe; apply/sym_equal/H2.
 Qed.
 
-(* In a move, the disk that moves accomodates r                              *)
+(* In a move, the disk that moves accomodates r                               *)
 Lemma move_diskr n (d : disk n) (c1 c2 : configuration n) : 
   move c1 c2 -> c1 d != c2 d -> r (c1 d) (c2 d).
 Proof.
@@ -175,7 +175,7 @@ case/moveP=> d1 [H1 H2 H3 H4] /eqP c1dDc2d.
 by have [/eqP<-|/H2] := boolP (d1 == d).
 Qed.
 
-(* In a move, only one disk moves *)
+(* In a move, only one disk moves                                             *)
 Lemma move_disk1 n (d1 d2 : disk n) (c1 c2 : configuration n) : 
   move c1 c2 -> c1 d1 != c2 d1 -> d1 != d2 -> c1 d2 = c2 d2.
 Proof.
@@ -232,19 +232,19 @@ apply: (iffP forallP) => [H i j| H i].
 by apply/forallP=> j; apply: H.
 Qed.
 
-(* merging two configurations : c1 for the small disks, c2 for the big ones *)
+(* merging two configurations : c1 for the small disks, c2 for the big ones   *)
 Definition cmerge m n (c1 : configuration m) (c2 : configuration n) :=
   [ffun i => match tsplit i with inl j => c1 j | inr j => c2 j end].
 
-(* right shifting a configuration : taking the disks smaller than n *)
+(* right shifting a configuration : taking the disks smaller than n           *)
 Definition crshift m n (c : configuration (m + n)) : configuration n := 
    [ffun i => c (trshift m i)].
 
-(* left shifting a configuration : taking the disks larger than n *)
+(* left shifting a configuration : taking the disks larger than n             *)
 Definition clshift m n (c : configuration (m + n)) : configuration m := 
    [ffun i => c (tlshift n i)].
 
-(* Sanity check *)
+(* Sanity check                                                               *)
 Lemma cmergeK m n (c : configuration (m + n)) :
   cmerge (clshift c) (crshift c) = c.
 Proof.
@@ -317,7 +317,7 @@ apply/connectP; eexists; first exact: Hp.
 by rewrite Hl [RHS]last_map.
 Qed.
 
-(* this should be equality *)
+(* this should be equality                                                    *)
 Lemma gdist_merger m n (c: configuration m) (c1 c2 : configuration n) : 
   connect move c1 c2 ->
   `d[cmerge c c1, cmerge c c2]_move <= `d[c1, c2]_move.
@@ -909,6 +909,14 @@ Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
 Lemma on_top1 k (d : disk 1) (c : configuration k 1) : on_top d c.
 Proof. by apply/on_topP=> [] [] [] //=; case: d => [] []. Qed.
 
+Lemma perfect_eqE n k (p1 p2 : peg k) :
+   (@perfect k n.+1 p1 == perfect p2) = (p1 == p2).
+Proof.
+apply/eqP/eqP => [|<-] // cp1Ecp2.
+rewrite -(_ : @perfect k n.+1 p1 sdisk = p1); last by rewrite ffunE.
+by rewrite cp1Ecp2 ffunE.
+Qed.
+
 Section PLift.
 
 Variables n q : nat.
@@ -1112,9 +1120,9 @@ Qed.
 
 End Drel.
 
-(*****************************************************************************)
-(*  Linear relation                                                          *)
-(*****************************************************************************)
+(******************************************************************************)
+(*  Linear relation                                                           *)
+(******************************************************************************)
 
 Section Lrel.
 

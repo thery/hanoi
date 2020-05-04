@@ -1110,15 +1110,6 @@ rewrite -addnS -[(2 ^ _).*2]mul2n -expnS prednK //.
 by apply: psi_leD.
 Qed.
 
-
-Lemma perfect_eqE n k (p1 p2 : peg k) :
-   (`cf[p1, n.+1] == `cf[p2, n.+1]) = (p1 == p2).
-Proof.
-apply/eqP/eqP => [|<-] // cp1Ecp2.
-rewrite -(_ : `cf[p1, n.+1] ord0 = p1); last by rewrite ffunE.
-by rewrite cp1Ecp2 ffunE.
-Qed.
-
 Lemma gdist_geq (n : nat) (p1 p2 : peg 4) : 
   p1 != p2 -> ϕ(n) <= d[`cf[p1, n], `cf[p2, n]].
 Proof.
