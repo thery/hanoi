@@ -5,6 +5,7 @@ extra.v
 gdist.v
 ghanoi.v
 ghanoi3.v
+ghanoi4.v
 lhanoi3.v
 hanoi3.v
 triangular.v

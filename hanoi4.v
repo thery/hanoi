@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect finmap.
-Require Import extra gdist ghanoi triangular phi hanoi3 psi.
+Require Import extra gdist ghanoi ghanoi4 triangular phi hanoi3 psi.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -13,76 +13,6 @@ Unset Strict Implicit.
 (******************************************************************************)
 
 Section Hanoi4.
-
-(*****************************************************************************)
-(*  The pegs are the four elements of 'I_4                                   *)
-(*****************************************************************************)
-
-Implicit Type p : peg 4.
-
-Let peg0 : peg 4 := ord0.
-Let peg1 : peg 4 := inord 1.
-Let peg2 : peg 4 := inord 2.
-Let peg3 : peg 4 := inord 3.
-
-Lemma peg4E p : [\/ p = peg0, p = peg1, p = peg2 | p = peg3].
-Proof.
-by case: p => [] [|[|[|[|]]]] // H; 
-   [apply: Or41|apply: Or42|apply: Or43|apply: Or44];
-   apply/val_eqP; rewrite //= inordK.
-Qed.
-
-Ltac comp2_tac peg2 peg3 :=
- let p := fresh "p" in
- exists peg2; exists peg3; repeat split; 
-      try (by apply/eqP/val_eqP; rewrite /= !inordK);
-    move=> p; case: (peg4E p)=>->;
-    ((by apply/Or41/val_eqP; rewrite /= ?inordK) ||
-     (by apply/Or42/val_eqP; rewrite /= ?inordK) ||
-     (by apply/Or43/val_eqP; rewrite /= ?inordK) ||
-     (by apply/Or44/val_eqP; rewrite /= ?inordK)).
-     
-
-Lemma peg4comp2 p1 p2 :
-  p1 != p2 -> exists p3, exists p4,
-    [/\ [/\ p4 != p3, p4 != p2 & p4 != p1],
-        [/\ p3 != p2 & p3 != p1] & 
-        (forall p, [\/ p = p1, p = p2, p = p3 | p = p4])].
-Proof.
-case: (peg4E p1)=>->; case: (peg4E p2)=>->; rewrite ?eqxx // => _.
-comp2_tac peg2 peg3. 
-comp2_tac peg1 peg3.
-comp2_tac peg1 peg2.
-comp2_tac peg2 peg3.
-comp2_tac peg0 peg3.
-comp2_tac peg0 peg2.
-comp2_tac peg1 peg3.
-comp2_tac peg0 peg3.
-comp2_tac peg0 peg1.
-comp2_tac peg1 peg2.
-comp2_tac peg0 peg2.
-comp2_tac peg0 peg1.
-Qed.
-
-Ltac comp3_tac peg0 :=
-let p := fresh "p" in
-exists peg0; (repeat split) => [|||p];
-     try (apply/eqP/val_eqP; rewrite /= ?inordK //);
-case: (peg4E p)=>->;
-    ((by apply/Or41/val_eqP; rewrite /= ?inordK) ||
-     (by apply/Or42/val_eqP; rewrite /= ?inordK) ||
-     (by apply/Or43/val_eqP; rewrite /= ?inordK) ||
-     (by apply/Or44/val_eqP; rewrite /= ?inordK)).
-
-Lemma peg4comp3 p1 p2 p3 :
-  p1 != p2 -> p1 != p3 -> p2 != p3 -> 
-  exists p4, [/\ p4 != p3, p4 != p2 & p4 != p1] /\
-        (forall p, [\/ p = p1, p = p2, p = p3 | p = p4]).
-Proof.
-case: (peg4E p1)=>->; case: (peg4E p2)=>->; 
-case: (peg4E p3)=>->; rewrite ?eqxx // => _ _ _;
-(comp3_tac peg0 || comp3_tac peg1 || comp3_tac peg2 || comp3_tac peg3).
-Qed.
 
 Let hrel : rel (peg 4) := @drel 4.
 Let hirr : irreflexive hrel := @dirr 4.
@@ -168,7 +98,7 @@ Qed.
 
 Notation " `cut[ a , b ] " := (ccut a b).
 Notation " `tuc[ a , b ] " := (ctuc a b).
-Notation " `dup[ a , b ] " := (rm_dup a b).
+Notation " `dup[ a , b ] " := (rm_rep a b).
 
 (* This is theorem 2.9 *)
 Lemma phi_2_9 n (u v : configuration 4 n) (p0 p2 p3 : peg 4) :
@@ -613,7 +543,7 @@ have [|K_gt0] := leqP K 0.
           by rewrite /= z2N2 -[ord_max]TE x3T3 eq_sym (negPf np3Dp2).
         by apply/val_eqP/eqP.
       rewrite -{1}CD.
-      apply: size_rm_dup_subset => //.
+      apply: size_rm_rep_subset => //.
         move=> i; rewrite !inE => /orP[]/eqP->; apply: map_f => //.
         by rewrite mem_rcons !inE eqxx.
       rewrite !inE negb_or; apply/andP; split; apply/eqP.
@@ -630,15 +560,15 @@ have [|K_gt0] := leqP K 0.
       rewrite x0Ez0.
       apply: gdist_path_le.
       apply: @path_crshift _ _ 1 _ _ _ (gpath_path gHz0z2).
-      by rewrite last_rm_dup last_map last_rcons.
+      by rewrite last_rm_rep last_map last_rcons.
     move: gHz0z2.
     case: (in_split x3Ircons) => l1 [l2 rE].
     rewrite rE -cat_rcons  => /gpath_catr.
-    rewrite map_cat cat_rm_dup size_cat map_rcons !last_rcons => gH3.
+    rewrite map_cat cat_rm_rep size_cat map_rcons !last_rcons => gH3.
     apply: leq_trans (leq_addl _ _).
       apply: gdist_path_le.
       apply: @path_crshift _ _ 1 _ _ _ (gpath_path gH3).
-      rewrite last_rm_dup last_map.
+      rewrite last_rm_rep last_map.
       suff <- : last x3 (l1 ++ x3 :: l2) = last x3 l2 by rewrite -rE last_rcons.
       by rewrite last_cat.
   apply: leq_trans (leq_add duz0_leq2 (leqnn _)).
@@ -924,22 +854,22 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
   rewrite -addnS; apply: leq_add.
     have := gE'; rewrite z0sz0saE gE x0sx0saE x3aE cat_rcons.
     rewrite -!cat_cons !catA -rcons_cat => /cat_injr <-.
-    rewrite rcons_cat !map_cat !cat_rm_dup !size_cat -addnA.
+    rewrite rcons_cat !map_cat !cat_rm_rep !size_cat -addnA.
     apply: leq_add.
       apply: leq_trans du''x0''_leq _.
       apply: gdist_path_le.
         apply: path_cut.
         by move : gHuv; rewrite gE => /gpath_catl/gpath_path.
-      by rewrite last_rm_dup last_map.
+      by rewrite last_rm_rep last_map.
     apply: leq_trans _ (leq_addl _ _).
     apply: leq_trans  dz2''x3''_leq  _.
     rewrite rcons_cons [map _ (_ ::_)]/=.
-    apply: leq_trans (size_rm_dup_cons _ _ _).
+    apply: leq_trans (size_rm_rep_cons _ _ _).
     rewrite gdistC //.
       apply: gdist_path_le.
       apply: path_cut.
       by have := gHx3v; rewrite x3aE -cat_rcons => /gpath_catl/gpath_path.
-    by rewrite last_rm_dup map_rcons last_rcons.
+    by rewrite last_rm_rep map_rcons last_rcons.
   have := gHuv; rewrite gE' z0sz0saE catA => /gpath_catl.
    rewrite last_cat last_rcons => gHuz2.
   have Puz2 := path_tuc tln (gpath_path gHuz2).
@@ -949,13 +879,13 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
   apply: leq_add.
     move: gE; rewrite gE'; rewrite z0sz0saE x0sx0saE x3aE -!cat_rcons !catA.
     move=> /cat_injr ->.
-    set cc := rm_dup _ _.
+    set cc := rm_rep _ _.
     suff : ccut oLn (ctuc tln x3) \in cc by case: cc.
-    apply: mem_rm_dup.
+    apply: mem_rm_rep.
       apply/eqP=> /ffunP/(_ ord0); rewrite !ffunE /=.
       apply/eqP; rewrite (_ : tuc_ord _ _ = T); last by apply: val_inj.
       by rewrite uT0 x3T3 np3Dp0.
-    apply/map_f/mem_rm_dup; last first.
+    apply/map_f/mem_rm_rep; last first.
       by apply: map_f; rewrite !(inE, mem_rcons, mem_cat, eqxx, orbT).
       have onT : 0 < n.+1 - T by rewrite subn_gt0.
     apply/eqP=> /ffunP/(_  (Ordinal onT)); rewrite !ffunE /=.
@@ -966,9 +896,9 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
   rewrite (size_cut_tuc nTLnT _ Puz3) //.
   rewrite -[2 ^ _]prednK ?expn_gt0 // -addn1.
   apply: leq_add; last first.
-    set cc := rm_dup _ _.
+    set cc := rm_rep _ _.
     suff : ctuc nTLnT (ctuc oLn (ctuc tln z2)) \in cc by case: cc.
-    apply: mem_rm_dup.
+    apply: mem_rm_rep.
       have oLn1 : 0 < n.+1 - T - 1 - (n - T).-1.
         rewrite -subnDA add1n subSn; last by rewrite ltnW.
         rewrite prednK //; last by rewrite subn_gt0.
@@ -979,8 +909,8 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
           by apply: ltnW.
         by rewrite subn_gt0.
       by rewrite z2N2 uN0.
-    apply/map_f/mem_rm_dup; last first.
-      apply/map_f/mem_rm_dup; last first.
+    apply/map_f/mem_rm_rep; last first.
+      apply/map_f/mem_rm_rep; last first.
         by apply: map_f; rewrite !(inE, mem_rcons, mem_cat, eqxx, orbT).
       have oLn1 : n - T < n.+1 - T by apply: ltn_sub2r.
       apply/eqP=> /ffunP/(_  (Ordinal oLn1)); rewrite !ffunE /=.
@@ -1004,14 +934,14 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
     have oprojE i : oproj i = 
                     tuc_ord tln (tuc_ord oLn (widen_ord nTLnT i)).
       by apply/val_inj; rewrite /= addn1 addnS.
-    rewrite !(map_cat, cat_rm_dup, size_cat).
+    rewrite !(map_cat, cat_rm_rep, size_cat).
     apply: leq_trans (leq_addr _ _).
     pose f (i : configuration 4 _) := ccut nTLnT (ctuc oLn (ctuc tln i)).
     have /gpath_path/(path_tuc tln)/(path_tuc oLn)/(path_cut nTLnT) := gHuz0.
     pose u1 := f u; rewrite -[ccut _ _]/u1.
     set cs := map _ _ => path1.
-    have csL : last u1 (rm_dup u1 cs) = f z0.
-      by rewrite /u1 /cs /f !(last_rm_dup, last_map).
+    have csL : last u1 (rm_rep u1 cs) = f z0.
+      by rewrite /u1 /cs /f !(last_rm_rep, last_map).
     pose sd1 :=  oproj @^-1:  (E'' :\ N).
     have card_sd1 :  #|sd1| = K.-1.
       have := TLN; rewrite leq_eqVlt => /orP[/eqP /= TEN| TLNN].
@@ -1045,8 +975,8 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
         rewrite !inE !ffunE /= -val_eqE /= => /and3P[jTDn /eqP uP _].
         by rewrite -oprojE uP eq_sym.
       rewrite !inE -val_eqE /= => /and3P[jTDn uEp0 TLjT].
-      have /mapP[i1 /subset_rm_dup /mapP[i2]] := subset_rm_dup iId.
-      move=> /subset_rm_dup /mapP[i3 i3Iz0b] -> -> ->.
+      have /mapP[i1 /subset_rm_rep /mapP[i2]] := subset_rm_rep iId.
+      move=> /subset_rm_rep /mapP[i3 i3Iz0b] -> -> ->.
       rewrite !ffunE -oprojE.
       apply: memE''; first by rewrite gE' !(inE, mem_cat, i3Iz0b, orbT).
       by rewrite !inE /= uEp0.

@@ -452,31 +452,31 @@ apply: c2H; rewrite (_ : x = (trshift m j)) //.
 by apply/val_eqP/eqP => /=.
 Qed.
 
-Fixpoint rm_dup (A : eqType) (a : A) (s : seq A) := 
+Fixpoint rm_rep (A : eqType) (a : A) (s : seq A) := 
   if s is b :: s1 then 
-    if a == b then rm_dup b s1 else b :: rm_dup b s1 
+    if a == b then rm_rep b s1 else b :: rm_rep b s1 
   else [::].
 
-Lemma subseq_rm_dup (A : eqType) (a : A) s : subseq (rm_dup a s) s.
+Lemma subseq_rm_rep (A : eqType) (a : A) s : subseq (rm_rep a s) s.
 Proof.
 elim: s a => // b s IH a.
-rewrite [rm_dup _ _]/=; case: (a == b).
+rewrite [rm_rep _ _]/=; case: (a == b).
   by apply: subseq_trans (IH _) (subseq_cons _ _).
 by rewrite /= eqxx IH.
 Qed.
 
-Lemma subset_rm_dup (A : eqType) (a : A) s : {subset rm_dup a s <= s}.
-Proof. by apply/mem_subseq/subseq_rm_dup. Qed.
+Lemma subset_rm_rep (A : eqType) (a : A) s : {subset rm_rep a s <= s}.
+Proof. by apply/mem_subseq/subseq_rm_rep. Qed.
 
-Lemma size_rm_dup (A : eqType) (a : A) s : size (rm_dup a s) <= size s.
-Proof. by apply/size_subseq/subseq_rm_dup. Qed.
+Lemma size_rm_rep (A : eqType) (a : A) s : size (rm_rep a s) <= size s.
+Proof. by apply/size_subseq/subseq_rm_rep. Qed.
 
-Lemma size_rm_dup_cons (A : eqType) (a b : A) s : 
-  size (rm_dup b s) <= size (rm_dup a (b :: s)).
+Lemma size_rm_rep_cons (A : eqType) (a b : A) s : 
+  size (rm_rep b s) <= size (rm_rep a (b :: s)).
 Proof. by rewrite /=; case: (_ == _) => //=. Qed.
 
-Lemma size_rm_dup_subset  (A : finType) (a : A) (s1 : {set A}) (s2 : seq A) : 
-  {subset s1 <= s2} -> a \notin s1 -> #|s1| <= size (rm_dup a s2).
+Lemma size_rm_rep_subset  (A : finType) (a : A) (s1 : {set A}) (s2 : seq A) : 
+  {subset s1 <= s2} -> a \notin s1 -> #|s1| <= size (rm_rep a s2).
 Proof.
 elim: s2 s1 a => /= [s1 a aS _|b s2 IH s1 a s1S aNIs1].
   rewrite leqn0 cards_eq0; apply/eqP/setP=> i.
@@ -495,21 +495,21 @@ apply: IH => [i|].
 by rewrite !inE eqxx.
 Qed.
 
-Lemma last_rm_dup (A : eqType) (a : A) s : last a (rm_dup a s) = last a s.
+Lemma last_rm_rep (A : eqType) (a : A) s : last a (rm_rep a s) = last a s.
 Proof.
 by elim: s a => //= b l IH a; case: (_ =P _) => /= [->|_]; apply: IH.
 Qed.
 
-Lemma cat_rm_dup (A : eqType) (a : A) s1 s2 : 
-  rm_dup a (s1 ++ s2) = rm_dup a s1 ++ rm_dup (last a s1) s2.
+Lemma cat_rm_rep (A : eqType) (a : A) s1 s2 : 
+  rm_rep a (s1 ++ s2) = rm_rep a s1 ++ rm_rep (last a s1) s2.
 Proof.
 elim: s1 s2 a => //= b s1 IH s2 a.
 case: eqP => [aEb|aDb] /=; first by apply: IH.
 by congr (_ :: _); apply: IH.
 Qed.
 
-Lemma mem_rm_dup (A : eqType) (a b: A) s : 
-   b != a -> b \in s -> b \in rm_dup a s.
+Lemma mem_rm_rep (A : eqType) (a b: A) s : 
+   b != a -> b \in s -> b \in rm_rep a s.
 Proof.
 elim: s a => //= c s IH a bDa; rewrite inE.  
 case: (boolP (b == c)) => /= [/eqP<- _|bDc bIs].
@@ -519,7 +519,7 @@ Qed.
 
 Lemma path_clshift m n (c : configuration (m + n)) cs :
     path move c cs ->
-    path move (clshift c) (rm_dup (clshift c) [seq (clshift i) | i <- cs]).
+    path move (clshift c) (rm_rep (clshift c) [seq (clshift i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH.
@@ -528,7 +528,7 @@ Qed.
 
 Lemma path_crshift m n (c : configuration (m + n)) cs :
     path move c cs ->
-    path move (crshift c) (rm_dup (crshift c) [seq (crshift i) | i <- cs]).
+    path move (crshift c) (rm_rep (crshift c) [seq (crshift i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH.
@@ -537,8 +537,8 @@ Qed.
 
 Lemma path_shift  m n (c : configuration (m + n)) cs :
     path move c cs ->
-    size cs = (size (rm_dup (clshift c) [seq (clshift i) | i <- cs]) +
-               size(rm_dup (crshift c) [seq (crshift i) | i <- cs]))%nat.
+    size cs = (size (rm_rep (clshift c) [seq (clshift i) | i <- cs]) +
+               size(rm_rep (crshift c) [seq (crshift i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /andP[/moveP[d [d2H d2H1 d2H2 d2H3]] c1Pcs].
 case: (tsplitP d) => [j dE | k dE].
@@ -569,10 +569,10 @@ Lemma gdist_clshift n m (c1 c2 : configuration (m + n)) :
   `d[clshift c1, clshift c2]_move <= `d[c1, c2]_move.
 Proof.
 move=> /gpath_connect[p pH].
-have := size_rm_dup (clshift c1) [seq (clshift i) | i <- p].
+have := size_rm_rep (clshift c1) [seq (clshift i) | i <- p].
 rewrite (gpath_dist pH) size_map; move/(leq_trans _); apply.
 apply: gdist_path_le; first by apply/path_clshift/(gpath_path pH).
-by rewrite last_rm_dup last_map (gpath_last pH).
+by rewrite last_rm_rep last_map (gpath_last pH).
 Qed.
 
 Lemma gdist_crshift n m (c1 c2 : configuration (m + n)) : 
@@ -580,10 +580,10 @@ Lemma gdist_crshift n m (c1 c2 : configuration (m + n)) :
   `d[crshift c1, crshift c2]_move <= `d[c1, c2]_move.
 Proof.
 move=> /gpath_connect[p pH].
-have := size_rm_dup (crshift c1) [seq (crshift i) | i <- p].
+have := size_rm_rep (crshift c1) [seq (crshift i) | i <- p].
 rewrite (gpath_dist pH) size_map; move/(leq_trans _); apply.
 apply: gdist_path_le; first by apply/path_crshift/(gpath_path pH).
-by rewrite last_rm_dup last_map (gpath_last pH).
+by rewrite last_rm_rep last_map (gpath_last pH).
 Qed.
 
 Lemma gdist_cshift n m (c1 c2 : configuration (m + n)) : 
@@ -595,9 +595,9 @@ move=> /gpath_connect[p pH].
 rewrite (gpath_dist pH) (path_shift (gpath_path pH)).
 apply: leq_add.
   apply: gdist_path_le; first by apply/path_clshift/(gpath_path pH).
-    by rewrite last_rm_dup last_map (gpath_last pH).
+    by rewrite last_rm_rep last_map (gpath_last pH).
 apply: gdist_path_le; first by apply/path_crshift/(gpath_path pH).
-by rewrite last_rm_dup last_map (gpath_last pH).
+by rewrite last_rm_rep last_map (gpath_last pH).
 Qed.
 
 Definition cliftrn m n p (c : configuration n) : configuration (m + n) :=
@@ -757,7 +757,7 @@ Qed.
 
 Lemma path_unlift n (c : configuration n.+1) (cs : seq (configuration _)) :
   path move c cs ->
-  path move ↓[c] (rm_dup ↓[c] [seq ↓[i] | i <- cs]).
+  path move ↓[c] (rm_rep ↓[c] [seq ↓[i] | i <- cs]).
 Proof. by move=> H; apply: path_crshift. Qed.
 
 Lemma gdist_cunlift n (c1 c2 : configuration n.+1) : 
@@ -1339,7 +1339,7 @@ Qed.
 
 Lemma path_cprojd (c : configuration _ _) cs :
     path (move rel) c cs ->
-    path (move rel) (cprojd c) (rm_dup (cprojd c) [seq (cprojd i) | i <- cs]).
+    path (move rel) (cprojd c) (rm_rep (cprojd c) [seq (cprojd i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
@@ -1351,10 +1351,10 @@ Lemma gdist_cprojd c1 c2 cs :
    `d[cprojd c1, cprojd c2]_(move rel) <= size cs.
 Proof.
 move=> cL cPcs.
-have := size_rm_dup (cprojd c1) [seq (cprojd i) | i <- cs].
+have := size_rm_rep (cprojd c1) [seq (cprojd i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
 apply: gdist_path_le; first by apply: path_cprojd.
-by rewrite last_rm_dup last_map cL.
+by rewrite last_rm_rep last_map cL.
 Qed.
 
 Lemma gpath_cprojd c1 c2 cs : 
@@ -1438,7 +1438,7 @@ Qed.
 
 Lemma path_cut (c : configuration _ _) cs :
     path (move rel) c cs ->
-    path (move rel) (ccut c) (rm_dup (ccut c) [seq (ccut i) | i <- cs]).
+    path (move rel) (ccut c) (rm_rep (ccut c) [seq (ccut i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
@@ -1450,10 +1450,10 @@ Lemma gdist_cut c1 c2 cs :
    `d[ccut c1, ccut c2]_(move rel) <= size cs.
 Proof.
 move=> cL cPcs.
-have := size_rm_dup (ccut c1) [seq (ccut i) | i <- cs].
+have := size_rm_rep (ccut c1) [seq (ccut i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
 apply: gdist_path_le; first by apply: path_cut.
-by rewrite last_rm_dup last_map cL.
+by rewrite last_rm_rep last_map cL.
 Qed.
 
 Lemma gpath_cut c1 c2 cs : 
@@ -1517,7 +1517,7 @@ Qed.
 
 Lemma path_tuc (c : configuration _ _) cs :
     path (move rel) c cs ->
-    path (move rel) (ctuc c) (rm_dup (ctuc c) [seq (ctuc i) | i <- cs]).
+    path (move rel) (ctuc c) (rm_rep (ctuc c) [seq (ctuc i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
@@ -1529,10 +1529,10 @@ Lemma gdist_tuc c1 c2 cs :
    `d[ctuc c1, ctuc c2]_(move rel) <= size cs.
 Proof.
 move=> cL cPcs.
-have := size_rm_dup (ctuc c1) [seq (ctuc i) | i <- cs].
+have := size_rm_rep (ctuc c1) [seq (ctuc i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
 apply: gdist_path_le; first by apply: path_tuc.
-by rewrite last_rm_dup last_map cL.
+by rewrite last_rm_rep last_map cL.
 Qed.
 
 Lemma gpath_tuc c1 c2 cs : 
@@ -1547,8 +1547,8 @@ Qed.
 Lemma size_cut_tuc (c : configuration _ _) cs :
     path (move rel) c cs ->
     size cs = 
-     (size (rm_dup (ccut c) [seq (ccut i) | i <- cs]) +
-      size (rm_dup (ctuc c) [seq (ctuc i) | i <- cs]))%nat.
+     (size (rm_rep (ccut c) [seq (ccut i) | i <- cs]) +
+      size (rm_rep (ctuc c) [seq (ctuc i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /andP[/moveP[d [dH1 dH2 dH3 dH4]] c1Pcs].
 have cdDc1d : c d != c1 d.
@@ -1579,9 +1579,9 @@ move=> cL cPcs.
 rewrite (@size_cut_tuc c1) //.
 apply: leq_add.
   apply: gdist_path_le; first by apply: path_cut.
-  by rewrite last_rm_dup last_map cL.
+  by rewrite last_rm_rep last_map cL.
 apply: gdist_path_le; first by apply: path_tuc.
-by rewrite last_rm_dup last_map cL.
+by rewrite last_rm_rep last_map cL.
 Qed.
 
 Lemma gpath_cut_tuc c1 c2 cs : 
@@ -1686,7 +1686,7 @@ Qed.
 Lemma path_cproj (c : configuration _ _) cs :
     all cvalid (c :: cs) ->
     path (move rel1) c cs ->
-    path (move rel2) (cproj c) (rm_dup (cproj c) [seq (cproj i) | i <- cs]).
+    path (move rel2) (cproj c) (rm_rep (cproj c) [seq (cproj i) | i <- cs]).
 Proof.
 elim: cs c => //= c1 cs IH c => /and3P[c1V c2V c3V] /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
@@ -1699,10 +1699,10 @@ Lemma gdist_cproj c1 c2 cs :
    `d[cproj c1, cproj c2]_(move rel2) <= size cs.
 Proof.
 move=> cV cL cPcs.
-have := size_rm_dup (cproj c1) [seq (cproj i) | i <- cs].
+have := size_rm_rep (cproj c1) [seq (cproj i) | i <- cs].
 rewrite size_map; move/(leq_trans _); apply.
 apply: gdist_path_le; first by apply: path_cproj.
-by rewrite last_rm_dup last_map cL.
+by rewrite last_rm_rep last_map cL.
 Qed.
 
 Lemma gpath_cproj c1 c2 cs : 
@@ -1749,8 +1749,8 @@ Lemma size_cproj (c : configuration _ _) cs :
     all (cvalid (~: sd) sp2) (c :: cs) ->
     path (move rel1) c cs ->
     size cs = 
-     (size (rm_dup (cproj sd p1Isp1 c) [seq (cproj sd  p1Isp1 i) | i <- cs]) +
-      size (rm_dup (cproj (~: sd) p2Isp2 c)
+     (size (rm_rep (cproj sd p1Isp1 c) [seq (cproj sd  p1Isp1 i) | i <- cs]) +
+      size (rm_rep (cproj (~: sd) p2Isp2 c)
              [seq (cproj (~: sd) p2Isp2 i) | i <- cs]))%nat.
 Proof.
 elim: cs c => //= c1 cs IH c /and3P[c1V1 c2V1 c3V1] 
@@ -1794,9 +1794,9 @@ move=> cV1 cV2 cL cPcs.
 rewrite (size_cproj cV1 cV2) //.
 apply: leq_add.
   apply: gdist_path_le; first by apply: path_cproj rel2_compat _ _ _ _.
-  by rewrite last_rm_dup last_map cL.
+  by rewrite last_rm_rep last_map cL.
 apply: gdist_path_le; first by apply: path_cproj rel3_compat _ _ _ _.
-by rewrite last_rm_dup last_map cL.
+by rewrite last_rm_rep last_map cL.
 Qed.
 
 Lemma gpath_cproj2 c1 c2 cs : 

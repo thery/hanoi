@@ -19,10 +19,8 @@ Variable T : finType.
 Variable r : rel T.
 
 Fixpoint connectn n x :=
-  if n is n1.+1 then
-    \bigcup_(y in (rgraph r x)) connectn n1 y
+  if n is n1.+1 then \bigcup_(y in (rgraph r x)) connectn n1 y
   else [set x].
-
 
 Lemma connectnP n x y :
   reflect 

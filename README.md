@@ -17,6 +17,7 @@ Hanoi towers in Coq
 | [triangular](./triangular.v)      | Theorems about triangular numbers        |
 | [phi](./phi.v)                    | Theorems about the Φ function            |
 | [psi](./psi.v)                    | Theorems about the Ψ function            |
+| [ghanoi4](./ghanoi4.v)            | General Hanoi framework with 4 pegs      |
 | [hanoi4](./hanoi4.v)              | Hanoi towers with 4 pegs                 |
 
 
