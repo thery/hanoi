@@ -854,36 +854,41 @@ Local Notation a := (alpha 2 3).
 (* First 60 element of the list *)
 Compute map a (iota 0 60).
 
-Definition dsum_alpha n := 2 * \sum_(1 <= i < n.+1) a i.
+Definition dsum_alpha n := \sum_(1 <= i < n.+1) a i.
 
-Local Notation S := dsum_alpha.
+Local Notation S1 := dsum_alpha.
 
-Lemma dsum_alpha_0 : S 0 = 0.
-Proof. by rewrite /S big_nat big1 // =>  [] []. Qed.
+Lemma dsum_alpha_0 : S1 0 = 0.
+Proof. by rewrite /S1 big_nat big1 // =>  [] []. Qed.
 
-Lemma S_leq n i : 
-i <= n -> S n <= 2 * S (n - i) + 3 ^ i - 1.
+Lemma div2K n : ~~ odd n -> n./2.*2 = n.
+Proof. by move=> nO; rewrite -{2}(odd_double_half n) (negPf nO). Qed.
+
+Lemma S1_leq n i : i <= n -> S1 n <= 2 * S1 (n - i) + (3 ^ i - 1)./2.
 Proof.
 move=> iLn.
-rewrite -addnBA ?expn_gt0; last by rewrite ltnW.
-rewrite subn1 predn_exp.
+rewrite -leq_double doubleD div2K; last first.
+  by rewrite odd_sub ?expn_gt0 //= odd_exp orbT.
+rewrite -!mul2n subn1 predn_exp.
 have <- := @big_mkord _ 0 addn i xpredT (expn 3).
-rewrite mulnCA -mulnDr leq_mul2l /=.
-by apply:  sum_alpha_leq.
+rewrite -mulnDr leq_mul2l /=.
+by have := sum_alpha_leq (isT : 1 < 2) (isT : 2 < 3) 
+                      (isT : coprime 2 3) iLn.
 Qed.
 
-Lemma S_eq n i : 
- 3 ^ i <= a n < 3 ^ i.+1 ->
- S n = 2 * S (n - i.+1) + 3 ^ i.+1 - 1.
+Lemma S1_eq n i : 
+  3 ^ i <= a n < 3 ^ i.+1 -> S1 n = 2 * S1 (n - i.+1) + (3 ^ i.+1 - 1)./2.
 Proof.
 move=> iLn.
-rewrite -addnBA ?expn_gt0; last by rewrite ltnW.
-rewrite subn1 predn_exp.
+apply: double_inj.
+rewrite doubleD div2K; last first.
+  by rewrite odd_sub ?expn_gt0 //= odd_exp orbT.
+rewrite -!mul2n subn1 predn_exp.
 have <- := @big_mkord _ 0 addn i.+1 xpredT (expn 3).
-apply/eqP.
-rewrite mulnCA -mulnDr eqn_mul2l /=.
-rewrite -subSn ?subSS.
-by apply/eqP/sum1_alpha_eq.
+rewrite -mulnDr; congr (_ * _).
+have := sum1_alpha_eq (isT : 1 < 2) (isT : 2 < 3) 
+                      (isT : coprime 2 3) iLn.
+rewrite /dsum_alpha -subSn //.
 case/andP: iLn => H1 _.
 by apply: b_exp_leq H1.
 Qed.
