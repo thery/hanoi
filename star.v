@@ -123,50 +123,41 @@ Fixpoint fmerge_aux (f g : nat -> nat) i j n :=
 
 Definition fmerge f g n := fmerge_aux f g 0 0 n.
 
-Lemma fmerge_aux_correct f g i j n n1 :
+Lemma fmerge_aux_correct f g i j n :
   increasing f -> increasing g -> 
-  n = i + j + n1 ->
-    (forall i1, i1 < i -> minn (f i1) (g (n - i1)) <= minn (f i) (g j)) ->
-    (forall j1, j1 < j -> minn (f (n - j1)) (g j1) <= minn (f i) (g j)) ->
-    (forall k, k <= n ->  minn (f k) (g (n - k)) <=  fmerge_aux f g i j n1).
+  (forall k, k <= n ->  
+     minn (f (i + k)) (g (j + (n - k))) <=  
+     fmerge_aux f g i j n).
 Proof.
 move=> fI gI.
-elim: n1 i j => /= [i j nE i1H j1H k kLn|
-                    n1 IH i j nE i1H j1H k kLn].
-  have [kLi|iLj] := leqP i k; last by apply: i1H.
-  move: kLi; rewrite leq_eqVlt => /orP[/eqP<-|kLi].
-    by rewrite nE addn0 addnC addnK.
-  rewrite -{1}(subKn kLn); apply: j1H.
-  by rewrite ltn_subLR // nE addn0 ltn_add2r.
-case: (leqP (g j) (f i)) => H; apply: IH => //.
-- by rewrite nE !(addSn, addnS).
-- by move=> i1 /i1H /leq_trans->; rewrite ?leq_minn2l.
-- move=> j1; rewrite ltnS; case: ltngtP => //= [j1Li _ | -> _].
-    apply: leq_trans (j1H _ _) _ => //.
-    by apply/leq_minn2l/gI.
-  rewrite (minn_idPr _); first by rewrite leq_min H gI.
-  rewrite (leq_trans H _) // (increasingE fI) //.
-  rewrite leq_subRL // nE; first by rewrite addnC leq_addr.
-  by rewrite addnAC leq_addl.
-- by rewrite nE !(addSn, addnS).
-- move=> i1; rewrite ltnS; case: ltngtP => //= [i1Li _ | -> _].
-    apply: leq_trans (i1H _ _) _ => //.
-    by apply/leq_minn2r/fI.
-  rewrite (minn_idPl _); first by rewrite leq_min fI ltnW.
-  rewrite (leq_trans (ltnW H)) // (increasingE gI) //.
-  rewrite leq_subRL // nE; first by rewrite leq_addr.
-  by rewrite -addnA leq_addr.
-by move=> j1 /j1H /leq_trans->; rewrite ?leq_minn2r.
+elim: n i j => /= [i j [|] // _|n IH i j k kLn].
+  by rewrite !addn0.
+case: leqP => [gLf|fLg].
+  move: kLn; rewrite leq_eqVlt => /orP[/eqP->|kLn].
+    rewrite subnn addn0 (minn_idPr _); last first.
+      by rewrite (leq_trans gLf) // increasingE // leq_addr.
+    apply: leq_trans (IH _ _ _ (leqnn _)).
+    rewrite subnn addn0 leq_min increasingE // andbT (leq_trans gLf) //.
+    by rewrite increasingE // leq_addr.
+  by rewrite subSn // -addSnnS IH.
+case: k kLn => [_ | k kLn].
+  rewrite addn0 subn0 (minn_idPl _); last first.
+    by rewrite (leq_trans (ltnW fLg)) // increasingE // leq_addr.
+  apply: leq_trans (IH i.+1 j 0 isT).
+  rewrite addn0 leq_min increasingE //= (leq_trans (ltnW fLg)) //.
+  by rewrite increasingE // leq_addr.
+by rewrite subSS -addSnnS IH.
 Qed.
 
-Lemma fmerge_aux_exist f g i j n n1 :
-  n = i + j + n1 ->
-  exists2 k, k <= n & fmerge_aux f g i j n1 = minn (f k) (g (n - k)).
+Lemma fmerge_aux_exist f g i j n :
+  exists2 k, k <= n & fmerge_aux f g i j n = minn (f (i + k)) (g (j + (n - k))).
 Proof.
-elim: n1 i j => /= [i j -> | n1 IH i j].
-  exists i; first by rewrite addn0 leq_addr.
-  by rewrite addn0 addnC addnK.
-by case: (leqP (g j) (f i)) => H U; apply: IH; rewrite // U ?(addnS, addSn) .
+elim: n i j => /= [i j | n IH i j]; first by exists 0; rewrite //= !addn0.
+case: (leqP (g j) (f i)) => [gLf|fLg]; last first.
+  by case: (IH i.+1 j) => k kLn ->; exists k.+1; rewrite // addnS subSS.
+case: (IH i j.+1) => [] [|k] kLn ->.
+  by exists 0; rewrite // addn0 !subn0 addnS.
+by exists k.+1; rewrite ?(leq_trans kLn) // addSnnS -subSn.
 Qed.
 
 Lemma fmergeE (f g : nat -> nat) n : 
@@ -175,7 +166,7 @@ Lemma fmergeE (f g : nat -> nat) n :
 Proof.
 move=> fI gI.
 apply/eqP; rewrite /fmerge eqn_leq; apply/andP; split.
-  case: (@fmerge_aux_exist f g 0 0 n n) => // i1 i1Ln ->.
+  case: (@fmerge_aux_exist f g 0 0 n) => // i1 i1Ln ->.
   by apply: (@leq_bigmax_cond _ _ _ (Ordinal (i1Ln : i1 < n.+1))).
 apply/bigmax_leqP => /= i _.
 by apply: fmerge_aux_correct; rewrite -1?ltnS.
