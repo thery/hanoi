@@ -1012,5 +1012,6 @@ rewrite -{1}[l]muln1 leq_mul2l (half_leq (_ : 2 <= _)) ?orbT //.
 by rewrite -ltnS prednK ?expn_gt0 // (@leq_exp2l _ 1) // subn_gt0.
 Qed.
 
-
 End S23.
+
+End Convex.
