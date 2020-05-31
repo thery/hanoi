@@ -6,12 +6,20 @@ Unset Printing Implicit Defensive.
 
 Lemma subn_minr : left_distributive subn minn.
 Proof.
-move=> m n p; rewrite /minn; case: leqP => nLm.
+move=> m n p; rewrite /minn; case: leqP => [nLm|mLn].
   by rewrite ltnNge leq_sub2r.
-case: (leqP n p) => nLp.
-  apply/eqP; move: (nLp); rewrite -subn_eq0 => /eqP->.
-  by rewrite ltnNge //= subn_eq0 (leq_trans (ltnW nLm)).
-by rewrite ltn_sub2r.
+have [nLp|pLn] := leqP n p; last by rewrite ltn_sub2r.
+apply/eqP; move: (nLp); rewrite -subn_eq0 => /eqP->.
+by rewrite ltnNge //= subn_eq0 (leq_trans (ltnW mLn)).
+Qed.
+
+Lemma subn_maxr : left_distributive subn maxn.
+Proof.
+move=> m n p; rewrite /maxn; case: leqP => [nLm|mLn].
+  by rewrite ltnNge leq_sub2r.
+have [nLp|pLn] := leqP n p; last by rewrite ltn_sub2r.
+apply/eqP; move: (nLp); rewrite -subn_eq0 => /eqP->.
+by rewrite ltnNge //= eq_sym subn_eq0 (leq_trans (ltnW mLn)).
 Qed.
 
 Lemma leq_minn2r m n p : m <= n -> minn m p <= minn n p.
@@ -35,6 +43,9 @@ Definition increasing (f : nat -> nat) := forall n, f n <= f n.+1.
 
 Definition decreasing (f : nat -> nat) := forall n, f n.+1 <= f n.
 
+Lemma increasing_ext f1 f2 : f1 =1 f2 -> increasing f1 -> increasing f2.
+Proof. by move=> fE fI i; rewrite -!fE. Qed.
+
 Lemma increasingE f m n : increasing f -> m <= n -> f m <= f n.
 Proof.
 move=> fI mLn; rewrite -(subnK mLn).
@@ -43,6 +54,9 @@ by apply: leq_trans (fI (d + m)).
 Qed.
 
 Definition delta (f : nat -> nat) n := f n.+1 - f n.
+
+Lemma delta_ext f1 f2 : f1 =1 f2 -> delta f1 =1 delta f2.
+Proof. by move=> fE i; rewrite /delta !fE. Qed.
 
 Definition fnorm (f : nat -> nat) n := f n - f 0.
 
@@ -87,6 +101,14 @@ Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
  (at level 41, F at level 41, i, n at level 50,
   format " \min_ ( i  <=  n )  F ").
 
+Lemma bigmin_constD  f n k :
+ \min_(i <= n) (f i + k) =  (\min_(i <= n) f i) + k.
+Proof. by elim: n => //=  n ->; rewrite addn_minl. Qed.
+
+Lemma bigmin_constB  f n k :
+ \min_(i <= n) (f i - k) =  (\min_(i <= n) f i) - k.
+Proof. by elim: n => //=  n ->; rewrite subn_minr. Qed.
+
 Lemma eq_bigmin f n : {i0 : 'I_n.+1 | \min_(i <= n) f i = f i0}.
 Proof.
 elim: n => /= [|n [i ->]]; first by exists ord0.
@@ -120,6 +142,9 @@ Qed.
 Lemma bigmin_fnorm f n : \min_(i <= n) fnorm f i = fnorm (bigmin f) n. 
 Proof. by elim: n => //= n ->; rewrite -subn_minr. Qed.
 
+Lemma bigmin_ext f1 f2 n : f1 =1 f2 -> \min_(i <= n) f1 i = \min_(i <= n) f2 i.
+Proof. by move=> fE; elim: n => //= n ->; rewrite fE. Qed.
+
 Definition conv (f g : nat -> nat) n :=
   \min_(i <= n) (f i + g (n - i)).
 
@@ -130,6 +155,31 @@ Lemma conv1 f g :
   conv f g 1 = minn (f 1 + g 0) (f 0 + g 1).
 Proof. by []. Qed.
 
+Lemma conv_fnorm f g : 
+  increasing f -> increasing g -> 
+  conv (fnorm f) (fnorm g) =1 fnorm (conv f g).
+Proof.
+move=> fI gI i.
+rewrite /fnorm /conv /= -bigmin_constB subnn.
+apply: bigmin_ext => j.
+by rewrite addnBA ?increasingE // addnBAC ?increasingE // subnDA.
+Qed.
+
+Lemma conv_ext f1 g1 f2 g2 : f1 =1 f2 -> g1 =1 g2 -> conv f1 g1 =1 conv f2 g2.
+Proof. by move=> fE gE i; apply: bigmin_ext => j; rewrite fE gE. Qed.
+
+Lemma increasing_conv f g : 
+  increasing f -> increasing g -> increasing (conv f g).
+Proof.
+move=> fI gI i.
+apply/bigmin_leqP => j.
+case: ltngtP => // [jLi | ->] _.
+  by apply: bigmin_inf (_ : j <= i) _; rewrite // leq_add2l subSn.
+rewrite subnn.
+by apply: bigmin_inf (leqnn i) _; rewrite subnn leq_add2r.
+Qed.
+
+
 Fixpoint fmerge_aux (f g : nat -> nat) i j n := 
  if n is n1.+1 then
    if f i < g j then fmerge_aux f g i.+1 j n1 
@@ -137,6 +187,17 @@ Fixpoint fmerge_aux (f g : nat -> nat) i j n :=
  else minn (f i) (g j).
 
 Definition fmerge f g n := fmerge_aux f g 0 0 n.
+
+Lemma fmerge_aux_ext f1 f2 g1 g2 i j : f1 =1 f2 -> g1 =1 g2 -> 
+  fmerge_aux f1 g1 i j =1 fmerge_aux f2 g2 i j.
+Proof.
+move=> fE gE n; elim: n i j => /= [i1 j1|n IH i j]; first by rewrite fE gE.
+by rewrite !(fE, gE, IH).
+Qed.
+
+Lemma fmerge_ext f1 f2 g1 g2 : f1 =1 f2 -> g1 =1 g2 -> 
+  fmerge f1 g1 =1 fmerge f2 g2.
+Proof. by move=> fE gE n; apply: fmerge_aux_ext. Qed.
 
 Lemma fmerge_aux_correct f g i j n :
   increasing f -> increasing g -> 
@@ -311,6 +372,38 @@ apply/eqP; rewrite eqn_leq; apply/andP; split; last first.
 apply/bigmin_leqP => k kLn.
 by apply: leq_sum_fmerge_conv.
 Qed.
+
+(* This is 3.2 *)
+Lemma delta_conv f g : 
+  convex f -> convex g -> 
+  delta (conv f g) =1 fmerge (delta f) (delta g).
+Proof.
+move=> [fI dfI] [gI dgI] n.
+rewrite -delta_fnorm; last by apply: increasing_conv.
+rewrite -(delta_ext (conv_fnorm _ _)) //.
+have/delta_ext-> : conv (fnorm f) (fnorm g) =1
+         conv (fun n => \sum_(i < n) (delta (fnorm f)) i) 
+              (fun n => \sum_(i < n) (delta (fnorm g)) i).
+  by apply: conv_ext => i; apply: sum_delta.
+have/delta_ext-> :
+  (conv (fun n : nat => \sum_(i < n) delta (fnorm f) i)
+        (fun n : nat => \sum_(i < n) delta (fnorm g) i)) =1
+  (fun n => \sum_(i < n) (fmerge (delta (fnorm f)) (delta (fnorm g))) i).
+  move=> k; rewrite -sum_fmerge_conv //.
+    by apply: increasing_ext dfI => i; rewrite delta_fnorm.
+  by apply: increasing_ext dgI => i; rewrite delta_fnorm.
+rewrite /delta big_ord_recr /= addnC addnK.
+by apply: fmerge_aux_ext => i; apply: delta_fnorm.
+Qed.
+
+Lemma convex_conv f g : convex f -> convex g -> convex (conv f g).
+Proof.
+move=> [fI dfI] [gI dgI]; split; first by apply: increasing_conv.
+apply: increasing_ext => [i|]; first by apply/sym_equal/delta_conv.
+by apply: increasing_fmerge.
+Qed.
+
+End Convex.
 
 Section Main. 
 
@@ -1013,5 +1106,3 @@ by rewrite -ltnS prednK ?expn_gt0 // (@leq_exp2l _ 1) // subn_gt0.
 Qed.
 
 End S23.
-
-End Convex.
