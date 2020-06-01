@@ -1109,4 +1109,35 @@ rewrite -{1}[l]muln1 leq_mul2l (half_leq (_ : 2 <= _)) ?orbT //.
 by rewrite -ltnS prednK ?expn_gt0 // (@leq_exp2l _ 1) // subn_gt0.
 Qed.
 
+Lemma leq_pred m n : m <= n -> m.-1 <= n.-1.
+Proof. by case: m; case: n => //=. Qed.
+
+Lemma even_halfB m n : 
+  ~~ odd m -> ~~ odd n -> (m - n)./2 = m./2 - n./2.
+Proof.
+move=> mE nE.
+have := odd_double_half m; rewrite (negPf mE) add0n => {1}<-.
+have := odd_double_half n; rewrite (negPf nE) add0n => {1}<-.
+by rewrite -doubleB doubleK.
+Qed.
+
+Lemma convex_dsum_alphaL l : convex (S_[l]).
+Proof.
+apply: convex_conv; split => [] i.
+- by rewrite leq_double /dsum_alpha [X in _ <= X]big_nat_recr leq_addr.
+- rewrite /delta -!doubleB leq_double.
+  rewrite [X in X - _ <= _]big_nat_recr // [addn_monoid _]/= addnC addnK.
+  rewrite [X in _ <= X - _]big_nat_recr // [addn_monoid _]/= addnC addnK.
+  by apply/ltnW/alpha_ltn.
+- rewrite leq_mul2l half_leq ?orbT //.
+  by apply: leq_pred; rewrite leq_exp2l.
+rewrite /delta -!mulnBr leq_mul2l -!even_halfB //;
+  try by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
+rewrite half_leq ?orbT //.
+rewrite -predn_sub -subnS prednK ?expn_gt0 //.
+rewrite -predn_sub -subnS prednK ?expn_gt0 //.
+rewrite !expnS !mulnA -[X in _ - X <= _]mul1n.
+by rewrite -!mulnBl leq_mul2r orbT.
+Qed.
+
 End S23.
