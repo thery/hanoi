@@ -405,6 +405,10 @@ Qed.
 
 End Convex.
 
+Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
+ (at level 41, F at level 41, i, n at level 50,
+  format " \min_ ( i  <=  n )  F ").
+
 Section Main. 
 
 Variable a b : nat.
