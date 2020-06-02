@@ -99,7 +99,7 @@ Fixpoint bigmin f n :=
 
 Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
  (at level 41, F at level 41, i, n at level 50,
-  format " \min_ ( i  <=  n )  F ").
+  format "\min_ ( i  <=  n )  F").
 
 Lemma bigmin_constD  f n k :
  \min_(i <= n) (f i + k) =  (\min_(i <= n) f i) + k.
@@ -167,6 +167,17 @@ Qed.
 
 Lemma conv_ext f1 g1 f2 g2 : f1 =1 f2 -> g1 =1 g2 -> conv f1 g1 =1 conv f2 g2.
 Proof. by move=> fE gE i; apply: bigmin_ext => j; rewrite fE gE. Qed.
+
+Lemma convC f g : conv f g =1 conv g f.
+Proof.
+move=> n; apply/eqP; rewrite /conv eqn_leq; apply/andP; split.
+  apply/bigmin_leqP => i iLn.
+  rewrite -{1}(subKn iLn) addnC.
+  by apply: bigmin_inf (leq_subr _ _) (leqnn _).
+apply/bigmin_leqP => i iLn.
+rewrite -{1}(subKn iLn) addnC.
+by apply: bigmin_inf (leq_subr _ _) (leqnn _).
+Qed.
 
 Lemma increasing_conv f g : 
   increasing f -> increasing g -> increasing (conv f g).
@@ -407,7 +418,7 @@ End Convex.
 
 Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
  (at level 41, F at level 41, i, n at level 50,
-  format " \min_ ( i  <=  n )  F ").
+  format "\min_ ( i  <=  n )  F").
 
 Section Main. 
 
@@ -429,7 +440,7 @@ Fixpoint alphal (n : nat) :=
     if a * c \in l then l1 else a * c :: l1)
    (behead l).
 
-Definition alpha n := if n isn't n1.+1 then 0 else head 1 (alphal n1).
+Definition alpha n := head 1 (alphal n).
 
 Lemma behead_sorted (T: eqType) (r : rel T) (l : seq T) : 
   sorted r l -> sorted r (behead l).
@@ -486,7 +497,7 @@ Qed.
 
 Lemma alpha_ltn n : alpha n < alpha n.+1.
 Proof.
-rewrite /alpha /=; case: n => //= n.
+rewrite /alpha /=.
 set h := head _ _.
 have hP : 0 < h.
   rewrite /h.
@@ -495,11 +506,9 @@ have hP : 0 < h.
 set l1 := merge _ _ _.
 have hIl1 : head 1 l1 \in l1.
   have /= := alphal_neq_nil n.+1.
-  rewrite -/l1; case: l1 => //= c l; first by rewrite inE eqxx.
+  by rewrite -/l1; case: l1 => //= c l; rewrite inE eqxx.
 suff hLi i :  i \in l1 -> h < i.
-  apply: hLi.
-  have /= := alphal_neq_nil n.+1; rewrite -/l1.
-  by case: (l1) => //= c l _; rewrite inE eqxx.
+  by apply/hLi/hIl1.
 rewrite mem_merge mem_cat.
 suff hLi1 : (i \in behead (alphal n)) -> h < i => [|H].
   have [H1|H1] := boolP (_ \in alphal _);
@@ -526,13 +535,11 @@ have F := alpha_ltn n.
 by rewrite ltnS leq_eqVlt => /orP[/eqP->| /IH /ltn_trans-> //].
 Qed.
 
-Lemma alpha_gt0 n : 0 < n -> 0 < alpha n.
-Proof. by case: n => // n _; apply: leq_ltn_trans (alpha_ltn _). Qed.
+Lemma alpha_gt0 n : 0 < alpha n.
+Proof. by case: n => // n; apply: leq_ltn_trans (alpha_ltn _). Qed.
 
-Lemma alpha_gtn_n n : n < alpha n.+1.
-Proof.
-by elim: n => // n IH; apply: leq_trans (alpha_ltn _).
-Qed.
+Lemma alpha_gtn_n n : n < alpha n.
+Proof. by elim: n => // n IH; apply: leq_trans (alpha_ltn _). Qed.
 
 Definition isAB i := exists m, i = a ^ m.1 * b ^ m.2.
 
@@ -577,36 +584,36 @@ case/or3P=> [/eqP->|/eqP->|//].
 by exists (m1, m2.+1); rewrite /= Hm mulnCA expnS.
 Qed.
 
-Lemma isAB_alpha n : isAB (alpha n.+1).
+Lemma isAB_alpha n : isAB (alpha n).
 Proof.
-rewrite /=.
+rewrite /alpha.
 case: (alphal n) (alphal_neq_nil n) 
       (@isAB_alphal n (head 1 (alphal n))) => //= c l _.
 by apply; rewrite inE eqxx.
 Qed.
 
 Lemma in_alphal n i :
- i \in alphal n -> i != alpha n.+1 -> i \in alphal n.+1.
+ i \in alphal n -> i != alpha n -> i \in alphal n.+1.
 Proof.
-have := alpha_gt0 (isT : 0 < n.+1).
-rewrite /= mem_merge mem_cat orbC.
+have := alpha_gt0 n.
+rewrite  /alpha /= mem_merge mem_cat orbC.
 case: (alphal n) => //= c l cP.
 by rewrite inE => /orP[/eqP->|->//]; rewrite eqxx.
 Qed.
 
-Lemma alpha_in_alphal n : alpha n.+1 \in alphal n.
+Lemma alpha_in_alphal n : alpha n \in alphal n.
 Proof.
 have /= := alphal_neq_nil n.
-case: alphal => //= c l.
+rewrite /alpha; case: alphal => //= c l.
 by rewrite inE eqxx.
 Qed.
 
 Lemma in_alphalS n i :
  i \in alphal n.+1 -> 
- i != a * alpha n.+1 ->  i != b * alpha n.+1 ->
+ i != a * alpha n ->  i != b * alpha n ->
  i \in alphal n.
 Proof.
-rewrite /=.
+rewrite /alpha /=.
 set h := head _ _.
 rewrite mem_merge mem_cat => /orP[]; last first.
   by case: alphal => //= c l; rewrite inE orbC => ->.
@@ -614,11 +621,11 @@ by (do 2 case: (_ \in alphal _); rewrite //= ?inE) =>
    [/eqP->|/eqP->|/orP[/eqP->|/eqP->]]; rewrite eqxx.
 Qed.
 
-Lemma a_in_alphalS n : a * alpha n.+1 \in alphal n.+1.
+Lemma a_in_alphalS n : a * alpha n \in alphal n.+1.
 Proof.
-have := alpha_gt0 (isT : 0 < n.+1).
-have := @in_alphal n (a * alpha n.+1).
-rewrite /= mem_merge.
+have := alpha_gt0 n.
+have := @in_alphal n (a * alpha n).
+rewrite /alpha /= mem_merge.
 set h := head _ _.
 have [H H1 H2|] := boolP (_ \in alphal n).
   apply: H1 => //.
@@ -626,11 +633,11 @@ have [H H1 H2|] := boolP (_ \in alphal n).
 by rewrite mem_cat inE eqxx.
 Qed.
 
-Lemma b_in_alphalS n : b * alpha n.+1 \in alphal n.+1.
+Lemma b_in_alphalS n : b * alpha n \in alphal n.+1.
 Proof.
-have := alpha_gt0 (isT : 0 < n.+1).
-have := @in_alphal n (b * alpha n.+1).
-rewrite /= mem_merge.
+have := alpha_gt0 n.
+have := @in_alphal n (b * alpha n).
+rewrite /alpha /= mem_merge.
 set h := head _ _.
 have [H H1 H2|] := boolP (b * _ \in alphal n).
   apply: H1 => //.
@@ -647,18 +654,18 @@ have F2 : 0 < a ^ m *  b ^ n.
   rewrite muln_gt0 !expn_gt0 ?(ltn_trans _ aLb) (ltn_trans _ aL1) //.
 have F3 p : P p -> p <= alpha (a ^ m * b ^ n).
   move=> /hasP[q] qIa.
-  suff F : alpha p.+1 <= q.
+  suff F : alpha p <= q.
      move=> /(dvdn_leq F2) H.
      rewrite ltnW // (leq_trans (alpha_gtn_n _)) //.
-     by rewrite (leq_trans F) // (leq_trans H) // -(prednK F2) alpha_gtn_n.
-  have /= := sorted_alphal p.
+     by rewrite (leq_trans F) // (leq_trans H) // ltnW // alpha_gtn_n.
+  have /= := sorted_alphal p; rewrite /alpha.
   case: (alphal _) qIa => //= a1 l.
   by rewrite inE => /orP[/eqP->//|qIl /(order_path_min leq_trans) /allP/(_ _ qIl)].
-exists (ex_maxn F1 F3).+1.
+exists (ex_maxn F1 F3).
 case: ex_maxnP => i /hasP[x xIa] Hx Fx.
 have : ~~ P i.+1 by apply/negP=> /Fx; rewrite ltnn.
 move/hasPn => FF.
-have F4 : x = alpha i.+1.
+have F4 : x = alpha i.
   by apply/eqP; case: eqP=> // /eqP /(in_alphal xIa) /FF/negP[].
 case: (isAB_alpha i) => [] [m1 n1 F5].
 have Cabe m2 n2 : coprime (a ^ m2) (b ^ n2).
@@ -690,7 +697,7 @@ rewrite ltnS leq_eqVlt => /orP[/eqP->//|/alpha_mono/ltnW->//].
 by rewrite leqnn.
 Qed.
 
-Lemma alpha_leq_double i : alpha i.+2 <= a * alpha i.+1.
+Lemma alpha_leq_double i : alpha i.+1 <= a * alpha i.
 Proof.
 apply: isAB_leq_alphaSn; first by apply/isAB_amul/isAB_alpha.
 by rewrite -[X in X < _]mul1n ltn_mul2r alpha_gt0.
@@ -702,26 +709,15 @@ move => isAB; have := @isAB_leq_alphaSn i _ isAB.
 by do 2 case: leqP => // _.
 Qed.
 
-Lemma sum_alpha_leq n i : 
-  i <= n ->
- \sum_(1 <= i0 < n.+1) alpha i0 <=
-       (a * \sum_(1 <= i0 < (n - i).+1) alpha i0) +
-       \sum_(0 <= i0 < i) b ^ i0.
-Proof.
-move=> iLn.
-rewrite big_distrr /=.
-set v := n - i; set w := i; set u := n.
-have {iLn}uvw : u = v + w by rewrite subnK.
-rewrite -(add1n u) -(add1n v) -(add0n w).
-have : (w != 0) * alpha 1 <= b ^ 0.
-  by rewrite expn0; case: (w) => //= w1; rewrite ltnW.
-have : (v != 0) * alpha 1 <= a * alpha 1.
-  by rewrite !muln1; case: (v) => // v1; rewrite ltnW.
-have : 0 < 1 by [].
-have : 0 < 1 by [].
-elim: {n i}u v w {-1 3}1 {4 6 10 11}1 {10 18 19}0 uvw
-  => [[] [] // i j k _ iP jP _| 
-                     u IH [|v] [|w] // i j k uvw iP jP aM1 aM2].
+Lemma foo : forall u v w n n0 n1 : nat,
+u = v + w ->
+(v != 0) * alpha n <= a * alpha n0 ->
+(w != 0) * alpha n <= b ^ n1 ->
+\sum_(n <= i0 < n + u) alpha i0 <=
+\sum_(n0 <= i < n0 + v) a * alpha i +
+\sum_(n1 <= i0 < n1 + w) b ^ i0.
+elim => [[] [] // i j k _ _| 
+                     u IH [|v] [|w] // i j k uvw aM1 aM2].
 - by rewrite !addn0 big_geq.
 - rewrite big_ltn; last by rewrite addnS leq_addr.
   rewrite [X in _ <= _ + X]big_ltn; last by rewrite addnS leq_addr.
@@ -733,7 +729,6 @@ elim: {n i}u v w {-1 3}1 {4 6 10 11}1 {10 18 19}0 uvw
   rewrite !mul1n in aM2 |- *.
   suff /leq_trans-> : alpha i.+1 <= a * alpha i => //.
     by rewrite expnS; apply: leq_mul => //; apply: ltnW.
-  case: (i) iP => // i1 _.
   by apply: alpha_leq_double.
 - rewrite big_ltn; last by rewrite addnS leq_addr.
   rewrite [X in _ <= X + _]big_ltn; last by rewrite addnS leq_addr.
@@ -776,7 +771,7 @@ rewrite -addSnnS -(addSnnS k).
 apply: IH => //; first by move: uvw; rewrite addnS => [[]].
   rewrite !mul1n in aM1, aM2 |- *.
   apply: isAB_leq_alphaSn.
-    by apply: isAB_amul; case: (j) jP => // j1 _; apply: isAB_alpha.
+    by apply: isAB_amul; apply: isAB_alpha.
   by apply: leq_ltn_trans bLaa.
 case: (w) => // w1.
 rewrite !mul1n in aM1, aM2 |- *.
@@ -785,29 +780,118 @@ apply: leq_ltn_trans aM2 _.
 by rewrite ltn_exp2l.
 Qed.
 
-Lemma b_exp_leq k n : b ^ k <= alpha n -> k < n.
+Lemma sum_alpha_leq n i : 
+  i <= n ->
+ \sum_(j < n) alpha j <= (a * \sum_(j < (n - i)) alpha j) + \sum_(j < i) b ^ j.
 Proof.
-elim: n k => [k|n IH [|k Hk]//]; first by rewrite leqNgt expn_gt0 ltnW.
+move=> iLn.
+rewrite -!(big_mkord xpredT) big_distrr /=.
+suff aux : forall u v w n n0 n1 : nat,
+           u = v + w ->
+          (v != 0) * alpha n <= a * alpha n0 ->
+          (w != 0) * alpha n <= b ^ n1 ->
+          \sum_(n <= i0 < n + u) alpha i0 <=
+          \sum_(n0 <= i < n0 + v) a * alpha i +
+          \sum_(n1 <= i0 < n1 + w) b ^ i0.
+  rewrite -{1}[n]add0n -{1}[n - i]add0n -{2}[i]add0n.
+  apply: aux => //.
+  - by rewrite subnK.
+  - by rewrite !muln1; apply: leq_trans aL1; case: eqP.
+  by rewrite muln1; case: eqP.
+elim => {i iLn}[[] [] // i j k _ _| 
+                     u IH [|v] [|w] // i j k uvw aM1 aM2].
+- by rewrite !addn0 big_geq.
+- rewrite big_ltn; last by rewrite addnS leq_addr.
+  rewrite [X in _ <= _ + X]big_ltn; last by rewrite addnS leq_addr.
+  rewrite addnCA.
+  apply: leq_add; first by rewrite mul1n in aM2.
+  rewrite -!addSnnS.
+  apply: IH => //; first by case: uvw.
+  case: (w) => // w1 //.
+  rewrite !mul1n in aM2 |- *.
+  suff /leq_trans-> : alpha i.+1 <= a * alpha i => //.
+    by rewrite expnS; apply: leq_mul => //; apply: ltnW.
+  by apply: alpha_leq_double.
+- rewrite big_ltn; last by rewrite addnS leq_addr.
+  rewrite [X in _ <= X + _]big_ltn; last by rewrite addnS leq_addr.
+  rewrite -addnA.
+  apply: leq_add; first by rewrite mul1n in aM1.
+  rewrite -!addSnnS.
+  apply: IH => //; first by case: uvw.
+  case: (v) => // v1 //.
+  rewrite !mul1n in aM1 |- *.
+  apply: isAB_leq_alphaSn; first by apply/isAB_amul/isAB_alpha.
+  apply: leq_ltn_trans aM1 _.
+  by rewrite ltn_mul2l ltnW // alpha_ltn.
+have aM3 : alpha i.+1 <= a * alpha j.+1.
+  rewrite !mul1n in aM1.
+  apply: isAB_leq_alphaSn; first by apply/isAB_amul/isAB_alpha.
+  apply: leq_ltn_trans aM1 _.
+  by rewrite ltn_mul2l ltnW // alpha_ltn.
+case: (leqP (a * alpha j) (b ^ k)) => [|bLaa].
+- rewrite leq_eqVlt => /orP[/eqP aaEb |aaLb].
+  have : a %| b ^ k by rewrite -aaEb dvdn_mulr.
+  move/gcdn_idPl.
+  have /eqP->:= @coprime_expr k _ _ aCb.
+  by case: a aL1 => // [] [].
+- rewrite big_ltn; last by rewrite addnS leq_addr.
+  rewrite [X in _ <= X + _]big_ltn; last by rewrite addnS leq_addr.
+  rewrite -addnA.
+  apply: leq_add; first by rewrite mul1n in aM1.
+  rewrite -2!addSnnS.
+  apply: IH => //; first by case: uvw.
+    case: (v) => // v1 //.
+    by rewrite !mul1n.
+  rewrite !mul1n in aM1, aM2 |- *.
+  apply: isAB_leq_alphaSn (isAB_bexp _) _.
+  by apply: leq_ltn_trans aaLb.
+rewrite big_ltn; last by rewrite addnS leq_addr.
+rewrite [X in _ <= _ + X]big_ltn; last by rewrite addnS leq_addr.
+rewrite addnCA.
+apply: leq_add; first by rewrite mul1n in aM2.
+rewrite -addSnnS -(addSnnS k).
+apply: IH => //; first by move: uvw; rewrite addnS => [[]].
+  rewrite !mul1n in aM1, aM2 |- *.
+  apply: isAB_leq_alphaSn.
+    by apply: isAB_amul; apply: isAB_alpha.
+  by apply: leq_ltn_trans bLaa.
+case: (w) => // w1.
+rewrite !mul1n in aM1, aM2 |- *.
+apply: isAB_leq_alphaSn (isAB_bexp _) _.
+apply: leq_ltn_trans aM2 _.
+by rewrite ltn_exp2l.
+Qed.
+
+Lemma alpha0 : alpha 0 = 1.
+Proof. by []. Qed.
+
+Lemma alpha1 : alpha 1 = a.
+Proof. 
+by rewrite /alpha /= !ifT //= muln1 !inE eqxx ?orbT.
+Qed.
+
+Lemma b_exp_leq k n : b ^ k <= alpha n -> k <= n.
+Proof.
+elim: n k => [k|n IH [|k Hk]//].
+  by rewrite -[alpha 0]/(b ^ 0) leq_exp2l.
 apply/IH/(isAB_geq_alphaSn (isAB_bexp _)).
 by apply: leq_trans Hk; rewrite ltn_exp2l.
 Qed.
 
-Lemma alpha_exp_bound n : alpha n < b ^ n.
+Lemma alpha_exp_bound n : alpha n < b ^ n.+1.
 Proof. by rewrite ltnNge; apply/negP => /b_exp_leq; rewrite ltnn. Qed.
 
-Lemma b_exp_ltn k n : b ^ k < alpha n -> k.+1 < n.
+Lemma b_exp_ltn k n : b ^ k < alpha n -> k < n.
 Proof.
-case: n => // n H.
-rewrite ltnS.
-apply: b_exp_leq.
-by apply: isAB_geq_alphaSn (isAB_bexp _) _.
+case: n => [|n H]; first by rewrite ltnNge expn_gt0 (leq_trans _ bL1).
+by rewrite ltnS; apply/b_exp_leq/(isAB_geq_alphaSn (isAB_bexp _)).
 Qed.
 
 Lemma alpha_b_eq n i : 
    b ^ i < alpha n.+1 < b ^ i.+1 -> alpha n.+1 = a * alpha (n - i).
 Proof.
 move=> /andP[beLa aLbe].
-have iLm : i < n.
+have iLm : i <= n.
   apply/b_exp_leq/isAB_geq_alphaSn => //.
   by exists (0, i); rewrite mul1n.
 have [[[|x] y] Hxy] : isAB (alpha n.+1) by apply: isAB_alpha.
@@ -831,10 +915,8 @@ have Slk : size lk = k.+1 by rewrite size_map size_enum_ord.
 have lkEla1 : lk =i la1.
   move=> u; rewrite mem_filter.
   apply/mapP/idP.
-    case => [] [[|z] Hz] _ ->; rewrite dvdn_mulr //.
-      by rewrite muln0; apply/mapP; exists ord0; rewrite ?mem_enum.
-    set v := Ordinal _.
-    have [[x1 y1] Hx1y1] : isAB (alpha v) by apply: isAB_alpha.
+    case => z Hz ->; rewrite dvdn_mulr //=.
+    have [[x1 y1] Hx1y1] : isAB (alpha z) by apply: isAB_alpha.
     case: (alpha_surjective x1.+1 y1) => t Ht.
     suff H1t : t < n.+2.
       apply/mapP; exists (Ordinal H1t); first by rewrite mem_enum.
@@ -842,11 +924,9 @@ have lkEla1 : lk =i la1.
     case: leqP => // /alpha_mono.
     rewrite ltnNge Hxy Ht /= !expnS -!mulnA -Hx1y1 -Hk.
     rewrite  (leq_pmul2l (ltnW aL1)).
-    have : v < k.+1 by [].
+    have : z < k.+1 by [].
     by rewrite ltnS leq_eqVlt => /orP[/eqP->|/alpha_mono/ltnW->]; rewrite // leqnn.
-  rewrite andbC => /andP[/mapP[[[|u1] Hu1] _ ->] Ha].
-    by exists ord0; rewrite ?mem_enum ?muln0.
-  set v := Ordinal _.
+  rewrite andbC => /andP[/mapP[v Hv ->] Ha].
   have [[[|x1] y1] Hx1y1] : isAB (alpha v) by apply: isAB_alpha.
     move: Ha; rewrite Hx1y1 mul1n /= => /gcdn_idPl.
     have /eqP-> : coprime a (b ^ y1) by rewrite coprime_expr.
@@ -861,10 +941,9 @@ have lkEla1 : lk =i la1.
   by apply: alpha_mono.
 have lbEla2 : lb =i la2.
   move=> u; apply/idP/idP; last first.
-    rewrite mem_filter andbC => /andP[/mapP[[[|j1] Hj1] _ ->] ].
-      by rewrite dvdn0.
-    have /alpha_mono : j1.+1 < n.+2 by [].
-      case: (isAB_alpha j1) => [] [[|u1] v1]->; last first.
+    rewrite mem_filter andbC => /andP[/mapP[v Hx ->]].
+    have /alpha_mono : v < n.+2 by [].
+      case: (isAB_alpha v) => [] [[|u1] v1]->/=; last first.
       by rewrite expnS -mulnA dvdn_mulr.
     rewrite mul1n => H _.
     have /(ltn_pexp2l (ltnW bL1)) v1Li : b ^ v1 < b ^ i.+1.
@@ -918,20 +997,21 @@ Lemma sum_alpha_eq n i :
  \sum_(i0 < n.+1) alpha i0 =
   (a * \sum_(i0 < (n - i)) alpha i0) + \sum_(i0 < i.+1) b ^ i0.
 Proof.
-elim: n i => [i|n IH i]; first by rewrite leqNgt expn_gt0 ltnW.
+elim: n i => [i|n IH i].
+  case: i => [_|i]; last by rewrite leqNgt alpha0 (ltn_exp2l 0).
+  by rewrite !big_ord_recr !big_ord0 muln0.
 rewrite leq_eqVlt => /andP[/orP[/eqP Ha Hb| Ha Hb]].
-  case: i Ha Hb => [|i Ha Hb].
-    case: (n) => [|n1 HH]; first by rewrite !big_ord_recr /= !big_ord0 muln0.
-    have : alpha 1 < alpha n1.+2 by apply: alpha_mono.
-    by rewrite -HH ltnn. 
-  rewrite big_ord_recr [X in _ = _ + X]big_ord_recr Ha.
+  case: i Ha Hb => [H|i Ha Hb].
+    have : alpha 0 < alpha n.+1 by apply: alpha_mono.
+    by rewrite [alpha 0]H ltnn.
+  rewrite big_ord_recr [X in _ = _ + X]big_ord_recr /= Ha.
   rewrite addnA; congr (_ + _).
   rewrite subSS.
   apply: IH => //.
   rewrite Ha alpha_ltn andbT.
   apply: isAB_geq_alphaSn (isAB_bexp _) _.
   by rewrite -Ha ltn_exp2l.
-rewrite subSn; last by apply/ltnW/(b_exp_ltn Ha).
+rewrite subSn; last exact: b_exp_ltn Ha.
 rewrite big_ord_recr [X in _ = _  * X + _]big_ord_recr.
 rewrite mulnDr addnAC.
 congr (_ + _); last first.
@@ -940,24 +1020,6 @@ apply: IH.
 rewrite (isAB_geq_alphaSn (isAB_bexp _)) //.
 apply: leq_trans Hb.
 by rewrite ltnS ltnW // alpha_ltn.
-Qed.
-
-Lemma sum1_alpha_eq n i : 
- b ^ i <= alpha n < b ^ i.+1 ->
-\sum_(1 <= i0 < n.+1) alpha i0 =
-(a * \sum_(1 <= i0 < (n - i)) alpha i0) +
- \sum_(0 <= i0 < i.+1) b ^ i0.
-Proof.
-move=> H.
-have: \sum_(0 <= i0 < n.+1) alpha i0 =
-      (a * \sum_(0 <= i0 < (n - i)) alpha i0) +
-       \sum_(0 <= i0 < i.+1) b ^ i0.
-  rewrite !big_mkord.
-  by apply: sum_alpha_eq.
-rewrite big_ltn // add0n.
-rewrite (big_ltn (_ : 0 < n - i)) ?addn0 //.
-rewrite subn_gt0.
-by apply: b_exp_leq; case/andP: H.
 Qed.
 
 End Main.
@@ -969,12 +1031,15 @@ Local Notation a := (alpha 2 3).
 (* First 60 element of the list *)
 Compute map a (iota 0 60).
 
-Definition dsum_alpha n := \sum_(1 <= i < n.+1) a i.
+Definition dsum_alpha n := \sum_(i < n) a i.
 
 Local Notation S1 := dsum_alpha.
 
 Lemma dsum_alpha_0 : S1 0 = 0.
-Proof. by rewrite /S1 big_nat big1 // =>  [] []. Qed.
+Proof. by rewrite /S1 big_ord0 // =>  [] []. Qed.
+
+Lemma dsum_alpha_1 : S1 1 = 1.
+Proof. by rewrite /S1 big_ord_recr /= big_ord0. Qed.
 
 Lemma div2K n : ~~ odd n -> n./2.*2 = n.
 Proof. by move=> nO; rewrite -{2}(odd_double_half n) (negPf nO). Qed.
@@ -985,10 +1050,8 @@ move=> iLn.
 rewrite -leq_double doubleD div2K; last first.
   by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
 rewrite -!mul2n predn_exp.
-have <- := @big_mkord _ 0 addn i xpredT (expn 3).
 rewrite -mulnDr leq_mul2l /=.
-by have := sum_alpha_leq (isT : 1 < 2) (isT : 2 < 3) 
-                      (isT : coprime 2 3) iLn.
+by apply: sum_alpha_leq.
 Qed.
 
 Lemma log3_proof n : exists i, n  < 3 ^ i.
@@ -1000,6 +1063,11 @@ Lemma log30 : log3 0 = 0.
 Proof.
 by rewrite /log3; case: ex_minnP => [] [|m] //= _ /(_ 0 isT); case: m.
 Qed.
+
+Lemma log31 : log3 1 = 0.
+Proof.
+by rewrite /log3; case: ex_minnP => [] [|m] //= _  /(_ 1 isT); case: m.
+Qed. 
 
 Lemma gtn_log3 n : n < 3 ^ (log3 n).+1.
 Proof.
@@ -1013,39 +1081,32 @@ rewrite /log3; case: ex_minnP => [] [|m] //= nLm H nL.
 by rewrite leqNgt; apply/negP => /H; rewrite ltnn.
 Qed.
 
-Lemma leq_log3_alpha n : 0 < n -> log3 (a n) < n.
+Lemma leq_log3_alpha n : log3 (a n) < n.+1.
 Proof.
-move=> n_gt0.
 rewrite -(ltn_exp2l _ _ (_ : 1 < 3)) //.
 apply: leq_ltn_trans (leq_log3 _) _; first by apply: alpha_gt0.
 by apply: alpha_exp_bound.
 Qed.
 
-Lemma S1_eq n : 
-  0 < n -> S1 n = (S1 (n - (log3 (a n)).+1)).*2 + (3 ^ (log3 (a n)).+1).-1./2.
+Lemma S1_eq n : 0 < n -> 
+  S1 n = (S1 (n - (log3 (a n.-1)).+1)).*2 + (3 ^ (log3 (a n.-1)).+1).-1./2.
 Proof.
-move=> n_gt0.
+case: n => // n _.
 apply: double_inj.
 rewrite doubleD div2K; last first.
   by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
-rewrite -!mul2n predn_exp.
-have <- := @big_mkord _ 0 addn (log3 (a n)).+1 xpredT (expn 3).
-rewrite -mulnDr; congr (_ * _).
+rewrite -!mul2n predn_exp -mulnDr; congr (2 * _).
 have iLn : 3 ^ (log3 (a n)) <= a n < 3 ^ (log3 (a n)).+1.
-  rewrite gtn_log3  leq_log3 //; case: n n_gt0 => // n _.
+  rewrite gtn_log3  leq_log3 //.
   by apply: alpha_gt0.
-have := sum1_alpha_eq (isT : 1 < 2) (isT : 2 < 3) 
-                      (isT : coprime 2 3) iLn.
-rewrite /dsum_alpha -subSn //.
-case/andP: iLn => H1 _.
-by apply: b_exp_leq H1.
+by apply: sum_alpha_eq.
 Qed.
 
 Lemma S1_bigmin n : 
   S1 n.+1 = \min_(i <= n) ((S1 i).*2 + (3 ^ (n.+1 - i)).-1./2).
 Proof.
 apply/eqP; rewrite eqn_leq; apply/andP; split; last first.
-  rewrite S1_eq // -{2}(subKn (leq_log3_alpha (isT : 0 < n.+1))).
+  rewrite S1_eq // -{2}(subKn (leq_log3_alpha n)).
   apply: bigmin_inf (leqnn _) => //.
   by rewrite leq_subLR addSnnS leq_addl.
 apply/bigmin_leqP => i iLn.
@@ -1053,16 +1114,19 @@ rewrite -{1}(subKn (_ : i <= n.+1)); last by apply: ltnW.
 by apply/S1_leq/leq_subr.
 Qed.
 
+Lemma delta_S1 n : delta S1 n = a n.
+Proof. by rewrite /S1 /delta big_ord_recr /= addnC addnK. Qed. 
+
 Definition dsum_alphaL l :=
  conv (fun i => (S1 i).*2) (fun i => l * (3 ^ i).-1./2).
 
 Notation " 'S_[' l ']' " := (dsum_alphaL l) 
  (format "S_[ l ]").
 
-Definition alphaL l n := S_[l] n.+1 - S_[l] n.
+Definition alphaL l n := delta S_[l] n.
 
 Notation " 'a_[' l ']' " := (alphaL l) 
- (format " a_[ l ] ").
+ (format "a_[ l ]").
 
 Lemma leq_bigmin f g n :
  (forall i, i <= n -> f i <= g i) ->
@@ -1121,23 +1185,45 @@ have := odd_double_half n; rewrite (negPf nE) add0n => {1}<-.
 by rewrite -doubleB doubleK.
 Qed.
 
+Lemma delta_2S1 i : delta (fun i : nat => (S1 i).*2) i = (a i).*2.
+Proof. by rewrite /delta -doubleB [_ - _]delta_S1. Qed.
+
+Lemma convex_2S1 : convex (fun i : nat => (S1 i).*2).
+Proof.
+split => [] i.
+  by rewrite leq_double /dsum_alpha [X in _ <= X]big_ord_recr leq_addr.
+by rewrite !delta_2S1 leq_double; apply/ltnW/alpha_ltn.
+Qed.
+
+Lemma delta_3l l i : delta (fun i : nat => l * ((3 ^ i).-1)./2) i = l * 3 ^ i.
+Proof.
+rewrite /delta -mulnBr -even_halfB //;
+  try by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
+rewrite -predn_sub -subnS prednK ?expn_gt0 //.
+by rewrite expnS -[X in _ * ((_ - X))./2]mul1n -mulnBl mul2n doubleK.
+Qed.
+
+Lemma convex_3l l : convex (fun i : nat => l * ((3 ^ i).-1)./2).
+Proof.
+split => [] i.
+  rewrite leq_mul2l half_leq ?orbT //.
+  by apply: leq_pred; rewrite leq_exp2l.
+by rewrite !delta_3l leq_mul2l leq_exp2l // leqnSn orbT.
+Qed.
+
 Lemma convex_dsum_alphaL l : convex (S_[l]).
 Proof.
-apply: convex_conv; split => [] i.
-- by rewrite leq_double /dsum_alpha [X in _ <= X]big_nat_recr leq_addr.
-- rewrite /delta -!doubleB leq_double.
-  rewrite [X in X - _ <= _]big_nat_recr // [addn_monoid _]/= addnC addnK.
-  rewrite [X in _ <= X - _]big_nat_recr // [addn_monoid _]/= addnC addnK.
-  by apply/ltnW/alpha_ltn.
-- rewrite leq_mul2l half_leq ?orbT //.
-  by apply: leq_pred; rewrite leq_exp2l.
-rewrite /delta -!mulnBr leq_mul2l -!even_halfB //;
-  try by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
-rewrite half_leq ?orbT //.
-rewrite -predn_sub -subnS prednK ?expn_gt0 //.
-rewrite -predn_sub -subnS prednK ?expn_gt0 //.
-rewrite !expnS !mulnA -[X in _ - X <= _]mul1n.
-by rewrite -!mulnBl leq_mul2r orbT.
+apply: convex_conv; first by apply: convex_2S1.
+by apply: convex_3l.
+Qed.
+
+Lemma alphaLE l n : 
+  a_[l] n = fmerge (fun i : nat => (a i).*2) (fun i : nat => l * 3 ^ i) n.
+Proof.
+rewrite [LHS]delta_conv; last by apply: convex_3l.
+  apply: fmerge_ext => i; first by rewrite delta_2S1.
+  by rewrite delta_3l.
+by apply: convex_2S1.
 Qed.
 
 End S23.
