@@ -53,6 +53,13 @@ elim: (_ - _) => //= d fL.
 by apply: leq_trans (fI (d + m)).
 Qed.
 
+Lemma decreasingE f m n : decreasing f -> m <= n -> f n <= f m.
+Proof.
+move=> fI mLn; rewrite -(subnK mLn).
+elim: (_ - _) => //= d fL.
+by apply: leq_trans (fI _) fL.
+Qed.
+
 Definition delta (f : nat -> nat) n := f n.+1 - f n.
 
 Lemma delta_ext f1 f2 : f1 =1 f2 -> delta f1 =1 delta f2.
@@ -1224,6 +1231,60 @@ rewrite [LHS]delta_conv; last by apply: convex_3l.
   apply: fmerge_ext => i; first by rewrite delta_2S1.
   by rewrite delta_3l.
 by apply: convex_2S1.
+Qed.
+
+Lemma increasing_alphaL l : increasing a_[l].
+Proof.
+apply: increasing_ext; first by move=> i; apply/sym_equal/alphaLE.
+apply: increasing_fmerge.
+  by move=> n; rewrite leq_double; apply/ltnW/alpha_mono.
+by move=> n; rewrite leq_mul2l leq_exp2l ?leqnSn ?orbT.
+Qed.
+
+Lemma increasing_alphaL_l n : increasing (fun l => a_[l] n).
+Proof.
+move=> l; rewrite !alphaLE !fmergeE //; last 4 first.
+- by move=> k; rewrite leq_double; apply/ltnW/alpha_mono.
+- by move=> k; rewrite leq_mul2l leq_exp2l ?leqnSn ?orbT.
+- by move=> k; rewrite leq_double; apply/ltnW/alpha_mono.
+- by move=> k; rewrite leq_mul2l leq_exp2l ?leqnSn ?orbT.
+apply/bigmax_leqP => i _.
+apply: leq_trans (_ : minn (a i).*2 (l.+1 * 3 ^ (n - i)) <= _).
+  by rewrite leq_min !geq_min leqnn /= leq_mul2r leqnSn !orbT.
+by apply: leq_bigmax.
+Qed.
+
+Lemma submodular_dsum_alphaL l n :
+  S_[l] n.+1 + S_[l.+1] n <= S_[l] n + S_[l.+1] n.+1.
+Proof.
+rewrite -leq_subLR -addnBAC; last first.
+  by have [daI _] := convex_dsum_alphaL l.
+rewrite -[_ - _]/(a_[l] _) addnC -leq_subRL; last first.
+  by have [daI _] := convex_dsum_alphaL l.+1.
+ rewrite -[_ - _]/(a_[l.+1] _).
+by apply: increasing_alphaL_l.
+Qed.
+
+Lemma bound_dsum_alphaL l n : S_[l] n <= (S1 n).*2.
+Proof.
+have [SLl|lLS] := leqP (S1 n).*2 l; first by rewrite lim_dsum_alphaL_l.
+rewrite -(lim_dsum_alphaL_l (leqnn _)).
+have [/increasingE H _] := concave_dsum_alphaL_l n.
+by apply/H/ltnW.
+Qed.
+
+Lemma bound_alphaL l n : a_[l] n <= (a n).*2.
+Proof.
+have [SLl|lLS] := leqP (S1 n.+1).*2 l.
+ rewrite /alphaL /delta !lim_dsum_alphaL_l //.
+   by rewrite -delta_S1 doubleB.
+ by apply: leq_trans SLl; case: convex_2S1.
+rewrite -delta_S1 /delta doubleB.
+rewrite -(lim_dsum_alphaL_l (leqnn _)).
+rewrite -[(S1 n).*2](@lim_dsum_alphaL_l (S1 n.+1).*2).
+  rewrite -[_ - _]/(a_[_] _).
+  by apply: increasingE (increasing_alphaL_l n) _; apply: ltnW.
+by case: convex_2S1.
 Qed.
 
 End S23.
