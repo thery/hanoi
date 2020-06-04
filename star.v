@@ -1392,4 +1392,54 @@ have := alpha_min_exp3 m k.
 by rewrite (minn_idPl _).
 Qed.
 
+Lemma eq_dsum_alphaL l n :
+  {i : 'I_n.+1 | S_[l] n = (S1 i).*2 + l * ((3 ^ (n - i)).-1)./2}.
+Proof. by apply: eq_bigmin. Qed.
+
+Lemma increasing_dsum_alpha : increasing S1.
+Proof.
+by move=> n; rewrite -leq_double; case: convex_2S1.
+Qed.
+
+(* This is 3.4 *)
+Lemma dsum_alphaL_alpha l n : 1 < l -> S_[l.+1] n.+1 <= S_[l] n + (a n).*2.
+Proof.
+move=> l_gt1.
+case: (eq_dsum_alphaL l n) => [] [/= m mLn] mH.
+rewrite mH; rewrite ltnS in mLn.
+apply: leq_trans (_ : (S1 m.+1).*2 + l.+1 * ((3 ^ (n - m)).-1)./2 <= _).
+  by rewrite -subSS; apply: bigmin_inf (leqnn _).
+rewrite addnAC mulSn addnA leq_add2r.
+rewrite -leq_subLR -addnBAC ?leq_double ?increasing_dsum_alpha //.
+rewrite [_ - _]delta_2S1.
+case: ltngtP mLn => // [mLn _ |-> _]; last by rewrite subnn addn0.
+apply: leq_trans (_ : (a m).*2 + (3 ^ (n - m).-1).*2 <= _).
+  rewrite leq_add2l -leq_double.
+  apply: leq_trans (_ : (3 ^ (n - m)).-1 <= _).
+    by rewrite -[X in _ <= X]odd_double_half leq_addl.
+  apply: leq_trans (ssrnat.leq_pred _) _.
+  by rewrite -[n -m]prednK ?subn_gt0 // expnSr -!muln2 -mulnA leq_mul.
+rewrite -doubleD leq_double.
+have := @alpha_min_exp3_cor m (n - m).-1.
+rewrite prednK ?subn_gt0 // [_ + (_ - _)]addnC subnK; last by apply: ltnW.
+apply.
+have : S_[l] n <= (S1 m.+1).*2 + l * (3 ^ (n - m.+1)).-1./2.
+  by apply: bigmin_inf mLn (leqnn _).
+rewrite mH (_ : S1 m.+1 = S1 m + a m); last first.
+  by rewrite addnC -delta_S1 subnK // increasing_dsum_alpha.
+rewrite doubleD -!addnA leq_add2l.
+rewrite addnC -leq_subLR -mulnBr -[_ <= a m]leq_double.
+move: (mLn); rewrite leq_eqVlt => /orP[/eqP<-|m1Ln].
+  rewrite subnn subn0 subSn // subnn /= expn0 muln1 => lLam.
+  by rewrite (leq_trans _ lLam). 
+rewrite -even_halfB //; last 2 first.
+- by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp //= [_ == 0]leqNgt mLn.
+- by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp //= [_ == 0]leqNgt m1Ln.
+have ->: (3 ^ (n - m)).-1 - (3 ^ (n - m.+1)).-1 = (3 ^ (n - m).-1).*2.
+  rewrite subnS -{1}predn_sub -subnS prednK ?expn_gt0 //.
+  rewrite -{1}[(n - m)]prednK ?subn_gt0 // expnS.
+  by rewrite -mul2n -{4}[2]/(3 - 1) mulnBl mul1n.
+by move=> /(leq_trans _)-> //; rewrite doubleK -mul2n leq_mul2r l_gt1 orbT.
+Qed.
+.
 End S23.
