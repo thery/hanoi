@@ -1441,5 +1441,5 @@ have ->: (3 ^ (n - m)).-1 - (3 ^ (n - m.+1)).-1 = (3 ^ (n - m).-1).*2.
   by rewrite -mul2n -{4}[2]/(3 - 1) mulnBl mul1n.
 by move=> /(leq_trans _)-> //; rewrite doubleK -mul2n leq_mul2r l_gt1 orbT.
 Qed.
-.
+
 End S23.
