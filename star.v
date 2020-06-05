@@ -149,8 +149,12 @@ Qed.
 Lemma bigmin_fnorm f n : \min_(i <= n) fnorm f i = fnorm (bigmin f) n. 
 Proof. by elim: n => //= n ->; rewrite -subn_minr. Qed.
 
-Lemma bigmin_ext f1 f2 n : f1 =1 f2 -> \min_(i <= n) f1 i = \min_(i <= n) f2 i.
-Proof. by move=> fE; elim: n => //= n ->; rewrite fE. Qed.
+Lemma bigmin_ext f1 f2 n : 
+  (forall i, i <= n -> f1 i = f2 i) -> \min_(i <= n) f1 i = \min_(i <= n) f2 i.
+Proof.
+elim: n => /= [->//|n IH H].
+by rewrite H // IH // => i iH; rewrite H // (leq_trans iH).
+Qed.
 
 Definition conv (f g : nat -> nat) n :=
   \min_(i <= n) (f i + g (n - i)).
@@ -1118,6 +1122,32 @@ Qed.
 Lemma leq_pred m n : m <= n -> m.-1 <= n.-1.
 Proof. by case: m; case: n => //=. Qed.
 
+
+Lemma even_halfMl k m : 
+  ~~ odd m -> (k * m)./2 = k * m./2.
+Proof.
+move=> mE.
+have := odd_double_half m; rewrite (negPf mE) add0n => {1}<-.
+by rewrite -doubleMr doubleK.
+Qed.
+
+Lemma even_halfMr k m : 
+  ~~ odd m -> (m * k)./2 = m./2 * k.
+Proof.
+move=> mE.
+have := odd_double_half m; rewrite (negPf mE) add0n => {1}<-.
+by rewrite -doubleMl doubleK.
+Qed.
+
+Lemma even_halfD m n : 
+  ~~ odd m -> ~~ odd n -> (m + n)./2 = m./2 + n./2.
+Proof.
+move=> mE nE.
+have := odd_double_half m; rewrite (negPf mE) add0n => {1}<-.
+have := odd_double_half n; rewrite (negPf nE) add0n => {1}<-.
+by rewrite -doubleD doubleK.
+Qed.
+
 Lemma even_halfB m n : 
   ~~ odd m -> ~~ odd n -> (m - n)./2 = m./2 - n./2.
 Proof.
@@ -1401,6 +1431,11 @@ Proof.
 by move=> n; rewrite -leq_double; case: convex_2S1.
 Qed.
 
+Lemma even_expn3_pred n : ~~ odd (3 ^ n).-1.
+Proof.
+by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp orbT.
+Qed.
+
 (* This is 3.4 *)
 Lemma dsum_alphaL_alpha l n : 1 < l -> S_[l.+1] n.+1 <= S_[l] n + (a n).*2.
 Proof.
@@ -1429,17 +1464,55 @@ rewrite mH (_ : S1 m.+1 = S1 m + a m); last first.
   by rewrite addnC -delta_S1 subnK // increasing_dsum_alpha.
 rewrite doubleD -!addnA leq_add2l.
 rewrite addnC -leq_subLR -mulnBr -[_ <= a m]leq_double.
-move: (mLn); rewrite leq_eqVlt => /orP[/eqP<-|m1Ln].
-  rewrite subnn subn0 subSn // subnn /= expn0 muln1 => lLam.
-  by rewrite (leq_trans _ lLam). 
-rewrite -even_halfB //; last 2 first.
-- by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp //= [_ == 0]leqNgt mLn.
-- by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp //= [_ == 0]leqNgt m1Ln.
+rewrite -even_halfB ?even_expn3_pred //.
 have ->: (3 ^ (n - m)).-1 - (3 ^ (n - m.+1)).-1 = (3 ^ (n - m).-1).*2.
   rewrite subnS -{1}predn_sub -subnS prednK ?expn_gt0 //.
   rewrite -{1}[(n - m)]prednK ?subn_gt0 // expnS.
   by rewrite -mul2n -{4}[2]/(3 - 1) mulnBl mul1n.
 by move=> /(leq_trans _)-> //; rewrite doubleK -mul2n leq_mul2r l_gt1 orbT.
+Qed.
+
+Lemma dsum_alphal_min_3  l n :
+  S_[l] n.+1 = minn (S1 n.+1).*2 (S_[3 * l] n + l).
+Proof.
+rewrite {1}/dsum_alphaL /conv /= subnn muln0 addn0.
+congr (minn _ _).
+rewrite /dsum_alphaL /conv -bigmin_constD.
+apply: bigmin_ext => i iH; rewrite -addnA; congr (_ + _).
+rewrite -mulnAC -{3}[l]mul1n -mulnDl mulnC; congr (_ * _).
+rewrite -even_halfMl ?even_expn3_pred // -{4}[1]/(2./2).
+rewrite -even_halfD ?odd_mul ?even_expn3_pred //; congr (_./2).
+rewrite subSn // expnS -!subn1 mulnBr muln1 addn2 -!subSn ?subSS //.
+  by rewrite ltnS -expnS (ltn_exp2l 0).
+by rewrite -expnS (leq_exp2l 1).
+Qed.
+
+Lemma S1E : S_[1] =1 S1.
+Proof.
+case => [|i].
+  by rewrite /dsum_alphaL /conv /= dsum_alpha_0.
+rewrite S1_bigmin /dsum_alphaL /conv /= subnn addn0 -S1_bigmin.
+rewrite (_ : \min_(_ <= _) _ = S1 i.+1).
+  by rewrite (minn_idPr _) // -addnn leq_addr.
+by rewrite S1_bigmin; apply: bigmin_ext => i1 i1H; rewrite mul1n.
+Qed.
+
+(* This is first part of 3.5 *)
+Lemma dsum_alpha3_S n : S1 n.+1 = (S_[3] n).+1.
+Proof.
+have := dsum_alphal_min_3 1 n.
+rewrite S1E addn1 /minn; case: leqP => // _ /eqP.
+rewrite -addnn -{1}[S1 _]add0n eqn_add2r.
+suff : 0 < S1 n.+1 by case: S1.
+rewrite -dsum_alpha_1 increasingE //.
+by apply: increasing_dsum_alpha.
+Qed.
+
+(* This is second part of 3.5 *)
+Lemma dsum_alpha3l l n : S_[l] n.+1 <= S_[3 * l] n + l.
+Proof.
+rewrite dsum_alphal_min_3.
+by apply: geq_minr.
 Qed.
 
 End S23.
