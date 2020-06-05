@@ -100,6 +100,45 @@ rewrite -(leq_add2r (f i.+1 + f i)) addnA subnK // addnCA subnK //.
 by rewrite addnn addnC.
 Qed.
 
+Lemma concaveEk f i k : 
+  concave f -> k <= i -> f (i - k) + f (i + k) <= (f i).*2.
+Proof.
+move=> [fI dfD].
+elim: k => /= [kLi|k IH kLi]; first by rewrite subn0 addn0 addnn.
+have H : i - k.+1 <= i + k.
+  by apply: leq_trans (leq_subr _ _) (leq_addr _ _).
+have fk1Lfk : f (i - k.+1) <= f (i - k).
+  by apply/(increasingE fI)/leq_sub2l.
+have := leq_add (decreasingE dfD H) (IH (ltnW kLi)).
+rewrite /delta [f (i - k) + _]addnC addnA subnK ?fU // addnC.
+rewrite -subSn // subSS addnBAC // leq_subRL.
+  by rewrite addnCA leq_add2l addnS.
+by apply: leq_trans fk1Lfk (leq_addr _ _).
+Qed.
+
+Lemma convexE f : 
+  increasing f -> (forall i, (f i.+1).*2 <= f i + f i.+2) -> convex f.
+Proof.
+move=> fI fH; split => // i.
+rewrite /delta.
+rewrite -(leq_add2r (f i.+1 + f i)) [_ + f i]addnC addnA subnK //.
+by rewrite addnn [f i + _]addnC addnA subnK // addnC.
+Qed.
+
+Lemma convexEk f i k : 
+  convex f -> k <= i -> (f i).*2 <= f (i - k) + f (i + k).
+Proof.
+move=> [fI dfI].
+elim: k => /= [kLi|k IH kLi]; first by rewrite subn0 addn0 addnn.
+have H : i - k.+1 <= i + k.
+  by apply: leq_trans (leq_subr _ _) (leq_addr _ _).
+have fk1Lfk : f (i - k.+1) <= f (i - k).
+  by apply/(increasingE fI)/leq_sub2l.
+have := leq_add (increasingE dfI H) (IH (ltnW kLi)).
+rewrite /delta [f (i - k) + _]addnC addnA subnK ?fU // addnC.
+by rewrite -subSn // subSS addnS addnBA // leq_subLR addnA leq_add2r.
+Qed.
+
 Fixpoint bigmin f n := 
  if n is n1.+1 then minn (f n) (bigmin f n1)
  else f 0.
@@ -1513,6 +1552,14 @@ Lemma dsum_alpha3l l n : S_[l] n.+1 <= S_[3 * l] n + l.
 Proof.
 rewrite dsum_alphal_min_3.
 by apply: geq_minr.
+Qed.
+
+Lemma leq_dsum_alpha_2l_l l n : S_[l] n + S_[l] n.+1 <= (S_[l.*2] n).*2 + l.
+Proof.
+have H := concaveEk (concave_dsum_alphaL_l n) (leq_addr l l).
+rewrite addnK addnn -{1}mul2n -{3}[l]mul1n -mulnDl in H.
+apply: leq_trans (leq_add H (leqnn _)).
+by rewrite -addnA leq_add2l dsum_alpha3l.
 Qed.
 
 End S23.
