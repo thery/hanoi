@@ -1562,4 +1562,42 @@ apply: leq_trans (leq_add H (leqnn _)).
 by rewrite -addnA leq_add2l dsum_alpha3l.
 Qed.
 
+Lemma leq_dsum_alpha_2l_1 n : S_[1] n + S_[1] n.+1 <= (S_[2] n).*2.+1.
+Proof. by have := leq_dsum_alpha_2l_l 1 n; rewrite addn1. Qed.
+
+(* This is 3.7 *)
+Lemma alpha_4_3 n : 3 < n -> 3 * a n.+1 <= 4 * a n.
+Proof.
+move=> n_gt_3.
+have an_gt_5 : 5 < a n by apply: increasingE (increasing_alpha) n_gt_3.
+have [[i [|j]] /= anE] : isAB 2 3 (a n) by apply: isAB_alpha.
+  rewrite muln1 in anE.
+  case: i anE an_gt_5 => [|[|[|i anE an_gt_5]]]; try by move=> ->.
+  suff H1 : 8 * a n.+1 <= 9 * a n.
+    rewrite -3!leq_double -!mul2n !mulnA -[_ * 3]/(3 * 8).
+    apply: leq_trans (_ : (3 * 9) * a n <= _).
+      by rewrite -!mulnA leq_mul2l //.
+    by rewrite leq_mul2r orbT.
+  pose m := 2 ^ i * 3 ^ 2.
+  case: (alpha_surjective (isT : 1 < 2) (isT : 2 < 3) (isT : coprime 2 3) i 2)
+    => m1 m1H.
+  have H2 : a n < a m1.
+    by rewrite anE m1H !expnSr -!mulnA ltn_mul2l ?expn_gt0.
+  have H3 : a n.+1 <= a m1.
+    case: (leqP m1 n) => /(increasingE increasing_alpha) //.
+    by rewrite leqNgt H2.
+  rewrite anE !expnS [X in _ <= X]mulnC !mulnA -[2 * 2 * 2]/8 -mulnA leq_mul2l.
+  by rewrite  -m1H.
+pose m := 2 ^ i.+2 * 3 ^ j.
+case: (alpha_surjective (isT : 1 < 2) (isT : 2 < 3) (isT : coprime 2 3) i.+2 j)
+    => m1 m1H.
+have H2 : a n < a m1.
+  rewrite anE m1H !expnSr -!mulnA ltn_mul2l ?expn_gt0 //=.
+  by rewrite mulnC !mulnA ltn_mul2r ?expn_gt0.
+have H3 : a n.+1 <= a m1.
+  case: (leqP m1 n) => /(increasingE increasing_alpha) //.
+  by rewrite leqNgt H2.
+by rewrite anE !expnSr -[4]/(2 ^ 2) !mulnA -expnD add2n -m1H mulnC leq_mul2r.
+Qed.
+
 End S23.
