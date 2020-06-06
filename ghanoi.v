@@ -26,6 +26,8 @@
 (*                         iff peg p1 is different from peg p2                *)
 (*    lrel              == a linear relation between pegs, lrel p1 p2 is      *)
 (*                         true iff peg p1 is next to peg p2                  *)
+(*    srel              == a star relation between pegs, lrel p1 p2 is        *)
+(*                         true iff p1 != p2 and p1 or p2 is the 0 peg        *)
 (*    move r c1 c2      == checks if going from configuration c1              *)
 (*                         to configuration c2 is a move compatible with      *)
 (*                         relation r (a relation over pegs)                  *)
@@ -1119,6 +1121,22 @@ by move=> x y; rewrite /drel /= eq_sym.
 Qed.
 
 End Drel.
+
+Section Srel.
+
+Variable n : nat.
+
+Definition srel : rel (peg n) := [rel x y | ((x : peg n) != y) && (x * y == 0)].
+
+Definition sirr : irreflexive srel.
+by move=> x; apply/idP/negP; rewrite negb_and eqxx.
+Qed.
+
+Definition ssym : symmetric srel.
+by move=> x y; rewrite /srel /= mulnC eq_sym.
+Qed.
+
+End Srel.
 
 (******************************************************************************)
 (*  Linear relation                                                           *)
