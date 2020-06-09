@@ -19,6 +19,9 @@ Hanoi towers in Coq
 | [psi](./psi.v)                    | Theorems about the Ψ function            |
 | [ghanoi4](./ghanoi4.v)            | General Hanoi framework with 4 pegs      |
 | [hanoi4](./hanoi4.v)              | Hanoi towers with 4 pegs                 |
+| [star](./star.v)                  | Some maths for the shanoi                |
+| [shanoi](./shanoi.v)              | Hanoi towers in star                     |
+| [shanoi4](./shanoi4.v)            | Hanoi towers with 4 pegs in star         |
 
 A note about this development is available [here](./Note.pdf).
 
