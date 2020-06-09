@@ -1601,3 +1601,17 @@ by rewrite anE !expnSr -[4]/(2 ^ 2) !mulnA -expnD add2n -m1H mulnC leq_mul2r.
 Qed.
 
 End S23.
+
+Notation a := (alpha 2 3).
+
+Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
+ (at level 41, F at level 41, i, n at level 50,
+  format "\min_ ( i  <=  n )  F").
+
+Notation " 'S_[' l ']' " := (dsum_alphaL l) 
+ (format "S_[ l ]").
+
+Notation " 'a_[' l ']' " := (alphaL l) 
+ (format "a_[ l ]").
+
+Notation S1 := dsum_alpha.
