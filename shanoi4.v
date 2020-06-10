@@ -15,6 +15,14 @@ Unset Strict Implicit.
 (*                                                                            *)
 (******************************************************************************)
 
+Lemma sum3E n (f : nat -> nat) : 
+  \sum_(i < 3 * n) f i =
+  \sum_(i < n) (f (3 * i) + f (3 * i).+1 + f (3 * i).+2).
+Proof.
+elim: n => [|n IH]; first by rewrite !big_ord0.
+by rewrite mulnS !big_ord_recr /= IH !addnA.
+Qed.
+
 Section sHanoi4.
 
 Let srel : rel (peg 4) := @srel 4.
@@ -349,7 +357,127 @@ have [/andP[a_gt1 aLl1]|] := boolP (2 <= a <= l.-1).
     - by rewrite uaiLEp2 /apeg; case: odd; rewrite // eq_sym.
     - by rewrite aMin1 ?prednK // /apeg; case: odd; rewrite // eq_sym.
     - by rewrite /apeg; case: odd.
-    by rewrite uaiLEp2.
+    by rewrite uaiLEp2. 
+  pose u1 (i : 'I_(3 * a).-2.+1) :=
+    if (i == 3 * a.-1 :>nat) then ↓[u (inord a.-1)] 
+    else if (i == (3 * a.-1).+1 :>nat) then sam1
+    else if (i %% 3) == 0 then ↓[u (inord (i %/ 3))]
+    else if (i %% 3) == 1 then si (inord (i %/ 3))
+    else ti (inord (i %/ 3)).
+   pose u2 (i : 'I_3) :=  
+    if i == 0 :> nat then sam1 else
+    if i == 1 :> nat then tam1 else ↓[u ai].
+  pose u3 (i : 'I_b.+1) := ↓[u (inord (i + a))].
+  have P1 : 
+    a.*2 +
+    \sum_(i < (3 * a).-2) 
+        d[u1 (inord i), u1 (inord i.+1)] +
+    \sum_(i < 2) 
+        d[u2 (inord i), u2 (inord i.+1)] +
+    \sum_(i < b)  d[u3 (inord i), u3 (inord i.+1)] 
+    <= 
+    \sum_(i < l.+1) d[u (inord i), u (inord i.+1)].
+    have G b1 : b1 = a ->  
+      \sum_(i < (3 * b1).-2) d[u1 (inord i), u1 (inord i.+1)] =
+      \sum_(i < (3 * a.-1)) d[u1 (inord i), u1 (inord i.+1)] +
+      d[↓[u (inord a.-1)], sam1].
+      move=> b1Ea.
+      have ta2E : (3 * b1).-2 = (3 * a.-1).+1.
+        by rewrite b1Ea -{1}[a]prednK // mulnS.
+      rewrite ta2E big_ord_recr /=; congr (_ + d[_,_]).
+        by rewrite /u1 ifT// inordK // -{2}b1Ea ?ta2E.
+      rewrite /u1 inordK; last by rewrite -{2}b1Ea ?ta2E.
+      by rewrite eqn_leq ltnn /= eqxx.
+    rewrite {}G //.
+    have -> := @sum3E _ (fun i => d[u1 (inord i), u1 (inord i.+1)]).
+    have -> : a.*2 = 2 + \sum_(i < a.-1) 2.
+      rewrite sum_nat_const /= cardT size_enum_ord.
+      by rewrite muln2 -(doubleD 1) add1n prednK.
+    rewrite !addnA -[2 + _ + _]addnA -big_split /=.
+    rewrite [2 + _]addnC -!addnA 2![X in _ + X <= _]addnA addnA.
+    have -> : \sum_(i < l.+1)  d[u (inord i), u (inord i.+1)] =
+      \sum_(i < a.-1) (d[u (inord i), u (inord i.+1)]) + 
+      d[u (inord a.-1), u ai] +
+      \sum_(i < b) d[u (inord (a +i)), u (inord (a + i.+1))].
+      have <- := big_mkord xpredT (fun i => d[u (inord i), u (inord i.+1)]).
+      rewrite (big_cat_nat _ _ _ (_ : _ <= (a.-1).+1)) //=; last first.
+         by rewrite prednK.
+      rewrite big_mkord big_ord_recr /= prednK //.
+      rewrite -{9}[a]add0n big_addn -/b big_mkord.
+      congr (_ + _ + _).
+      by apply: eq_bigr => i; rewrite addnC addnS.
+    apply: leq_add; first apply: leq_add.
+    - rewrite leq_eqVlt; apply/orP; left; apply/eqP.
+      apply: eq_bigr => i _.
+      have -> : u1 (inord (3 * i)) = ↓[u (inord i)].
+        rewrite /u1 inordK; last first.
+          rewrite ltnS (leq_trans (_ : _ <= 3 * (a.-1))) //.
+            by rewrite leq_mul2l /= ltnW.
+          by rewrite -{2}[a]prednK // mulnS addSn add2n /= ltnW.
+        rewrite eqn_mul2l /= eqn_leq [_ <= i]leqNgt ltn_ord andbF.
+        rewrite eqn_leq ltn_mul2l /= ltnNge [i <= _]ltnW // andbF.
+        by rewrite modnMr eqxx mulKn.
+      have -> : u1 (inord (3 * i).+1) = si (inord i).
+        rewrite /u1 inordK; last first.
+          rewrite ltnS (leq_trans (_ : _ <= 3 * (a.-1))) //.
+            by rewrite ltn_mul2l /=.
+          by rewrite -{2}[a]prednK // mulnS addSn add2n /= ltnW.
+        rewrite eqn_leq [_ <= _.+1]leqNgt.
+        rewrite (leq_trans (_ : (3 * i).+2 <= (3 * i.+1))) ?andbF //;
+               last 2 first.
+        - by rewrite mulnS addSn add2n.
+        - by rewrite leq_mul2l /=.
+        rewrite eqn_leq !ltnS [_ <= 3 * i]leq_mul2l.
+        rewrite [_ <= i]leqNgt ltn_ord andbF.
+        have ->: (3 * i).+1 %% 3 = 1.
+          rewrite -addn1 mulnC modnMDl //.
+        suff ->: (3 * i).+1 %/ 3 = i by [].
+        rewrite -addn1 mulnC divnDl //.
+          by rewrite mulnK // divn_small // addn0.
+        by rewrite dvdn_mull // dvdnn.
+      have -> : u1 (inord (3 * i).+2) = ti (inord i).
+        rewrite /u1 inordK; last first.
+          rewrite ltnS (leq_trans (_ : _ <= 3 * (a.-1))) //.
+            rewrite (leq_trans (_ : _ <= 3 * (i.+1))) //.
+              by rewrite mulnS addSn add2n.
+            by rewrite leq_mul2l /=.
+          by rewrite -{2}[a]prednK // mulnS addSn add2n /= ltnW.
+        rewrite eqn_leq [_ <= _.+1]leqNgt.
+        rewrite -[(3 * i).+3](mulnDr 3 1 i) leq_mul2l ltn_ord andbF.
+        rewrite eqn_leq !ltnS [_ <= _.+1]leqNgt.
+        rewrite (leq_trans (_ : (3 * i).+1 < 3 * (i.+1))) ?andbF //;
+             last 2 first.
+        - by rewrite mulnS addSn add2n.
+        - by rewrite leq_mul2l /=.
+        have ->: (3 * i).+2 %% 3 = 2.
+          rewrite -addn2 mulnC modnMDl //.
+        suff ->: (3 * i).+2 %/ 3 = i by [].
+        rewrite -addn2 mulnC divnDl //.
+          by rewrite mulnK // divn_small // addn0.
+        by rewrite dvdn_mull // dvdnn.
+      have -> : u1 (inord (3 * i).+3) = ↓[u (inord i.+1)].
+        have -> : (3 * i).+3 = 3 * (i.+1) by rewrite mulnS addSn add2n.
+        rewrite /u1 inordK; last first.
+          rewrite ltnS (leq_trans (_ : _ <= 3 * (a.-1))) //.
+            by rewrite leq_mul2l /=.
+          by rewrite -{2}[a]prednK // mulnS addSn add2n /= ltnW.
+        rewrite eqn_mul2l /=; case: eqP => [->//|_].
+        rewrite eqn_leq [_ <= 3 * i.+1]leqNgt ltnS leq_mul2l /= ltn_ord andbF.
+        by rewrite modnMr mulKn.
+      rewrite /si /ti; case: (F) => [] [s t] [_ _].
+      rewrite inordK => [->|]; last by rewrite prednK // -ltnS prednK.
+      by rewrite add2n /= addn0 !addnA.
+    - rewrite leq_eqVlt; apply/orP; left; apply/eqP.
+      rewrite !big_ord_recr big_ord0 //= add0n !addnA.
+      have -> : u2 (inord 0) = sam1 by rewrite /u2 /= inordK.
+      have -> : u2 (inord 1) = tam1 by rewrite /u2 /= inordK.
+      have -> : u2 (inord 2) = ↓[u ai] by rewrite /u2 /= inordK.
+      by move: duam1ua1E; rewrite addn0 add2n !addnA !addSn.
+    apply: leq_sum => i _.
+    rewrite /u3 inordK; last by rewrite ltnS ltnW.
+    rewrite /u3 inordK; last by rewrite ltnS.
+    rewrite addSn [i + _]addnC addnS.
+    by apply/gdist_cunlift/shanoi_connect.
 Admitted.
 
 End Case1.
