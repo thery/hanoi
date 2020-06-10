@@ -44,25 +44,26 @@ by exists (b :: l1); exists l2; rewrite /= lE.
 Qed.
 
 Lemma split_first (A : eqType) (l : seq A) (P : pred A) :
-  ~~ all [predC P] l -> exists b, exists l1, exists l2,
-    [/\ all [predC P] l1, P b &  l = l1 ++ b :: l2].
+  ~~ all [predC P] l -> {bl1l2 : (A * seq A * seq A) |
+    [/\ all [predC P] bl1l2.1.2, P bl1l2.1.1 &  
+             l = bl1l2.1.2 ++ bl1l2.1.1 :: bl1l2.2]}.
 Proof.
 elim: l => //= b l IH.
 rewrite negb_and negbK; case: (boolP (b \in P)) =>
-      [bIP| bNIP /= /IH [c [l1 [l2 [H1 H2 ->]]]]].
-  by exists b; exists [::]; exists l; split.
-by exists c; exists (b :: l1); exists l2; split; rewrite /= ?bNIP.
+      [bIP _| bNIP /= /IH [[[c l1] l2] [H1 H2 ->]]].
+  by exists (b, [::], l); split.
+by exists (c, b :: l1, l2); split; rewrite /= ?bNIP.
 Qed.
 
 Lemma split_last (A : eqType) (l : seq A) (P : pred A) :
-  ~~ all [predC P] l  -> exists b, exists l1, exists l2,
-    [/\  P b, all [predC  P] l2 &  l = l1 ++ b :: l2].
+  ~~ all [predC P] l  -> 
+  {bl1l2 | [/\  P bl1l2.1.1, all [predC  P] bl1l2.2 &  
+                l = bl1l2.1.2 ++ bl1l2.1.1 :: bl1l2.2]}.
 Proof.
 move=> lA.
 case: (@split_first _ (rev l) P); first by rewrite all_rev.
-move=> b [l1 [l2 [H1 H2 H3]]].
-exists b; exists (rev l2); exists (rev l1); split => //.
-  by rewrite all_rev.
+move=> [[b l1] l2] [H1 H2 H3].
+exists (b, rev l2, rev l1); split => //; first by rewrite all_rev.
 by rewrite -{1}[l]revK H3 rev_cat /= rev_cons cat_rcons.
 Qed.
 

@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect finmap.
-Require Import extra star gdist ghanoi ghanoi4 shanoi.
+Require Import zify extra star gdist ghanoi ghanoi4 shanoi.
 
 Open Scope nat_scope.
 
@@ -79,26 +79,25 @@ by case: (peg4E p1) => ->; rewrite ?eqxx //;
 Qed.
 
 (* This is lemma 2.1 *)
-Lemma sgdist_simple n (p1 p2 p3 : peg 4) (u v : configuration 4 n.+1) : 
+Lemma sgdist_simple n (p2 : peg 4) (u v : configuration 4 n.+1) 
+    (p1 := u ldisk) (p3 := v ldisk): 
    p1 != p2 -> p1 != p3 -> p2 != p3 -> 
    p1 != p0 -> p2 != p0 -> p3 != p0 ->
-   u ldisk = p1 -> v ldisk = p3 -> 
-   exists s : configuration 4 n, exists t : configuration 4 n, 
-     [/\ (codom s) \subset [:: p2; p3], codom t \subset [:: p1; p2] & 
-         d[u, v] = D[[:: cunliftr u; s; t; cunliftr v]].+2].
+   {st : (configuration 4 n * configuration 4 n) |
+     [/\ codom st.1 \subset [:: p2; p3], codom st.2 \subset [:: p1; p2] & 
+         d[u, v] = D[[:: cunliftr u; st.1; st.2; cunliftr v]].+2]}.
 Proof.
-move=> p1Dp2 p1Dp3 p2Dp3 p1Dp0 p2Dp0 p3Dp0 uld vld.
+move=> p1Dp2 p1Dp3 p2Dp3 p1Dp0 p2Dp0 p3Dp0.
 have pE p : [\/ p = p0, p = p1, p = p2 | p = p3] by apply: pE4.
 have [cs /= csH] := gpath_connect (shanoi_connect u v).
 have vIcs : v \in cs.
   have := mem_last u cs; rewrite (gpath_last csH).
   rewrite inE; case: eqP => //  vEu.
-  by case/eqP : p1Dp3; rewrite -vld vEu.
-case: (@split_first _ cs (fun c => c ldisk != p1)) => 
-     [|sp [cs1 [cs2 ]]].
+  by case/eqP : p1Dp3; rewrite /p3 vEu.
+case: (@split_first _ cs (fun c => c ldisk != p1)) => [|[[sp cs1] cs2]].
   apply/negP=> /allP /(_ _ vIcs).
   rewrite /= -topredE /= negbK.
-  by rewrite eq_sym vld (negPf p1Dp3).
+  by rewrite eq_sym (negPf p1Dp3).
 case=> /allP spH spLE csE.
 pose s := last u cs1.
 have sMsp : s `--> sp.
@@ -126,10 +125,10 @@ have sCd : codom (cunliftr s) \subset [:: p2; p3].
   by rewrite /= /bump [n <= j]leqNgt ltn_ord add0n.
 have vIcs2 : v \in cs2.
   move: vIcs; rewrite csE !(inE, mem_cat) => /or3P[|/eqP vEs|] //.
-    by move=> /spH; rewrite /= -topredE negbK vld eq_sym (negPf p1Dp3).
-  by case/eqP : p3Dp0; rewrite -vld vEs.
+    by move=> /spH; rewrite /= -topredE negbK eq_sym (negPf p1Dp3).
+  by case/eqP : p3Dp0; rewrite /p3 vEs.
 case: (@split_last _ (sp :: cs2) (fun c => c ldisk != p3)) => 
-     [|/= t [cs3 [cs4 ]]].
+     [|/= [[t cs3] cs4]/=].
   apply/negP=> /allP /(_ _ (mem_head _ _)).
   by rewrite /= -topredE /= negbK spLp0 eq_sym (negPf p3Dp0).
 case=> // tLE tH scs2E.
@@ -160,14 +159,12 @@ have tCd : codom (cunliftr t) \subset [:: p1; p2].
   move/eqP; rewrite -tpLp3 -[_ == _]negbK; case/negP.
   apply: move_on_toplDr tMtp _ _; first by rewrite tpLp3 tLp0 eq_sym.
   by rewrite /= /bump [n <= j]leqNgt ltn_ord add0n ltnW.
-exists (cunliftr s); exists (cunliftr t); split => //=.
+exists (cunliftr s, cunliftr t); split => //=.
 rewrite addn0.
 move: csH; rewrite csE => csH.
 rewrite (gdist_cat csH) -[@move _ _ _]/smove -/s.
 move: csH => /gpath_catr; rewrite -/s => csH.
-rewrite gdist_cunlift_eq //; last 2 first.
-- by apply: shanoi_connect.
-- by rewrite sLp1.
+rewrite gdist_cunlift_eq //; last by apply: shanoi_connect.
 rewrite -!addnS.
 congr (_ + _).
 have ->: cunliftr s = cunliftr sp.
@@ -187,8 +184,7 @@ case: cs3 scs2E => [[spEt cs2E]|c3 cs3 /= [spE cs2E]].
   rewrite gdist0 add0n (gdist_cons csH) ctEctp.
   move: csH => /gpath_consr csH.
   rewrite gdist_cunlift_eq //.
-    by apply: shanoi_connect.
-  by rewrite vld.
+  by apply: shanoi_connect.
 move: csH; rewrite cs2E -cat_rcons => csH.
 rewrite (gdist_cat csH) last_rcons.
 rewrite gdist_cunlift_eq //; last 2 first.
@@ -199,8 +195,7 @@ move: csH => /gpath_catr; rewrite last_rcons => csH.
 rewrite (gdist_cons csH); congr (_).+1.
 move: csH => /gpath_consr csH.
 rewrite ctEctp gdist_cunlift_eq //.
-- by apply: shanoi_connect.
-by rewrite vld.
+by apply: shanoi_connect.
 Qed.
 
 Definition beta n l k := 
@@ -295,11 +290,66 @@ Hypothesis KH2 : u ord_max ord_max != apeg l.+1 p1 p3.
 Hypothesis l_gt0 : l != 0.
 
 Lemma case1 :
-  (S_[l.+1] n.+1).*2 + (a_[l.+1] n.+1).*2 <=
+  (S_[l.+1] n.+2).*2 <= 
   \sum_(i < l.+1)  d[u (inord i), u (inord i.+1)] +
   \sum_(k < n.+2) (u ord0 k != apeg 0 p1 p3) * beta n.+2 l.+1 k +
   \sum_(k < n.+2) (u ord_max k != apeg l.+1 p1 p3) * beta n.+2 l.+1 k.
 Proof.
+have il1E : inord l.+1 = ord_max :> 'I_l.+2 by apply/val_eqP; rewrite /= inordK.
+have iE : exists i, u (inord i) ord_max != apeg i p1 p3.
+  by exists l.+1; rewrite il1E.
+case: (@ex_minnP _ iE) => a aH aMin.
+have aMin1 i : i < a -> u (inord i) ord_max = apeg i p1 p3.
+  by case: (u (inord i) ord_max =P apeg i p1 p3) => // /eqP /aMin; case: leqP.
+have aLl : a <= l.+1 by apply: aMin; rewrite il1E.
+pose ai : 'I_l.+2 := inord a.
+have aiE : ai = a :> nat by rewrite inordK.
+pose b := l.+1 - a.
+pose bi : 'I_l.+2 := inord b.
+have biE : bi = b :> nat by rewrite inordK // /b ltn_subLR // leq_addl.
+have [/andP[a_gt1 aLl1]|] := boolP (2 <= a <= l.-1).
+  have a_gt0 : 0 < a by rewrite (leq_trans _ a_gt1).
+  have uaiLEp2 : u ai ldisk = p2.
+    have /cH/subsetP/(_ (u ai ldisk) (codom_f _ _)) : 0 < ai < l.+1.
+      by rewrite aiE (leq_trans _ a_gt1) //= ltnS (leq_trans aLl1)
+                 // ssrnat.leq_pred.
+    by rewrite !inE aiE (negPf aH) orbF => /eqP.
+  have F (i : 'I_a.-2.+1) : 
+   let u1 := u (inord i) in let u2 := u (inord i.+1) in
+   {st : (configuration 4 n.+1 * configuration 4 n.+1) |
+     [/\ codom st.1 \subset [:: p2; u2 ldisk ], 
+         codom st.2 \subset [:: u1 ldisk; p2] & 
+         d[u1, u2] = 
+           D[[:: cunliftr u1; st.1; st.2; cunliftr u2]].+2]}.
+    have iLa : i < a.-1.
+      by have := ltn_ord i; rewrite {2}[a.-2.+1]prednK // -ltnS prednK.
+    have iLa1 : i < a by rewrite (leq_trans iLa) // ssrnat.leq_pred.
+    apply: sgdist_simple => //.
+    - by rewrite aMin1 // /apeg; case odd; rewrite // eq_sym.
+    - rewrite !aMin1 //; last by rewrite -{2}[a]prednK.
+      by rewrite /apeg /=; case: odd; rewrite // eq_sym.
+    - rewrite aMin1; last by rewrite -{2}[a]prednK.
+      by rewrite /apeg /=; case: odd; rewrite // eq_sym.
+    - by rewrite aMin1 // /apeg /=; case: odd; rewrite // eq_sym.
+    rewrite aMin1; last by rewrite -{2}[a]prednK.
+    by rewrite /apeg /=; case: odd; rewrite // eq_sym.
+  pose si i : configuration 4 n.+1 := let: (exist (x, _) _) := F i in x.
+  pose ti i : configuration 4 n.+1 := let: (exist (_, x) _) := F i in x.  
+  have [[sam1 tam1] /= [sam1C tam1E duam1ua1E]] : 
+   let u1 := u (inord a.-1) in let u2 := u ai in
+   {st : (configuration 4 n.+1 * configuration 4 n.+1) |
+     [/\ codom st.1 \subset [:: apeg a p1 p3; u2 ldisk ], 
+         codom st.2 \subset [:: u1 ldisk; apeg a p1 p3] & 
+         d[u1, u2] = 
+           D[[:: cunliftr u1; st.1; st.2; cunliftr u2]].+2]}.
+    apply: sgdist_simple => //.
+    - rewrite aMin1 ?prednK // /apeg -{2}[a]prednK //=.
+      by case: odd; rewrite // eq_sym.
+    - by rewrite uaiLEp2 aMin1 ?prednK // /apeg; case: odd; rewrite // eq_sym.
+    - by rewrite uaiLEp2 /apeg; case: odd; rewrite // eq_sym.
+    - by rewrite aMin1 ?prednK // /apeg; case: odd; rewrite // eq_sym.
+    - by rewrite /apeg; case: odd.
+    by rewrite uaiLEp2.
 Admitted.
 
 End Case1.
@@ -331,7 +381,7 @@ elim: {n}_.+1 {-2}n (leqnSn n) l p1 p2 p3 u => [[]// _ l p1 p2 p3 u|
     - by rewrite H; move/eqP: H; rewrite gdist_eq0 => ->.
     - case/gpathP; rewrite /= andbT => /moveP[z].
       rewrite [z]disk1_all => [] [zH _ _ _] aE.
-      move/andP: zH => [] [_]; rewrite aE.
+      case/andP: zH => _; rewrite aE.
       move: c1Dp0 c2Dp0; rewrite !configuration1_eq !Ival_eq /= !ffunE /=.
       by do 2 case: val.
     move=> /gpath_dist; case: eqP => [<-|/eqP c1Dc2]; first by rewrite gdist0.
@@ -381,7 +431,7 @@ elim: {n}_.+1 {-2}n (leqnSn n) l p1 p2 p3 u => [[]// _ l p1 p2 p3 u|
         by rewrite !inE (negPf p1Dp2) (negPf p1Dp3).
       by apply/val_eqP; rewrite /= inordK.
     - rewrite configuration1_eq ffunE.
-      case: eqP => // H.
+      case: (_ =P _) => // H.
       have /cH :  0 < (inord l.+1 : 'I_l.+3) < l.+2 by rewrite inordK /=.
       move=> /subsetP/(_ _ (codom_f _ d0)).
       rewrite H !inE eq_sym (negPf p2Dp0) /apeg /=; case: odd => /=.
@@ -411,13 +461,13 @@ elim: {n}_.+1 {-2}n (leqnSn n) l p1 p2 p3 u => [[]// _ l p1 p2 p3 u|
   by rewrite eq_sym (negPf p1Dp0).
 pose u' : {ffun 'I_l.+2 -> configuration 4 n.+1} :=
      [ffun i : 'I_l.+2 => cunliftr (u i)].
-rewrite dsum_alphaL_S doubleD.
 have H (k : 'I_l.+2) : 
   0 < k < l.+1 -> codom (u' k) \subset [:: p2; apeg k p1 p3].
   by move=> k1; rewrite ffunE; apply/codom_liftr/cH. 
 pose K := (u ord0 ord_max != apeg 0 p1 p3) + 
           (u ord_max ord_max != apeg l.+1 p1 p3).
 have [HK|] := boolP ((K == 2) || ((K == 1) && (l == 0))).
+  rewrite dsum_alphaL_S doubleD.
   have IH' := IH _ (nLm : n.+1 <= m) _ p1 p2 p3 u'
               p1Dp2 p1Dp3 p2Dp3 p1Dp0 p2Dp0 p3Dp0 H.
   rewrite ![\sum_(_ < _.+2) _]big_ord_recr /=.
