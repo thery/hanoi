@@ -763,7 +763,7 @@ elim: {n}_.+1 {-2}n (leqnSn n) l p1 p2 p3 u => [[]// _ l p1 p2 p3 u|
     rewrite big_ord_recl big_ord0 addn0.
     rewrite (_ : inord 0 = ord0); last by apply/val_eqP; rewrite /= inordK.
     rewrite (_ : inord 1 = ord_max); last by apply/val_eqP; rewrite /= inordK.
-    rewrite /beta /apeg /= -[a 0]/1; do 2 case: eqP; rewrite /= ?addn0;
+    rewrite /beta /apeg /= -[α 0]/1; do 2 case: eqP; rewrite /= ?addn0;
         try by move=> *; rewrite leq_addl.
     move=> u1E u0E.
     rewrite d0fE //.
@@ -857,7 +857,6 @@ rewrite negb_or negb_and.
 have: K <= 2 by rewrite /K; do 2 case: (_ != _).
 case: ltngtP; rewrite // ltnS.
 case: ltngtP => //= KE _ _ l_gt0; last first.
-  have {}l_gt0 : 0 < l by case: l l_gt0.
   move: KE; rewrite /K.
   (case: eqP => [KH1|/eqP KH1] /=; case: eqP) => // [/eqP KH2|KH2] _.
     by apply: (@case1 _ IH) cH KH1 KH2 l_gt0.
