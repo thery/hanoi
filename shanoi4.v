@@ -23,6 +23,9 @@ elim: n => [|n IH]; first by rewrite !big_ord0.
 by rewrite mulnS !big_ord_recr /= IH !addnA.
 Qed.
 
+Lemma alphaL1E k : α_[1] k = α k.
+Proof. by rewrite /alphaL /delta !S1E -delta_S1. Qed.
+
 Section sHanoi4.
 
 Let srel : rel (peg 4) := @srel 4.
@@ -207,18 +210,19 @@ by apply: shanoi_connect.
 Qed.
 
 Definition beta n l k := 
-  if ((1 < l) && (k == n.-1)) then α_[l] k else (α k).*2.
+  if ((1 < l) && (k == n.-1)) then α_[l] k else (α_[1] k).*2.
 
 Lemma leq_beta n l k : α_[l] k <= beta n l k.
 Proof.
-rewrite /beta; case: (_ < _) => /=; last by apply: bound_alphaL.
-by case: (_ == _) => //=; apply: bound_alphaL.
+rewrite /beta; case: (_ < _) => /=; last first.
+  by rewrite alphaL1E; apply: bound_alphaL.
+by case: (_ == _) => //=; rewrite alphaL1E; apply: bound_alphaL.
 Qed.
 
-Lemma geq_beta n l k : beta n l k <= (α k).*2.
+Lemma geq_beta n l k : beta n l k <= (α_[1] k).*2.
 Proof.
 rewrite /beta; case: (_ < _) => //=.
-by case: (_ == _) => //=; apply: bound_alphaL.
+by case: (_ == _) => //=; rewrite alphaL1E; apply: bound_alphaL.
 Qed.
 
 Lemma S0E n : S_[0] n = 0.
@@ -275,7 +279,8 @@ Hypothesis IH: forall n : nat,
 
 Lemma sum_beta_S n l a : 1 < l ->
   \sum_(k < n.+1) a k * beta n.+1 l k =
-   \sum_(k < n) (a (widen_ord (leqnSn n) k) * (α k).*2) + a ord_max * α_[l] n.
+   \sum_(k < n) (a (widen_ord (leqnSn n) k) * (α_[1] k).*2) 
+    + a ord_max * α_[l] n.
 Proof.
 move=> l_gt1.
 rewrite big_ord_recr /= /beta l_gt1 eqxx /=; congr (_ + _).
@@ -284,7 +289,7 @@ by rewrite eqn_leq [_ <= i]leqNgt ltn_ord andbF.
 Qed.
 
 Lemma leq_sum_beta n l a : 
-  \sum_(k < n) a k * beta n l k <= \sum_(k < n) a k * (α k).*2.
+  \sum_(k < n) a k * beta n l k <= \sum_(k < n) a k * (α_[1] k).*2.
 Proof.
 by apply: leq_sum => i _; rewrite leq_mul2l geq_beta orbT.
 Qed.
@@ -313,6 +318,16 @@ Proof. by move=> k kH; rewrite ffunE; apply/codom_liftr/cH. Qed.
 Hypothesis KH1 : u ord0 ord_max = apeg 0 p1 p3.
 Hypothesis KH2 : u ord_max ord_max != apeg l.+1 p1 p3.
 Hypothesis l_gt0 : l != 0.
+
+Lemma concaveEk1 (f : nat -> nat) (i k1 k2 : nat) :
+  concave f -> f (i + k1 + k2) + f i <= f (i + k2) + f (i + k1).
+Proof.
+move=> fC; have [fI dfD] := fC.
+elim: k2 k1 i => [k1 i|k2 IHH k1 i]; first by rewrite !addn0 addnC.
+rewrite !addnS -(subnK (fI _)) -[X in _ <= X + _](subnK (fI _)).
+rewrite -addnA -[X in _ <= X]addnA leq_add //.
+by apply: (decreasingE dfD); rewrite addnAC leq_addr.
+Qed.
 
 Lemma case1 :
   (S_[l.+1] n.+2).*2 <= 
@@ -654,8 +669,9 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     by apply/val_eqP.
   set x1S := \sum_(i < n) _ in P2.
   set y1S := \sum_(i < n) _ in P3.
-  have x1Sy1SE : x1S + y1S = (S1 n).*2.
-    rewrite -addnn -!big_split /=; apply: eq_bigr => i _.
+  have x1Sy1SE : x1S + y1S = (S_[1] n).*2.
+    rewrite -addnn !S1E -!big_split /=; apply: eq_bigr => i _.
+    rewrite -alphaL1E.
     set v := widen_ord _ _.
     have /subsetP := sam1C => /(_ (sam1 v) (codom_f _ _)).
     rewrite !inE -uiME uaiLEp2 addnn.
@@ -669,9 +685,9 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     by rewrite (negPf p1Dp2). 
   set x2S := \sum_(i < n) _ in P3.
   set y2S := \sum_(i < n) _ in P4.
-  have xSy2SE : x2S + y2S = (S1 n).*2.
-    rewrite -addnn -!big_split /=; apply: eq_bigr => i _.
-    rewrite /ai.
+  have x2y2SE : x2S + y2S = (S_[1] n).*2.
+    rewrite -addnn !S1E -!big_split /=; apply: eq_bigr => i _.
+    rewrite /ai -alphaL1E.
     set v := cunliftr _ _.
     have /H : 0 < (inord a : 'I_l.+2) < l.+1 by rewrite inordK // a_gt0.
     rewrite ffunE => /subsetP /(_ v (codom_f _ _)).
@@ -706,6 +722,161 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
   rewrite -addnn {1}dsum_alphaL_S in P2.
   rewrite -addnn {1}dsum_alphaL_S in P3.
   rewrite -addnn {1}dsum_alphaL_S.
+  have F4 k : S_[a.-1] k.+1 <= S_[(3 *a).-2] k + a.-1.
+    apply: leq_trans (dsum_alpha3l _ _) _.
+    rewrite leq_add2r.
+    apply: (increasingE (increasing_dsum_alphaL_l _)).
+    by rewrite -{2}[a]prednK // mulnS addSn add2n /=.
+  have F4n := F4 n.
+  have {F4}F4n1 := F4 n.+1.
+  have F5 k :
+    S_[l.+1] k.+1 + S_[1] k.+1 + S_[b.+1] k.+1 <=
+    S_[a.-1] k.+1 + S_[b.+2] k.+1 + S_[b] k + (α_[1] k).*2.
+    have <- : a + b = l.+1 by rewrite addnC subnK.
+    rewrite alphaL1E.
+    rewrite -[X in _ <= X]addnA (leq_add _ (dsum_alphaL_alpha k b_gt1)) //.
+    have := concaveEk1 1 a.-2 b.+1 (concave_dsum_alphaL_l k.+1).
+    rewrite add1n prednK; last by rewrite -subn1 ltn_subRL addn0.
+    by rewrite -addSnnS prednK // add1n [X in _ <= X]addnC.
+  have F5n := F5 n.
+  have {F5}F5n1 := F5 n.+1.
+  have F6 k : S_[b.+2] k + S_[1] k <= S_[b.+1] k + S_[2] k.
+    by have := concaveEk1 1 1 b (concave_dsum_alphaL_l k).
+  have F6n := F6 n.+1.
+  have {F6}F6n1 := F6 n.+2.
+  have F72 := dsum_alphaL_S 2 n.+1.
+  have F721 := dsum_alphaL_S 2 n.
+  have F711 := dsum_alphaL_S 1 n.+1.
+  have F71 := dsum_alphaL_S 1 n.
+  have F73 := dsum_alphaL_S b n.  
+  have F8 : α_[2] n.+1 <= α_[1] n.+2.
+    have ->: α_[1] n.+2 = α_[3] n.+1.
+    by rewrite {2}/alphaL /delta -subSS -!dsum_alpha3_S -!S1E.
+    by apply: increasing_alphaL_l.
+  have F9 : α_[1] (n.+2) <= (α_[1] n).*2.+2.
+    rewrite !alphaL1E.
+    case: n => // [] [|[|[|]]] // k.
+    apply: leq_trans (leqnSn _).
+    apply: leq_trans (leqnSn _).
+    rewrite -(leq_pmul2l (_ : 0 < 3)) //.
+    apply: leq_trans (alpha_4_3 _) _ => //.
+    rewrite -(leq_pmul2l (_ : 0 < 3)) //.
+    rewrite mulnCA (leq_trans (_ : _ <= 4 * (4 *  α_[1] k.+4))) //.
+      by rewrite !alphaL1E leq_mul2l /= alpha_4_3.
+    by rewrite alphaL1E -mul2n !mulnA leq_mul2r orbT.
+  rewrite [_ +  α_[_] _]addnC -!addnA addnC !addnA leq_add2r.
+  rewrite -[X in _ <= X]addnA.
+  apply: leq_trans (leq_add P1 (leqnn _)).
+  rewrite -(leq_add2r (x1S + v1)).
+  rewrite [X in _ <= X](_ : _ =
+            a.*2 + x2P1 + x3P1 + yS + (x1P1 + xS + (x1S + v1))); last by ring.
+  apply: leq_trans (leq_add (leqnn _) P2).
+  rewrite {P2}!addnA.
+  rewrite -(leq_add2r ((y1S + v2) + (x2S + v3))).
+  rewrite [X in _ <= X](_ : _ =
+    a.*2 + x3P1 + yS + S_[(3 * a).-2] n + α_[(3 * a).-2] n +
+    S_[(3 * a).-2] n.+1 + (x2P1 + (y1S + v2) + (x2S + v3))); last by ring.
+  apply: leq_trans (leq_add (leqnn _) P3).
+  rewrite {P3}!addnA.
+  rewrite -(leq_add2r (y2S + v4)).
+  rewrite [X in _ <= X](_ : _ =
+            a.*2 + S_[(3 * a).-2] n + α_[(3 * a).-2] n + S_[(3 * a).-2] n.+1 +
+            S_[2] n + α_[2] n + S_[2] n.+1 + (x3P1 + (y2S + v4) + yS));
+    last by ring.
+  apply: leq_trans (leq_add (leqnn _) P4).
+  rewrite [X in X <= _](_ : _ =
+            S_[l.+1] n.+1 + S_[l.+1] n.+2 + (x1S + y1S) +
+            (x2S + y2S) +  (v1 + v2) + (v3 + v4)); last by ring.
+  rewrite {}x1Sy1SE {}x2y2SE.
+  apply: leq_trans (leq_add (leqnn _) v3v4) _.
+  rewrite addnC !addnA -addnA.
+  apply: leq_trans (leq_add (leqnn _) v1v2) _.
+  rewrite [X in _ <= X](_ : _ =
+    a.*2 + S_[(3 * a).-2] n + S_[(3 * a).-2] n.+1 + S_[2] n +
+    α_[2] n + S_[2] n.+1 + (S_[b] n.+1).*2 + α_[(3 * a).-2] n); last by ring.
+  rewrite leq_add2r.    
+  rewrite [X in _ <= X](_ : _ =
+    2 + a.-1 + S_[(3 * a).-2] n.+1 + S_[2] n +
+    α_[2] n + S_[2] n.+1 + (S_[b] n.+1).*2 + (S_[(3 * a).-2] n + a.-1)); 
+      last first.
+    suff ->: a.*2 =  2 + a.-1 + a.-1 by ring.
+    by rewrite -mul2n -{1}[a]prednK //; ring.
+  apply: leq_trans (leq_add (leqnn _) F4n).
+  rewrite [X in _ <= X](_ : _ =
+    2 + S_[2] n + α_[2] n +
+    S_[2] n.+1 + (S_[b] n.+1).*2 + S_[a.-1] n.+1 + (S_[(3 * a).-2] n.+1 + a.-1)
+    ); last by ring.
+  apply: leq_trans (leq_add (leqnn _) F4n1).
+  rewrite -(leq_add2r (S_[1] n.+1 + S_[b.+1] n.+1)).
+  rewrite [X in X <= _](_ : _ =
+    α_[b] n + S_[l.+1] n.+2 + (S_[1] n).*2 + (S_[1] n).*2 +
+    (S_[l.+1] n.+1 + S_[1] n.+1 + S_[b.+1] n.+1)); last by ring.
+  apply: leq_trans (leq_add (leqnn _) F5n) _.
+  rewrite -(leq_add2r (S_[1] n.+2 + S_[b.+1] n.+2)).
+  rewrite [X in X <= _](_ : _ =
+    α_[b] n + (S_[1] n).*2 + (S_[1] n).*2 +
+   (S_[a.-1] n.+1 + S_[b.+2] n.+1 + S_[b] n + (α_[1] n).*2) +
+   (S_[l.+1] n.+2 + S_[1] n.+2 + S_[b.+1] n.+2)); last by ring.
+  apply: leq_trans (leq_add (leqnn _) F5n1) _.
+  rewrite [X in X <= _](_ : _ =
+    α_[b] n + (S_[1] n).*2 + (S_[1] n).*2 +
+    (S_[b.+2] n.+1 + S_[b] n + (α_[1] n).*2) +
+    (S_[b.+2] n.+2 + S_[b] n.+1 + (α_[1] n.+1).*2)
+    + (S_[a.-1] n.+1 + S_[a.-1] n.+2)); last by ring.
+  rewrite [X in _ <= X](_ : _ =
+    2 + S_[2] n + α_[2] n + S_[2] n.+1 + (S_[b] n.+1).*2
+    + (S_[1] n.+1 + S_[b.+1] n.+1) + (S_[1] n.+2 + S_[b.+1] n.+2)
+    + (S_[a.-1] n.+1 + S_[a.-1] n.+2)); last by ring.
+  rewrite leq_add2r.
+  rewrite -(leq_add2r (S_[1] n.+1)).
+  rewrite [X in X <= _](_ : _ =
+    α_[b] n + (S_[1] n).*2 + (S_[1] n).*2 + (S_[b] n + (α_[1] n).*2) +
+    (S_[b.+2] n.+2 + S_[b] n.+1 + (α_[1] n.+1).*2) + 
+    (S_[b.+2] n.+1 +  S_[1] n.+1)); last by ring.
+  rewrite [X in _ <= X](_ : _ =
+     2 + S_[2] n + α_[2] n + (S_[b] n.+1).*2 + S_[1] n.+1 + (S_[1] n.+2 + 
+    S_[b.+1] n.+2) + S_[1] n.+1 + (S_[b.+1] n.+1 + S_[2] n.+1));
+    last by ring.
+  apply: leq_trans (leq_add (leqnn _) F6n).
+  rewrite leq_add2r.
+  rewrite [X in X <= _](_ : _ =
+    α_[b] n + (S_[1] n).*2 + S_[b] n + 
+   (S_[b.+2] n.+2 + (α_[1] n.+1).*2) +
+   (S_[b] n.+1 + (S_[1] n + α_[1] n).*2)); last by rewrite -!mul2n; ring.
+  rewrite [X in _ <= X](_ : _ =
+    2 + S_[2] n + α_[2] n + (S_[b] n.+1) + 
+     (S_[1] n.+2 + S_[b.+1] n.+2) + (S_[b] n.+1 + (S_[1] n.+1).*2));
+    last by rewrite -!mul2n; ring.
+  rewrite F71 leq_add2r.
+  rewrite [X in X <= _](_ : _ =
+     (S_[1] n).*2 + (S_[b.+2] n.+2 + (α_[1] n.+1).*2) +
+     (S_[b] n + α_[b] n)); last by ring.
+  rewrite [X in _ <= X](_ : _ =
+    2 + S_[2] n + α_[2] n + (S_[1] n.+2 + S_[b.+1] n.+2) + S_[b] n.+1);
+    last by ring.
+  rewrite -F73 leq_add2r.
+  rewrite -(leq_add2r (S_[1] n.+2 + S_[2] n.+2)).
+  rewrite [X in X <= _](_ : _ =
+    (S_[1] n).*2 + (S_[2] n.+2 + (α_[1] n.+1).*2) + (S_[b.+2] n.+2 + 
+     S_[1] n.+2)); last by ring.
+  rewrite [X in _ <= X](_ : _ =
+    2 + S_[2] n + α_[2] n + (S_[1] n.+2 + S_[1] n.+2 ) +
+   (S_[b.+1] n.+2 + S_[2] n.+2)); last by ring.
+  apply: leq_trans (leq_add (leqnn _) F6n1).
+  rewrite leq_add2r.
+  rewrite F72 F721 F711 F71.
+  rewrite [X in X <= _](_ : _ =
+  ((α_[2] n.+1 +
+  ((S_[1] n).*2 + S_[2] n + α_[2] n + (α_[1] n.+1).*2)))); last by ring.
+  rewrite [X in _ <= X](_ : _ =
+    2 +
+    (α_[1] n + (α_[1] n)) +
+    ((S_[1] n).*2 + S_[2] n + α_[2] n + (α_[1] n.+1).*2));
+    last by rewrite -!mul2n; ring.
+  rewrite leq_add2r.
+  apply: leq_trans F8 _.
+  rewrite addnn add2n.
+  by apply: F9.
 Admitted.
 
 End Case1.
@@ -763,7 +934,7 @@ elim: {n}_.+1 {-2}n (leqnSn n) l p1 p2 p3 u => [[]// _ l p1 p2 p3 u|
     rewrite big_ord_recl big_ord0 addn0.
     rewrite (_ : inord 0 = ord0); last by apply/val_eqP; rewrite /= inordK.
     rewrite (_ : inord 1 = ord_max); last by apply/val_eqP; rewrite /= inordK.
-    rewrite /beta /apeg /= -[α 0]/1; do 2 case: eqP; rewrite /= ?addn0;
+    rewrite /beta /apeg /= alphaL1E -[_ 0]/1; do 2 case: eqP; rewrite /= ?addn0;
         try by move=> *; rewrite leq_addl.
     move=> u1E u0E.
     rewrite d0fE //.
@@ -852,7 +1023,7 @@ have [HK|] := boolP ((K == 2) || ((K == 1) && (l == 0))).
   rewrite -mulnDl -/K.
   case/orP: HK => [/eqP->|/andP[/eqP-> /eqP->]].
     by rewrite mul2n leq_double leq_beta.
-  by rewrite mul1n /beta /= /alphaL /delta !S1E -delta_S1.
+  by rewrite mul1n /beta /= /alphaL /delta !S1E.
 rewrite negb_or negb_and.
 have: K <= 2 by rewrite /K; do 2 case: (_ != _).
 case: ltngtP; rewrite // ltnS.
