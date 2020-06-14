@@ -274,26 +274,6 @@ rewrite /alphaL /delta /dsum_alphaL /conv /= dsum_alpha_1 dsum_alpha_0.
 by rewrite muln0 addn0 add0n subn0 muln1.
 Qed.
 
-(* This corresponds to 4.1 *)
-Section Case1.
-
-Variable m : nat.
-Hypothesis IH: forall n : nat,
-     n <= m ->
-     forall (l : nat) (p1 p2 p3 : ordinal_eqType 4)
-       (u : {ffun 'I_l.+1 -> configuration 4 n}),
-     p1 != p2 ->
-     p1 != p3 ->
-     p2 != p3 ->
-     p1 != p0 ->
-     p2 != p0 ->
-     p3 != p0 ->
-     (forall k : 'I_l.+1,
-      0 < k < l -> codom (u k) \subset [:: p2; apeg k p1 p3]) ->
-     (S_[l] n).*2 <=
-     \sum_(i < l)  d[u (inord i), u (inord i.+1)] +
-     \sum_(k < n) (u ord0 k != apeg 0 p1 p3) * beta n l k +
-     \sum_(k < n) (u ord_max k != apeg l p1 p3) * beta n l k.
 
 Lemma beta1E n k : beta n 1 k = (α_[1] k).*2.
 Proof. by rewrite /beta ltnn. Qed.
@@ -314,6 +294,37 @@ Lemma leq_sum_beta n l a :
 Proof.
 by apply: leq_sum => i _; rewrite leq_mul2l geq_beta orbT.
 Qed.
+
+Lemma concaveEk1 (f : nat -> nat) (i k1 k2 : nat) :
+  concave f -> f (i + k1 + k2) + f i <= f (i + k2) + f (i + k1).
+Proof.
+move=> fC; have [fI dfD] := fC.
+elim: k2 k1 i => [k1 i|k2 IHH k1 i]; first by rewrite !addn0 addnC.
+rewrite !addnS -(subnK (fI _)) -[X in _ <= X + _](subnK (fI _)).
+rewrite -addnA -[X in _ <= X]addnA leq_add //.
+by apply: (decreasingE dfD); rewrite addnAC leq_addr.
+Qed.
+
+(* This corresponds to 4.1 *)
+Section Case1.
+
+Variable m : nat.
+Hypothesis IH: forall n : nat,
+     n <= m ->
+     forall (l : nat) (p1 p2 p3 : ordinal_eqType 4)
+       (u : {ffun 'I_l.+1 -> configuration 4 n}),
+     p1 != p2 ->
+     p1 != p3 ->
+     p2 != p3 ->
+     p1 != p0 ->
+     p2 != p0 ->
+     p3 != p0 ->
+     (forall k : 'I_l.+1,
+      0 < k < l -> codom (u k) \subset [:: p2; apeg k p1 p3]) ->
+     (S_[l] n).*2 <=
+     \sum_(i < l)  d[u (inord i), u (inord i.+1)] +
+     \sum_(k < n) (u ord0 k != apeg 0 p1 p3) * beta n l k +
+     \sum_(k < n) (u ord_max k != apeg l p1 p3) * beta n l k.
 
 Variable n : nat.
 Hypothesis nLm : n.+1 < m.+1.
@@ -339,16 +350,6 @@ Proof. by move=> k kH; rewrite ffunE; apply/codom_liftr/cH. Qed.
 Hypothesis KH1 : u ord0 ord_max = p1.
 Hypothesis KH2 : u ord_max ord_max != apeg l.+1 p1 p3.
 Hypothesis l_gt0 : l != 0.
-
-Lemma concaveEk1 (f : nat -> nat) (i k1 k2 : nat) :
-  concave f -> f (i + k1 + k2) + f i <= f (i + k2) + f (i + k1).
-Proof.
-move=> fC; have [fI dfD] := fC.
-elim: k2 k1 i => [k1 i|k2 IHH k1 i]; first by rewrite !addn0 addnC.
-rewrite !addnS -(subnK (fI _)) -[X in _ <= X + _](subnK (fI _)).
-rewrite -addnA -[X in _ <= X]addnA leq_add //.
-by apply: (decreasingE dfD); rewrite addnAC leq_addr.
-Qed.
 
 Lemma case1 :
   (S_[l.+1] n.+2).*2 <= 
@@ -1694,6 +1695,63 @@ Qed.
 
 End Case1.
 
+
+(* This corresponds to 4.2 *)
+Section Case2.
+
+Variable m : nat.
+Hypothesis IH: forall n : nat,
+     n <= m ->
+     forall (l : nat) (p1 p2 p3 : ordinal_eqType 4)
+       (u : {ffun 'I_l.+1 -> configuration 4 n}),
+     p1 != p2 ->
+     p1 != p3 ->
+     p2 != p3 ->
+     p1 != p0 ->
+     p2 != p0 ->
+     p3 != p0 ->
+     (forall k : 'I_l.+1,
+      0 < k < l -> codom (u k) \subset [:: p2; apeg k p1 p3]) ->
+     (S_[l] n).*2 <=
+     \sum_(i < l)  d[u (inord i), u (inord i.+1)] +
+     \sum_(k < n) (u ord0 k != apeg 0 p1 p3) * beta n l k +
+     \sum_(k < n) (u ord_max k != apeg l p1 p3) * beta n l k.
+
+
+Variable n : nat.
+Hypothesis nLm : n.+1 < m.+1.
+Variable l : nat.
+Variables p1 p2 p3: peg 4.
+Variable u : {ffun 'I_l.+2 -> configuration 4 n.+2}.
+Hypothesis p1Dp2 : p1 != p2.
+Hypothesis p1Dp3 : p1 != p3.
+Hypothesis p2Dp3 : p2 != p3.
+Hypothesis p1Dp0 : p1 != p0.
+Hypothesis p2Dp0 : p2 != p0.
+Hypothesis p3Dp0 : p3 != p0.
+Hypothesis cH : forall k : 'I_l.+2,
+     0 < k < l.+1 -> codom (u k) \subset [:: p2; apeg k p1 p3].
+
+Let u':= ([ffun i => ↓[u i]] : {ffun 'I_l.+2 -> configuration 4 n.+1})
+ : {ffun 'I_l.+2 -> configuration 4 n.+1}.
+
+Let H: forall k : 'I_l.+2,
+    0 < k < l.+1 -> codom (u' k) \subset [:: p2; apeg k p1 p3].
+Proof. by move=> k kH; rewrite ffunE; apply/codom_liftr/cH. Qed.
+
+Hypothesis KH1 : u ord0 ord_max = p1.
+Hypothesis KH2 : u ord_max ord_max = apeg l.+1 p1 p3.
+
+Lemma case2 :
+  (S_[l.+1] n.+2).*2 <= 
+  \sum_(i < l.+1)  d[u (inord i), u (inord i.+1)] +
+  \sum_(k < n.+2) (u ord0 k != apeg 0 p1 p3) * beta n.+2 l.+1 k +
+  \sum_(k < n.+2) (u ord_max k != apeg l.+1 p1 p3) * beta n.+2 l.+1 k.
+Proof.
+Admitted.
+
+End Case2.
+
 Lemma main p1 p2 p3 n l (u : {ffun 'I_l.+1 -> configuration 4 n}) :
    p1 != p2 -> p1 != p3 -> p2 != p3 -> 
    p1 != p0 -> p2 != p0 -> p3 != p0 ->
@@ -1904,7 +1962,10 @@ case: ltngtP => //= KE _ _ l_gt0; last first.
   have -> : inord 0 = ord0 :> 'I_l.+2 
     by apply/val_eqP; rewrite /= inordK.
   by case: odd.
-Admitted.    
+move: KE; rewrite /K; do 2 case: eqP => //=.
+move => uME u0E _.
+by apply: (case2 IH (nLm : n < m) _ _ _ _ _ _ cH).
+Qed.
 
 End sHanoi4.
 
