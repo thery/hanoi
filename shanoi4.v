@@ -2281,8 +2281,98 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
     set x3S := \sum_(_ < _) _ in P6; set y3S := \sum_(_ < _) _ in P6;
     set v3 := (_ * _) in P6; set v4 := (_ * _) in P6.
     have x2Sx3SE : x2S + x3S = (S_[1] n).*2 by apply: sum_alpha_diffE.
-    have v1v3 : v1 + v3 <= α_[maxn (3 * a).-2 2] n by apply: alphaL_diffE.
-
+    have v1v3 : v1 + v3 <= α_[(3 * a).-2] n.
+      apply:leq_trans (alphaL_diffE _ _ _ _ _ _) _ => //.
+      by rewrite (maxn_idPl _).
+    pose u4 := [ffun i : 'I_b.+1 => ↓[u (inord (a + i))]].
+    pose pa := apeg a p1 p3.
+    pose paD1 := apeg a.+1 p1 p3.
+    have cH7 (k : 'I_b.+1) : 
+      0 < k < b -> codom (u4 k) \subset [:: p2; apeg k pa paD1].
+      move=> /andP[k_gt0 k_ltb].
+      have akLl : a + k < l.+1.
+        rewrite  ltnS (leq_trans _ a1Ll) //.
+        by rewrite -(subnK aLa1) addnC leq_add2r ltnW.
+      rewrite !ffunE.
+      have /H : 0 < (inord (a + k) : 'I_l.+2) < l.+1.
+        rewrite inordK; first by rewrite addn_gt0 a_gt0.
+        by rewrite ltnS ltnW.
+      rewrite ffunE inordK //; last by rewrite ltnS ltnW.
+      by rewrite /pa /paD1 /apeg odd_add /=; do 2 case: odd. 
+    have P7 : 
+      (S_[b] n.+1).*2 <=
+      \sum_(i < b)  d[↓[u (inord (a + i))], ↓[u (inord (a + i).+1)]] +
+      \sum_(k < n.+1) (↓[u (inord a)] k != apeg a p1 p3) * beta n.+1 b k +
+      \sum_(k < n.+1) (↓[u (inord a1)] k != apeg a1 p1 p3) * beta n.+1 b k.
+      apply: leq_trans (IH _ _ _ _ _ _ _ cH7) (leq_add (leq_add _ _) _);
+        rewrite /pa /paD1 // 1?eq_sym //.
+      - by rewrite /apeg /=; case: odd; rewrite // eq_sym.
+      - apply: leq_sum => i; rewrite !ffunE !inordK ?addnS //.
+          by rewrite ltnS.
+        by rewrite ltnS ltnW.
+      - by apply: leq_sum => i _; rewrite !ffunE addn0.
+      apply: leq_sum => i _; rewrite !ffunE /= [a + b]addnC subnK //.
+      by rewrite /b /apeg odd_sub //=; do 2 case: odd.
+    rewrite !sum_beta_S // in P7.
+    set x4S := \sum_(_ < n) _ in P7; set y4S := \sum_(_ < n) _ in P7;
+    set v5 := (_ * _) in P7; set v6 := (_ * _) in P7.
+    have y3Sx4SE : y3S + x4S = (S_[1] n).*2.
+      apply: sum_alpha_diffE; first by rewrite eq_sym.
+      apply: codom_liftr.
+      have := @cH (inord a); rewrite inordK //; apply.
+      by rewrite a_gt0 /= ltnS (leq_trans _ a1Ll).
+    have v4v5 : v4 + v5 <= α_[b] n.
+      apply: (leq_trans (alphaL_diffE _ _ _ _ _ _)).
+      - by rewrite eq_sym.
+      - apply: codom_liftr.
+        have := @cH (inord a); rewrite inordK //; apply.
+        by rewrite a_gt0 /= ltnS (leq_trans _ a1Ll).
+      by rewrite (maxn_idPr _).
+    pose u5 := [ffun i : 'I_3 =>
+                     if i == 0 :> nat then ↓[u (inord a1)]
+                 else if i == 1 :> nat then sa1 else ta1].
+    have cH8 (k : 'I_3) : 
+      0 < k < 2 -> codom (u5 k) \subset [:: p1; apeg k p2 p3].
+      move=> /andP[k_gt0 k_lt2].
+      rewrite !ffunE.
+      by have ->/= : k = 1 :> nat by case: (k : nat) k_gt0 k_lt2 => // [] [|].
+    have P8 : 
+      (S_[2] n.+1).*2 <=
+      (d[↓[u (inord a1)], sa1] + d[sa1, ta1]) +
+      \sum_(k < n.+1) (↓[u (inord a1)] k != p2) * beta n.+1 2 k +
+      \sum_(k < n.+1) (ta1 k != p2) * beta n.+1 2 k.
+      apply: (leq_trans (IH _ _ _ _ _ _ _ cH8)) => //.
+        by rewrite eq_sym.
+      repeat apply: leq_add; rewrite leq_eqVlt; apply/orP; left; apply/eqP.
+      - by rewrite !big_ord_recr big_ord0 !ffunE !inordK /=.
+      - by apply: eq_bigr => i _; rewrite !ffunE.
+      by apply: eq_bigr => i _; rewrite !ffunE.
+    rewrite !sum_beta_S // in P8.
+    set x5S := \sum_(_ < n) _ in P8; set y5S := \sum_(_ < n) _ in P8;
+    set v7 := (_ * _) in P8; set v8 := (_ * _) in P8.
+    have y4Sx5SE : y4S + x5S = (S_[1] n).*2.
+      apply: sum_alpha_diffE => //.
+      apply: codom_liftr.
+      apply: codom_subC.
+      have := @cH (inord a1); rewrite inordK //.
+        by apply; rewrite a1_gt0 /= ltnS.
+      by rewrite ltnS ltnW.
+    have v6v7 : v6 + v7 <= α_[b] n.
+      apply: (leq_trans (alphaL_diffE _ _ _ _ _ _)) => //.
+        apply: codom_liftr.
+        apply: codom_subC.
+        have := @cH (inord a1); rewrite inordK //.
+          by apply; rewrite a1_gt0.
+        by rewrite ltnS // ltnW.
+      by rewrite (maxn_idPl _).
+    have v2v8 : v2 + v8 <= α_[(3 * c).-2] n.
+      apply: (leq_trans (alphaL_diffE _ _ _ _ _ _)) => //.
+      - by rewrite /pa1.
+      - by apply: codom_subC.
+      by rewrite (maxn_idPl _).
+    have y2Sy5SE :  y2S + y5S = (S_[1] n).*2.
+      apply: sum_alpha_diffE; first by rewrite /pa1.
+      by apply: codom_subC.
 Admitted.
 
 End Case2.
