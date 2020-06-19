@@ -1598,6 +1598,102 @@ have H3 : α n.+1 <= α m1.
 by rewrite anE !expnSr -[4]/(2 ^ 2) !mulnA -expnD add2n -m1H mulnC leq_mul2r.
 Qed.
 
+
+Lemma dsum_alphaL_S l n : S_[l] n.+1 = S_[l] n + α_[l] n.
+Proof. by rewrite addnC subnK //; case: (convex_dsum_alphaL l). Qed.
+
+Lemma dsum_alphaLE l n : S_[l] n = \sum_(i < n) α_[l] i.
+Proof.
+elim: n => [|n IH].
+  by rewrite /dsum_alphaL /conv /= dsum_alpha_0 muln0 big_ord0.
+by rewrite dsum_alphaL_S IH big_ord_recr.
+Qed.
+
+
+(* Table *)
+
+
+Lemma S1_small : 
+  ((S_[1] 0 = 0) * (S_[1] 1 = 1) * (S_[1] 2 = 3) * (S_[1] 3 = 6) * 
+  (S_[1] 4 = 10) * (S_[1] 5 = 16) * (S_[1] 6 = 24))%type.
+Proof.
+by rewrite /dsum_alphaL /conv /= /dsum_alpha
+              -!(big_mkord xpredT) unlock /=; compute.
+Qed.
+
+Lemma S2_small : 
+  ((S_[2] 0 = 0 ) * (S_[2] 1 = 2) * (S_[2] 2 = 4) * (S_[2] 3 = 8) * (
+  S_[2] 4 = 14) * (S_[2] 5 = 20) * (S_[2] 6 = 28))%type.
+Proof.
+by rewrite /dsum_alphaL /conv /= /dsum_alpha
+              -!(big_mkord xpredT) unlock /=; compute.
+Qed.
+
+Lemma S3_small : 
+  ((S_[3] 0 = 0) * (S_[3] 1 = 2) * (S_[3] 2 = 5) * (S_[3] 3 = 9) * (
+  S_[3] 4 = 15) * (S_[3] 5 = 23) * (S_[3] 6 = 32))%type.
+Proof.
+by rewrite /dsum_alphaL /conv /= /dsum_alpha
+              -!(big_mkord xpredT) unlock /=; compute.
+Qed.
+
+Lemma S4_small : 
+  ((S_[4] 0 = 0) * (S_[4] 1 = 2) * (S_[4] 2 = 6) * (S_[4] 3 = 10) * (
+  S_[4] 4 = 16) * (S_[4] 5 = 24) * (S_[4] 6 = 36))%type.
+Proof.
+by rewrite /dsum_alphaL /conv /= /dsum_alpha
+              -!(big_mkord xpredT) unlock /=; compute.
+Qed.
+
+Lemma S5_small : 
+  ((S_[5] 0 = 0) * (S_[5] 1 = 2) * (S_[5] 2 = 6) * (S_[5] 3 = 11) * (
+  S_[5] 4 = 17) * (S_[5] 5 = 25) * (S_[5] 6 = 37))%type.
+Proof.
+by rewrite /dsum_alphaL /conv /= /dsum_alpha
+              -!(big_mkord xpredT) unlock /=; compute.
+Qed.
+
+Lemma alpha1_small : 
+  ((α_[1] 0 = 1) * (α_[1] 1 = 2) * (α_[1] 2 = 3) * (α_[1] 3 = 4) * 
+  (α_[1] 4 = 6) * (α_[1] 5 = 8))%type.
+Proof.
+by rewrite /alphaL /delta !S1_small; compute.
+Qed.
+
+Lemma alpha2_small : 
+  ((α_[2] 0 = 2) * (α_[2] 1 = 2) * (α_[2] 2 = 4) * (α_[2] 3 = 6) * (
+  α_[2] 4 = 6) * (α_[2] 5 = 8))%type.
+Proof.
+by rewrite /alphaL /delta !S2_small; compute.
+Qed.
+
+Lemma alpha3_small : 
+  ((α_[3] 0 = 2) * (α_[3] 1 = 3) * (α_[3] 2 = 4) * (α_[3] 3 = 6) * (
+  α_[3] 4 = 8) * (α_[3] 5 = 9))%type.
+Proof.
+by rewrite /alphaL /delta !S3_small; compute.
+Qed.
+
+Lemma alpha4_small : 
+  ((α_[4] 0 = 2) * (α_[4] 1 = 4) * (α_[4] 2 = 4) * (α_[4] 3 = 6) * (
+  α_[4] 4 = 8) * (α_[4] 5 = 12))%type.
+Proof.
+by rewrite /alphaL /delta !S4_small; compute.
+Qed.
+
+Lemma alpha5_small : 
+  ((α_[5] 0 = 2) * (α_[5] 1 = 4) * (α_[5] 2 = 5) * (α_[5] 3 = 6) * (
+  α_[5] 4 = 8) * (α_[5] 5 = 12))%type.
+Proof.
+by rewrite /alphaL /delta !S5_small; compute.
+Qed.
+
+Definition alphaS_small :=
+   (S1_small, S2_small, S3_small, S4_small, S5_small).
+
+Definition alpha_small :=
+   (alpha1_small, alpha2_small, alpha3_small, alpha4_small, alpha5_small).
+
 End S23.
 
 Notation α := (alpha 2 3).
