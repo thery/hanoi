@@ -3589,6 +3589,220 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
       last by rewrite -!mul2n; ring.
     rewrite leq_add2r ltnW // ltnS.
     by rewrite !alphaL1E; apply: alpha_4_3.
+  move: b_lt2; rewrite leq_eqVlt => /orP[/eqP [] bE1 | b_lt1].
+    pose u1l := 
+      [ffun i =>  
+        if (i : 'I_5) == 0 :> nat then ↓[u ord0] else
+        if i == 1 :> nat then sam1 else
+        if i == 2 :> nat then tam1 else 
+        if i == 3 :> nat then ↓[u (inord 1)] else ↓[u (inord 2)]].
+    have a1E2 : a1 = 2.
+      by move: (cE1); rewrite /c l1E aE1 bE1 cE1; case: (a1) => // [] [|[|]].
+    have P1l1 : 
+      a.*2 + \sum_(i < 4)  d[u1l (inord i), u1l (inord i.+1)] <=
+      \sum_(i < a1) d[u (inord i), u (inord i.+1)].
+      rewrite a1E2 !big_ord_recr /= !big_ord0 !add0n {1}aE1.
+      rewrite !ffunE /= !inordK ?aE1 //= add2n -2!addSn leq_add //; last first.
+        by apply/gdist_cunlift/shanoi_connect.
+      rewrite (inord_eq0 _ (_ : 0 = 0)) //.
+      rewrite (_ : ord0 = inord a.-1); last first.
+        by apply/val_eqP; rewrite /= inordK aE1.
+      by rewrite -[in inord 1]aE1 duam1ua1E /= addnA addn0.
+    have cH1 (k : 'I_5) : 
+      0 < k < 4 -> codom (u1l k) \subset [:: p3; apeg k p1 p2].
+      case: k => [] [|[|[|[|]]]] //= iH _; rewrite !ffunE /apeg /=.
+      - by have := sam1C; rewrite aE1.
+      - by apply: codom_subC.
+      apply/codom_liftr/codom_subC.
+      have /cH: 0 < (inord 1 : 'I_l.+2) < l.+1 by rewrite inordK.
+      by rewrite inordK.
+    have lE2 : l = 2 by move: l1E; rewrite aE1 bE1 cE1 => [] [].
+    have {cH1}P4 :
+      (S_[4] n.+1).*2 <=
+      \sum_(i < 4)  d[u1l (inord i), u1l (inord i.+1)] +
+      \sum_(k < n.+1) (↓[u ord0] k != p1) * beta n.+1 4 k +
+      \sum_(k < n.+1) (↓[u (inord a1)] k != p1) * beta n.+1 4 k.
+      apply: leq_trans (IH _ _ _ _ _ _ _ cH1) _ => //.
+        by rewrite eq_sym.
+      repeat apply: leq_add => //; apply: leq_sum  => i /= _; rewrite !ffunE //.
+      by rewrite a1El -[in inord 2]lE2.
+    have {}P4 := leq_trans P4 (leq_add (leq_add (leqnn _) (leq_sum_beta _ _))
+                                    (leqnn _)).
+    rewrite sum_beta_S // in P4.
+    set x1S := \sum_(_ < _) _ in P4; set v1 := (_ != _) * _ in P4.
+    set y1S := \sum_(_ < _) _ in P4; set y2S := \sum_(_ < _) _ in P4.
+    have cH2 (k : 'I_(3 * c).+1) : 
+      0 < k < 3 * c -> 
+      codom (u2 k) \subset [:: apeg a1 p1 p3; apeg k p2 (apeg a1.+1 p1 p3)].
+      move=> /andP[k_gt0 k_ltb].
+      rewrite {2}cE1 muln1 in k_ltb.
+      rewrite ffunE !modn_small // !divn_small // addn0.
+      case: (k : nat) k_gt0 k_ltb => //= [] [|[|]] //= _ _; first by rewrite a1E2.
+      by apply: codom_subC.
+    have P5 : 
+      (S_[3 * c] n.+1).*2 <= \sum_(i < 3 * c)  d[u2 (inord i), u2 (inord i.+1)] +
+      \sum_(k < n.+1) (↓[u (inord a1)] k != p2) * beta n.+1 3 k +
+      \sum_(k < n.+1) (↓[u ord_max] k != apeg l.+1 p1 p3) * beta n.+1 3 k.
+      apply: leq_trans (IH _ _ _ _ _ _ _ cH2) (leq_add (leq_add _ _) _);
+          rewrite // 1?eq_sym //.
+      - by rewrite a1E2 eq_sym.
+      - by apply: leq_sum => i _; rewrite ffunE /= addn0 cE1 muln1.
+      apply: leq_sum => i _; rewrite ffunE /= mod3E /= div3E // cE1 muln1.
+      rewrite a1El addn1 (_ : inord _ = ord_max) //.
+      by apply/val_eqP; rewrite /= inordK.
+    have {}P5 := leq_trans P5 (leq_add (leqnn _) (leq_sum_beta _ _)).
+    rewrite sum_beta_S // {1}[in 3 *c]cE1 muln1 in P5.
+    set x2S := \sum_(_ < _) _ in P5;   set v2 := (_ != _) * _ in P5.
+    set y3S := \sum_(_ < _) _ in P5; set y4S := \sum_(_ < _) _ in P5.
+    rewrite -(big_mkord xpredT (fun i => d[u (inord i), u (inord i.+1)])).
+    rewrite (big_cat_nat _ _ _ (_ : 0 <= a1)) //=; last by apply: ltnW.
+    rewrite big_mkord -!addnA.
+    apply: leq_trans (leq_add P1l1  (leqnn _)); rewrite -/x1S.
+    rewrite -{P1l1}P2 -/x2S {1}lE2 !sum_beta_S //.
+    rewrite KH1 KH2 !eqxx !addn0 aE1.
+    rewrite [\sum_(_ < _) _](_ : _ = y1S); last first.
+      apply: eq_bigr => i _; rewrite !ffunE; congr ((u _ _ != _) * _).
+      by apply/val_eqP=> /=.
+    rewrite [\sum_(_ < _) _](_ : _ = y4S); last first.
+      apply: eq_bigr => i _; rewrite !ffunE; congr ((u _ _ != _) * _).
+      by apply/val_eqP=> /=.
+    have y2Sy3SE : y2S + y3S = (S_[1] n).*2.
+      apply: sum_alpha_diffE => //.
+      apply/codom_liftr/codom_subC.
+      have /cH : 0 < (inord a1 : 'I_l.+2) < l.+1 by rewrite inordK // a1E2 lE2.
+      by rewrite inordK // a1E2.
+    have v1v2 : v1 + v2 <= α_[maxn 4 3] n.
+      apply: alphaL_diffE => //.
+      apply/codom_liftr/codom_subC.
+      have /cH : 0 < (inord a1 : 'I_l.+2) < l.+1 by rewrite inordK // a1E2 lE2.
+      by rewrite inordK // a1E2.
+    rewrite (maxn_idPl _) // in v1v2.
+    rewrite {1}aE1 -[1.*2]/2 in P1.
+    rewrite {1}cE1 -[1.*2]/2.
+    have F1n4 := dsum_alphaL_S 4 n.
+    have F1n3 : (S_[3] n.+2).+1 = S_[1] n.+3.
+      by rewrite -dsum_alpha3_S S1E.
+    have F1n13 : (S_[3] n.+1).+1 = S_[1] n.+2.
+      by rewrite -dsum_alpha3_S  S1E.
+    have F2 k : 5 * S_[1] k.+1 + S_[1] k.+2 <= 6 * S_[4] k + 9.
+      have F3 :  4 * S_[3] k + 2 * S_[6] k <= 6 * S_[4] k.
+        rewrite -{1}[4]/(2 * 2) -mulnA -mulnDr -{2}[6]/(2 * 3) -mulnA.
+        rewrite leq_mul2l /= -(leq_add2r (S_[5] k)).
+        rewrite[X in X <= _](_ : _ =
+          S_[6] k + S_[3] k +  (S_[5] k + S_[3] k)
+          ); last by ring.
+        rewrite[X in _ <= X](_ : _ =
+          S_[5] k + S_[4] k +  (S_[4] k + S_[4] k)
+          ); last by ring.
+        by apply: leq_add; apply: concaveEk1 3 _ _ (concave_dsum_alphaL_l k).
+      apply: leq_trans (leq_add F3 (leqnn _)).
+      have F3k : S_[1] k.+1 <= S_[3] k + 1 by apply: dsum_alpha3l.
+      have F3k1 : S_[2] k.+1 <= S_[6] k + 2 by apply: dsum_alpha3l.
+      rewrite [X in _ <= X](_ : _ = 
+        (((S_[3] k + 1) + (S_[3] k + 1)) + 
+        ((S_[3] k + 1) + (S_[3] k + 1))) + 1 +
+        ((S_[6] k + 2) + (S_[6] k + 2))); last by ring.
+      apply: leq_trans (leq_add (leqnn _) (leq_add F3k1 F3k1)).
+      rewrite -addnA.
+      apply: leq_trans (leq_add (leq_add (leq_add F3k F3k) (leq_add F3k F3k))
+                (leqnn _)).
+      have F4 := leq_dsum_alpha_2l_1 k.+1.
+      rewrite !addnn add1n.
+      apply: leq_trans (leq_add (leqnn _) F4).
+      rewrite !addnA leq_add2r.
+      by rewrite [X in _ <= X](_ : _ = 5 * S_[1] k.+1 ) => //; rewrite -!mul2n; ring.
+   (* lia should work *)
+    move: P4 P5 => P4 P5.
+    rewrite -(leq_add2r (y2S + v1)).
+    rewrite [X in _ <= X](_ : _ =
+      4 + x2S + y4S + (x1S + y1S + (y2S + v1))); last by ring.
+    apply: leq_trans (leq_add (leqnn _) P4); rewrite {P4}//.
+    rewrite -(leq_add2r (y3S + v2)).
+    rewrite [X in _ <= X](_ : _ =
+      4 + (S_[4] n.+1).*2 + (x2S + (y3S + v2) + y4S)); last ring.
+    apply: leq_trans (leq_add (leqnn _) P5); rewrite {P5}//.
+    rewrite [X in X <= _](_ : _ =
+      (S_[3] n.+2).*2 + (y2S + y3S) + (v1 + v2)); last by ring.
+    rewrite {}y2Sy3SE.
+    apply: leq_trans (leq_add (leqnn _) v1v2) _.
+    rewrite -[in X in _ <= X]addnn.
+    rewrite {1}F1n4 -(leq_add2r 2).
+    rewrite [X in X <= _](_ : _ =
+      ((S_[3] n.+2).+1).*2 + (S_[1] n).*2 + α_[4] n); 
+      last by rewrite -!mul2n; ring.
+    rewrite [X in _ <= X](_ : _ =
+      4 + S_[4] n + S_[4] n.+1 + ((S_[3] n.+1).+1).*2 + α_[4] n); 
+        last by rewrite -!mul2n; ring.
+    rewrite leq_add2r F1n3 F1n13.
+    rewrite -(leq_add2r (S_[1] n.+2).*2).
+    case : n => [|[|[|[|n1]]]]; try by rewrite !alphaS_small.
+    set m1 := n1.+3.
+    rewrite -[_ <= _](leq_mul2l 6).
+    rewrite[X in _ <= X](_ : _ =
+      6 + 24 * (S_[1] m1.+3) + ((6 * S_[4] m1.+1 + 9) +
+                                (6 * S_[4] m1.+2 + 9)));
+      last by rewrite -!mul2n; ring.
+    apply: leq_trans _ (leq_add (leqnn _) (leq_add (F2 m1.+1) (F2 m1.+2))).
+    rewrite[ X in _ <= X](_ : _ =
+      18 * S_[1] m1.+3 + 5 * S_[1] m1.+2 + 6 +
+           (S_[1] m1.+4 + 12 * S_[1] m1.+3));
+      last by ring.
+    rewrite[ X in X <= _](_ : _ =
+      11 * S_[1] m1.+4 + 12 * S_[1] m1.+1 + 
+             (S_[1] m1.+4 + 12 * S_[1] m1.+3 ));
+      last by rewrite -!mul2n; ring.
+    rewrite leq_add2r.
+    have F3n3 := dsum_alphaL_S 1 m1.+3.
+    have F3n2 := dsum_alphaL_S 1 m1.+2.
+    have F3n1 := dsum_alphaL_S 1 m1.+1.
+    rewrite !(F3n3, F3n2, F3n1).
+    rewrite [X in X <= _](_ : _ =
+      11 * α_[1] m1.+3 +
+      (11 * α_[1] m1.+1 + 11 * α_[1] m1.+2 + 23 * S_[1] m1.+1)); last by ring.
+    rewrite [X in _ <= X](_ : _ =
+      7 * α_[1] m1.+2 +
+      12 * α_[1] m1.+1 + 6 + (11 * α_[1] m1.+1 + 11 * α_[1] m1.+2 + 23 * S_[1] m1.+1)); last by ring.
+    rewrite leq_add2r.
+    have F4m1 : 12 * α_[1] m1.+3 <= 16 * α_[1] m1.+2.
+      rewrite -[12]/(4 * 3) -mulnA.
+      rewrite -[16]/(4 * 4) -mulnA leq_mul2l /=.
+      by rewrite !alphaL1E alpha_4_3.
+    apply: leq_trans (leq_trans _ F4m1) _; first by rewrite leq_mul2r orbT.
+    rewrite -[16]/(7 + 9) mulnDl -addnA leq_add2l.
+    have F4m2 : 9 * α_[1] m1.+2 <= 12 * α_[1] m1.+1.
+      rewrite -[12]/(3 * 4) -mulnA.
+      rewrite -[9]/(3 * 3) -mulnA leq_mul2l /=.
+      by rewrite !alphaL1E alpha_4_3.
+    by apply: leq_trans F4m2 (leq_addr _ _).
+  have bE0 : b = 0 by case: (b) b_lt1 => //.
+  have lE1 : l = 1 by have := l1E; rewrite aE1 bE0 cE1 => [] [].
+  have a1E1 : a1 = 1 by rewrite a1El.
+  rewrite (_ : apeg 0 p1 p3 = apeg 0 p1 p2) //.
+  rewrite (_ : apeg l.+1 p1 p3 = apeg l.+1 p1 p2); last by rewrite lE1.
+  apply: (@case2 m IH)  => //.
+  - by rewrite (_ : apeg _ = apeg 1).
+  - move=> k hK; rewrite {3}lE1 in hK.
+    have -> : k = inord 1.
+      apply/val_eqP; rewrite /= inordK //.
+      by case: (k : nat) hK => [] // [|].
+    rewrite inordK /apeg //= .
+    apply: codom_subC.
+    have := cH (inord 1).
+    rewrite inordK /apeg //= .
+    by apply.
+  - by rewrite KH2 lE1.
+  move=> k.
+  have [->|[->|->]] // : k = ord0 \/ k = (inord 1) \/ k = (inord 2).
+  - move: k; rewrite lE1.
+    case => [] []; first by left; apply: val_inj => /=.
+    case.
+      by right; left; apply: val_inj; rewrite /= inordK.
+    case => //.
+    by right; right; apply: val_inj; rewrite /= inordK.
+  by rewrite -[in inord 1]aE1 uaLEp2 aE1 inordK.
+  rewrite {1}(_ : inord 2 = ord_max); last first.
+    by apply/val_eqP; rewrite /= lE1 inordK.
+  by rewrite KH2 lE1 /= inordK.
 Admitted.
 
 End Case3.
