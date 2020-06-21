@@ -1535,8 +1535,9 @@ by rewrite S1_bigmin; apply: bigmin_ext => i1 i1H; rewrite mul1n.
 Qed.
 
 (* This is first part of 3.5 *)
-Lemma dsum_alpha3_S n : S1 n.+1 = (S_[3] n).+1.
+Lemma dsum_alpha3_S n : S_[1] n.+1 = (S_[3] n).+1.
 Proof.
+rewrite S1E.
 have := dsum_alphal_min_3 1 n.
 rewrite S1E addn1 /minn; case: leqP => // _ /eqP.
 rewrite -addnn -{1}[S1 _]add0n eqn_add2r.
