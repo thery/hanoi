@@ -1269,16 +1269,32 @@ rewrite -[_ - _]/(α_[l] _) addnC -leq_subRL; last first.
 by apply: increasing_alphaL_l.
 Qed.
 
-Lemma bound_dsum_alphaL l n : S_[l] n <= (S1 n).*2.
+Lemma S1E : S_[1] =1 S1.
 Proof.
+case => [|i].
+  by rewrite /dsum_alphaL /conv /= dsum_alpha_0.
+rewrite S1_bigmin /dsum_alphaL /conv /= subnn addn0 -S1_bigmin.
+rewrite (_ : \min_(_ <= _) _ = S1 i.+1).
+  by rewrite (minn_idPr _) // -addnn leq_addr.
+by rewrite S1_bigmin; apply: bigmin_ext => i1 i1H; rewrite mul1n.
+Qed.
+
+Lemma bound_dsum_alphaL l n : S_[l] n <= (S_[1] n).*2.
+Proof.
+rewrite S1E.
 have [SLl|lLS] := leqP (S1 n).*2 l; first by rewrite lim_dsum_alphaL_l.
 rewrite -(lim_dsum_alphaL_l (leqnn _)).
 have [/increasingE H _] := concave_dsum_alphaL_l n.
 by apply/H/ltnW.
 Qed.
 
-Lemma bound_alphaL l n : α_[l] n <= (α n).*2.
+Lemma alphaL1E k : α_[1] k = α k.
+Proof. by rewrite /alphaL /delta !S1E -delta_S1. Qed.
+
+
+Lemma bound_alphaL l n : α_[l] n <= (α_[1] n).*2.
 Proof.
+rewrite alphaL1E.
 have [SLl|lLS] := leqP (S1 n.+1).*2 l.
  rewrite /alphaL /delta !lim_dsum_alphaL_l //.
    by rewrite -delta_S1 doubleB.
@@ -1297,34 +1313,6 @@ Proof. by []. Qed.
 Lemma count_cons (T : Type) a b (l : seq T) : count a (b :: l) = a b + count a l.
 Proof. by []. Qed.
 
-
-Lemma bar n k :
-  α (n + k) < (α n).*2 ->
-  count (fun i : nat => ~~(3 %| α i)) (iota n k.+1) <= 1.
-Proof.
-elim: k n => [n _ /=|k IH n H]; first by case: negb.
-have /IH : α (n.+1 + k) < (α n.+1).*2.
-  by rewrite addSnnS (leq_trans H) // leq_double ltnW // alpha_mono.
-rewrite (iotaS _ _.+1) count_cons.
-case: ltngtP => // [|H1 _].
-  by case: count => //; case: (~~ _).
-have /hasP[i iH1 iH2] : has (fun i : nat => ~~ (3 %| α i)) (iota n.+1 k.+1).
-  by rewrite has_count H1.
-move: iH1; rewrite mem_iota => /andP[nLi iLn].
-rewrite H1; case: (boolP (~~ _)) => //= iH3.
-have [[i1 [|j1]] /= aiE] : isAB 2 3 (α i) by apply: isAB_alpha.
-  have [[i2 [|j2]] /= anE] : isAB 2 3 (α n) by apply: isAB_alpha.
-    rewrite !muln1 in aiE anE.
-    have : α n < α i by apply: alpha_mono.
-    rewrite aiE anE ltn_exp2l // => i2Li1.
-    have : (α i) < (α n).*2.
-      apply: leq_trans H; rewrite ltnS -addSnnS //. 
-      move: iLn;rewrite addnS ltnS; case: ltngtP => // [iLS _|<-//].
-      by apply/ltnW/alpha_mono.
-    by rewrite aiE anE -mul2n -expnS ltn_exp2l // ltnS leqNgt i2Li1.
-  by case/negP : iH3; rewrite anE expnS mulnCA dvdn_mulr.
-by case/negP : iH2; rewrite aiE expnS mulnCA dvdn_mulr.
-Qed.
 
 Lemma increasing_alpha : increasing α.
 Proof. by move=> n; apply/ltnW/alpha_mono. Qed.
@@ -1474,9 +1462,9 @@ by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp orbT.
 Qed.
 
 (* This is 3.4 *)
-Lemma dsum_alphaL_alpha l n : 1 < l -> S_[l.+1] n.+1 <= S_[l] n + (α n).*2.
+Lemma dsum_alphaL_alpha l n : 1 < l -> S_[l.+1] n.+1 <= S_[l] n + (α_[1] n).*2.
 Proof.
-move=> l_gt1.
+rewrite alphaL1E => l_gt1.
 case: (eq_dsum_alphaL l n) => [] [/= m mLn] mH.
 rewrite mH; rewrite ltnS in mLn.
 apply: leq_trans (_ : (S1 m.+1).*2 + l.+1 * ((3 ^ (n - m)).-1)./2 <= _).
@@ -1524,15 +1512,6 @@ rewrite subSn // expnS -!subn1 mulnBr muln1 addn2 -!subSn ?subSS //.
 by rewrite -expnS (leq_exp2l 1).
 Qed.
 
-Lemma S1E : S_[1] =1 S1.
-Proof.
-case => [|i].
-  by rewrite /dsum_alphaL /conv /= dsum_alpha_0.
-rewrite S1_bigmin /dsum_alphaL /conv /= subnn addn0 -S1_bigmin.
-rewrite (_ : \min_(_ <= _) _ = S1 i.+1).
-  by rewrite (minn_idPr _) // -addnn leq_addr.
-by rewrite S1_bigmin; apply: bigmin_ext => i1 i1H; rewrite mul1n.
-Qed.
 
 (* This is first part of 3.5 *)
 Lemma dsum_alpha3_S n : S_[1] n.+1 = (S_[3] n).+1.
@@ -1564,9 +1543,11 @@ Qed.
 Lemma leq_dsum_alpha_2l_1 n : S_[1] n + S_[1] n.+1 <= (S_[2] n).*2.+1.
 Proof. by have := leq_dsum_alpha_2l_l 1 n; rewrite addn1. Qed.
 
+
 (* This is 3.7 *)
-Lemma alpha_4_3 n : 3 < n -> 3 * α n.+1 <= 4 * α n.
+Lemma alpha_4_3 n : 3 < n -> 3 * α_[1] n.+1 <= 4 * α_[1] n.
 Proof.
+rewrite !alphaL1E.
 move=> n_gt_3.
 have an_gt_5 : 5 < α n by apply: increasingE (increasing_alpha) n_gt_3.
 have [[i [|j]] /= anE] : isAB 2 3 (α n) by apply: isAB_alpha.
@@ -1599,6 +1580,29 @@ have H3 : α n.+1 <= α m1.
 by rewrite anE !expnSr -[4]/(2 ^ 2) !mulnA -expnD add2n -m1H mulnC leq_mul2r.
 Qed.
 
+Lemma alphaL_1_2 n : α_[1] (n.+1) <= (α_[1] n).*2.
+Proof. 
+rewrite !alphaL1E.
+case: n => // [] [|[|[|]]] // k.
+rewrite -(leq_pmul2l (_ : 0 < 3)) //.
+rewrite -!alphaL1E.
+apply: leq_trans (alpha_4_3 _) _ => //.
+by rewrite -mul2n mulnA leq_mul2r orbT.
+Qed.
+
+Lemma alphaL_4_5 n : α_[1] (n.+2) <= (α_[1] n).*2.+1.
+Proof. 
+rewrite !alphaL1E.
+case: n => // [] [|[|[|]]] // k.
+rewrite -!alphaL1E.
+apply: leq_trans (leqnSn _).
+rewrite -(leq_pmul2l (_ : 0 < 3)) //.
+apply: leq_trans (alpha_4_3 _) _ => //.
+rewrite -(leq_pmul2l (_ : 0 < 3)) //.
+rewrite mulnCA (leq_trans (_ : _ <= 4 * (4 *  α_[1] k.+4))) //.
+  by rewrite leq_mul2l /= alpha_4_3.
+by rewrite -mul2n !mulnA leq_mul2r orbT.
+Qed.
 
 Lemma dsum_alphaL_S l n : S_[l] n.+1 = S_[l] n + α_[l] n.
 Proof. by rewrite addnC subnK //; case: (convex_dsum_alphaL l). Qed.
@@ -1612,7 +1616,6 @@ Qed.
 
 
 (* Table *)
-
 
 Lemma S1_small : 
   ((S_[1] 0 = 0) * (S_[1] 1 = 1) * (S_[1] 2 = 3) * (S_[1] 3 = 6) * 
