@@ -116,6 +116,16 @@ rewrite -subSn // subSS addnBAC // leq_subRL.
 by apply: leq_trans fk1Lfk (leq_addr _ _).
 Qed.
 
+Lemma concaveEk1 (f : nat -> nat) (i k1 k2 : nat) :
+  concave f -> f (i + k1 + k2) + f i <= f (i + k2) + f (i + k1).
+Proof.
+move=> fC; have [fI dfD] := fC.
+elim: k2 k1 i => [k1 i|k2 IHH k1 i]; first by rewrite !addn0 addnC.
+rewrite !addnS -(subnK (fI _)) -[X in _ <= X + _](subnK (fI _)).
+rewrite -addnA -[X in _ <= X]addnA leq_add //.
+by apply: (decreasingE dfD); rewrite addnAC leq_addr.
+Qed.
+
 Lemma convexE f : 
   increasing f -> (forall i, (f i.+1).*2 <= f i + f i.+2) -> convex f.
 Proof.
@@ -1523,6 +1533,11 @@ rewrite -addnn -{1}[S1 _]add0n eqn_add2r.
 suff : 0 < S1 n.+1 by case: S1.
 rewrite -dsum_alpha_1 increasingE //.
 by apply: increasing_dsum_alpha.
+Qed.
+
+Lemma alphaL_3E n : α_[3] n = α_[1] n.+1.
+Proof.
+by rewrite /alphaL /delta -subSS -!dsum_alpha3_S.
 Qed.
 
 (* This is second part of 3.5 *)

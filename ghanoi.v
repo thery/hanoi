@@ -766,6 +766,20 @@ Lemma gdist_cunlift n (c1 c2 : configuration n.+1) :
   connect move c1 c2 -> `d[↓[c1], ↓[c2]]_move <= `d[c1, c2]_move.
 Proof. by move=> H; apply: gdist_crshift. Qed.
 
+Lemma gdist_cunlift_eq n (c1 c2 : configuration n.+1) : 
+  irreflexive r ->
+  connect move c1 c2 ->  c1 ldisk = c2 ldisk ->
+    `d[c1, c2]_move = `d[↓[c1], ↓[c2]]_move.
+Proof.
+move=> ir c1Cc2 c1Ec2; apply/eqP; rewrite eqn_leq gdist_cunlift // andbT.
+rewrite -{1}[c1]cunliftrK -{1}[c2]cunliftrK -c1Ec2.
+apply: gdist_liftr => //.
+case/connectP: c1Cc2 => p pH c2E.
+apply/connectP; exists (rm_rep (↓[c1]) ([seq ↓[i] | i <- p])) => //.
+  by apply: path_unlift.
+by rewrite last_rm_rep c2E last_map.
+Qed.
+
 Lemma perfect_liftrn m n p : cliftrn m p (perfect n p) = perfect (m + n) p.
 Proof.
 by apply/ffunP => i; rewrite !ffunE; case: tsplitP => j; rewrite !ffunE.

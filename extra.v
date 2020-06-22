@@ -360,4 +360,48 @@ move: jDi; rewrite mem_sint /= -leqNgt => jDi.
 by exists k; rewrite // !inE -leqNgt kIs -jEk jDi.
 Qed.
 
+(******************************************************************************)
+(*                                                                            *)
+(*              Specific theorems for shanoi                                  *)
+(*                                                                            *)
+(******************************************************************************)
 
+Lemma codom_subC (A : finType) (B : finType) (f : {ffun A -> B}) 
+          (p1 p2 : B) : 
+  codom f \subset [:: p1; p2] -> codom f \subset [:: p2; p1].
+Proof.
+by move=> /subsetP sB; apply/subsetP => i /sB; rewrite !inE orbC.
+Qed.
+
+Lemma inord_eq0 n k : k = 0 -> inord k = ord0 :> 'I_n.+1.
+Proof. by move=> -> /=; apply/val_eqP; rewrite /= inordK. Qed.
+
+Lemma mod3_0 a : (3 * a) %% 3 = 0.
+Proof. by rewrite modnMr. Qed.
+
+Lemma mod3_1 a : (3 * a).+1 %% 3 = 1.
+Proof. by rewrite mulnC -addn1 modnMDl. Qed.
+
+Lemma mod3_2 a : (3 * a).+2 %% 3 = 2.
+Proof. by rewrite mulnC -addn2 modnMDl. Qed.
+
+Definition mod3E := (mod3_0, mod3_1, mod3_2).
+
+Lemma div3_0 a : (3 * a) %/ 3 = a.
+Proof. by rewrite mulKn. Qed.
+
+Lemma div3_1 a : (3 * a).+1 %/ 3 = a.
+Proof. by rewrite mulnC -addn1 divnMDl // divn_small // addn0. Qed.
+
+Lemma div3_2 a : (3 * a).+2 %/ 3 = a.
+Proof. by rewrite mulnC -addn2 divnMDl // divn_small // addn0. Qed.
+
+Definition div3E := (div3_0, div3_1, div3_2).
+
+Lemma sum3E n (f : nat -> nat) : 
+  \sum_(i < 3 * n) f i =
+  \sum_(i < n) (f (3 * i) + f (3 * i).+1 + f (3 * i).+2).
+Proof.
+elim: n => [|n IH]; first by rewrite !big_ord0.
+by rewrite mulnS !big_ord_recr /= IH !addnA.
+Qed.
