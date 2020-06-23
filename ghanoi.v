@@ -93,8 +93,19 @@ Definition perfect p : configuration :=  [ffun d => p].
 
 End Disk.
 
+
 (* The smallest disk *)
 Definition sdisk {n} : disk n.+1 := ord0.
+
+Lemma disk1_all (d : disk 1) : d = sdisk.
+Proof. by apply/val_eqP; case: d => [] []. Qed.
+
+Lemma configuration1_eq (c1 c2 : configuration 1) : 
+  (c1 == c2) = (c1 sdisk == c2 sdisk).
+Proof.
+apply/eqP/eqP; first by move=> /ffunP/(_ sdisk).
+by move=> H; apply/ffunP=> i; rewrite [i]disk1_all.
+Qed.
 
 (* The largest disk *)
 Definition ldisk {n} : disk n.+1 := ord_max.
