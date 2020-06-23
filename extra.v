@@ -933,3 +933,148 @@ Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
  (at level 41, F at level 41, i, n at level 50,
   format "\min_ ( i  <=  n )  F").
 
+
+(* Mimic AC match for leq_trans *)
+Ltac is_num term :=
+ match term with 
+ | 0 => true 
+ | S ?X => is_num X
+ | _ => false
+end.
+
+Ltac split_term term :=
+ match term with 
+ | ?X * ?Y => match is_num X with true =>  constr:((X, Y))
+              | false => 
+              let v := once (split_term X) in constr:((fst v, snd v * Y)) 
+              end
+ | ?X => match is_num X with true => constr:((X, 1)) 
+                             | _ => constr:((1, X)) end
+ | _ => false
+end.
+
+
+Ltac delta_term n1 n2 t2 :=
+  let n :=  constr:(n1 - n2) in
+  let n1 := eval compute in n in
+  let vt2 := eval lazy delta [fst snd] iota beta in t2 in 
+  let r :=
+    match n1 with 
+    | 0 => constr:(0) 
+    | 1 => constr:(t2) 
+    | ?X  => 
+    match vt2 with | 1 => X | _ => constr:(X * vt2) end
+    end in
+   eval lazy delta [fst snd] iota beta in r. 
+    
+Ltac delta_lterm2 n1 t1 lt2 :=
+ match lt2 with 
+ |  ?X2 + ?Y2 =>
+     let v2 := split_term Y2 in
+     let n2 := constr:(fst v2) in
+     let t2 := constr:(snd v2) in
+     let t := constr:((t1, t2)) in
+     let vt := eval lazy delta [fst snd] iota beta in t in 
+     match vt with 
+     | (?X, ?X) => delta_term n1 n2 t2
+     |  _  => delta_lterm2 n1 t1 X2
+     end
+ |   ?Y2 =>
+     let v2 := split_term Y2 in
+     let n2 := constr:(fst v2) in
+     let t2 := constr:(snd v2) in 
+     let t := constr:((t1, t2)) in
+     let vt := eval lazy delta [fst snd] iota beta in t in 
+     match vt with 
+     | (?X, ?X) => delta_term n1 n2 t2
+     |  _  => delta_term n1 0 t1
+     end
+end.
+
+Ltac make_sum t1 t2 :=
+  match t1 with 0 => t2 | _ => 
+  match t2 with 0 => t1 | _ => constr:(t1 + t2) end end. 
+  
+Ltac delta_lterm1 lt1 lt2 :=
+ match lt1 with 
+ |  ?X1 + ?Y1 =>
+     let v1 := split_term Y1 in
+     let n1 := constr:(fst v1) in
+     let t1 := constr:(snd v1) in 
+     let r1 := delta_lterm1 X1 lt2 in
+     let r2 := delta_lterm2 n1 t1 lt2 in make_sum r1 r2
+
+ |   ?Y1 =>
+     let v1 := split_term Y1 in
+     let n1 := constr:(fst v1) in
+     let t1 := constr:(snd v1) in delta_lterm2 n1 t1 lt2
+end.
+
+Ltac test t1 t2 := let xx := delta_lterm1 t1 t2 in pose kk := xx.
+
+Ltac applyr H :=
+  rewrite -?mul2n in H |- *;
+  match goal with 
+  H: is_true (leq _ ?X) |- is_true (leq _ ?Y) =>
+    ring_simplify X Y in H;
+    ring_simplify X Y; rewrite ?[nat_of_bin _]/= in H |- *
+  end;
+  let Z := fresh "Z" in
+  match goal with 
+  H: is_true (leq _ ?X1) |- is_true (leq _ ?Y1) =>
+    let v := delta_lterm1 Y1 X1 in
+    (try (rewrite [Z in _ <= Z](_ : _ = v + X1))); 
+    [ apply: leq_trans (leq_add (leqnn _) H); rewrite {H}// ?(add0n,addn0) 
+     | ring]
+  end.
+  
+Ltac applyl H :=
+  rewrite -?mul2n in H |- *;
+  match goal with 
+  H: is_true (leq ?X _) |- is_true (leq ?Y _) =>
+    ring_simplify X Y; ring_simplify X Y in H;
+    rewrite ?[nat_of_bin _]/= in H |- *
+  end;
+  let Z := fresh "Z" in
+  match goal with 
+  H: is_true (leq ?X1 _) |- is_true (leq ?Y1 _) =>
+    let v := delta_lterm1 Y1 X1 in
+    (try rewrite [Z in Z <= _](_ : Y1 = v + X1));
+    [apply: leq_trans (leq_add (leqnn _) H) _;
+     rewrite {H}// ?(add0n,addn0) | ring]
+  end.
+
+Ltac gsimpl :=
+  rewrite -?mul2n in |- *;
+  match goal with 
+  |- is_true (leq ?X ?Y) =>
+    ring_simplify X Y; rewrite ?[nat_of_bin _]/=
+  end;
+  let Z := fresh "Z" in
+  match goal with 
+    |- is_true (leq ?X1 ?Y1) =>
+    let v := delta_lterm1 Y1 X1 in
+    match v with 
+    | 0 => 
+    let v := delta_lterm1 X1 Y1 in
+    let v1 := delta_lterm1 X1 v in
+    let v2 := delta_lterm1 Y1 v1 in
+    (try (rewrite [Z in _ <= Z](_ : Y1 = v2 + v1); last by ring));
+    (try (rewrite [Z in Z <= _](_ : X1 = v + v1); last by ring));
+    rewrite ?leq_add2r
+    | _ => 
+    let v1 := delta_lterm1 Y1 v in
+    let v2 := delta_lterm1 X1 v1 in
+    (try (rewrite [Z in _ <= Z](_ : Y1 = v + v1); last by ring));
+    (try (rewrite [Z in Z <= _](_ : X1 = v2 + v1); last by ring));
+    rewrite ?leq_add2r
+  end
+  end.
+  
+Ltac sring := rewrite -!mul2n; ring.
+Ltac changel t :=
+  let X := fresh "X" in 
+  rewrite [X in X <= _](_ : _ = t); last by (ring || sring).
+Ltac changer t := 
+  let X := fresh "X" in 
+  rewrite [X in _ <= X](_ : _ = t); last by (ring || sring).
