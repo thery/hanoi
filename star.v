@@ -568,7 +568,7 @@ Lemma S1_leq n i : i <= n -> S1 n <= (S1 (n - i)).*2 + (3 ^ i).-1./2.
 Proof.
 move=> iLn.
 rewrite -leq_double doubleD div2K; last first.
-  by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
+  by rewrite -subn1 oddB ?expn_gt0 //= odd_exp orbT.
 rewrite -!mul2n predn_exp.
 rewrite -mulnDr leq_mul2l /=.
 by apply: sum_alpha_leq.
@@ -614,7 +614,7 @@ Proof.
 case: n => // n _.
 apply: double_inj.
 rewrite doubleD div2K; last first.
-  by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
+  by rewrite -subn1 oddB ?expn_gt0 //= odd_exp orbT.
 rewrite -!mul2n predn_exp -mulnDr; congr (2 * _).
 have iLn : 3 ^ (log3 (α n)) <= α n < 3 ^ (log3 (α n)).+1.
   rewrite gtn_log3  leq_log3 //.
@@ -706,7 +706,7 @@ Qed.
 Lemma delta_3l l i : delta (fun i : nat => l * ((3 ^ i).-1)./2) i = l * 3 ^ i.
 Proof.
 rewrite /delta -mulnBr -even_halfB //;
-  try by rewrite -subn1 odd_sub ?expn_gt0 //= odd_exp orbT.
+  try by rewrite -subn1 oddB ?expn_gt0 //= odd_exp orbT.
 rewrite -predn_sub -subnS prednK ?expn_gt0 //.
 by rewrite expnS -[X in _ * ((_ - X))./2]mul1n -mulnBl mul2n doubleK.
 Qed.
@@ -970,7 +970,7 @@ Qed.
 
 Lemma even_expn3_pred n : ~~ odd (3 ^ n).-1.
 Proof.
-by rewrite -subn1 odd_sub ?expn_gt0 // odd_exp orbT.
+by rewrite -subn1 oddB ?expn_gt0 // odd_exp orbT.
 Qed.
 
 (* This is 3.4 *)

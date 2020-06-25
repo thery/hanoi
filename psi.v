@@ -105,8 +105,9 @@ End BigFSetAux.
 Section PsiDef.
 
 Implicit Type e : {fset nat}.
-Import GRing.Theory.
-Import Num.Theory.
+
+Import Order.TTheory GRing.Theory Num.Theory.
+
 
 Open Scope fset_scope.
 
@@ -196,23 +197,19 @@ Qed.
 Definition rnz (z : int) := `|Num.max 0%R z|.
 
 Lemma rnz_ler0 z : (z <= 0)%R -> rnz z = 0.
-Proof. by move=>  zN; rewrite /rnz maxr_l. Qed.
+Proof. by move=>  zN; rewrite /rnz max_l. Qed.
 
 Lemma rnz_ger0 z : (0 <= z)%R -> (z = (rnz z)%:R)%R.
-Proof.
-by move=>  zP; rewrite /rnz maxr_r // natz gez0_abs.
-Qed.
+Proof. by move=>  zP; rewrite /rnz max_r // natz gez0_abs. Qed.
 
 Lemma ler_rnz z : (z <= rnz z)%R.
-Proof.
-by rewrite /rnz; case: maxrP => // zP; rewrite gtz0_abs.
-Qed.
+Proof. by rewrite /rnz; case: ler0P => //= zP; rewrite gtz0_abs. Qed.
 
 Lemma rnz_ler z1 z2 : (z1 <= z2)%R -> rnz z1 <= rnz z2.
 Proof.
-(rewrite /rnz; (do 2 case: maxrP => //)) => [z2N z1P z1Lz2|z1P z2P].
-  by have := ler_trans z1Lz2 z2N; rewrite lerNgt z1P.
-by rewrite -{1}[z1]gtz0_abs // -{1}[z2]gtz0_abs.
+rewrite /rnz; case: ler0P => // z1_gt0 z1Lz2; case: ler0P => //= [|z2_gt0].
+  by rewrite leNgt => /negP[]; apply: lt_le_trans z1Lz2.
+by rewrite -lez_nat !gtz0_abs.
 Qed.
 
 Definition psi e := \max_(l < psi_auxb e) rnz (psi_aux l e).
@@ -236,7 +233,7 @@ Proof.
 pose n := maxn (psi_auxb e) l.+1.
 have /psiE_leq-> : psi_auxb e <= n by apply: leq_maxl.
 have O : l < n by apply: leq_maxr.
-have [/ler_trans->//|/ltrW/rnz_ger0->] := lerP (psi_aux l e) 0.
+have [/le_trans->//|/ltW/rnz_ger0->] := lerP (psi_aux l e) 0.
   by rewrite (ler_nat _ 0).
 rewrite ler_nat.
 by rewrite (bigD1 (Ordinal O)) //= leq_maxl.
@@ -246,10 +243,10 @@ Lemma psi_ler l e :
   (((2 ^ l).-1 + \sum_(i <- e) 2 ^ (minn (troot i) l))%:R - (l * 2 ^ l)%:R 
       <= ((psi e)%:R : int))%R.
 Proof.
-have [/psi_aux_psib/ler_trans->//|lLp] := leqP (psi_auxb e) l.
+have [/psi_aux_psib/le_trans->//|lLp] := leqP (psi_auxb e) l.
   by rewrite (ler_nat _ 0).
 rewrite [X in (_ <= X%:R)%R](bigD1 (Ordinal lLp)) //=.
-apply: ler_trans (ler_rnz _) _.
+apply: le_trans (ler_rnz _) _.
 rewrite -natz ler_nat.
 apply: leq_maxl.
 Qed.
@@ -259,9 +256,9 @@ Proof.
 have [l] :  {l : 'I_(psi_auxb e) | psi e = rnz (psi_aux l e)}.
   apply: eq_bigmax.
   by rewrite card_ord.
-rewrite /rnz.
-case: maxrP => [pG pE|pP ->]; last by exists l; rewrite natz gtz0_abs.
-by exists 0; apply/eqP; rewrite eqr_le {1}pE psi_aux_0_ge0 psi_max.
+rewrite /rnz; case: ler0P => [pG pE|pP ->]; last first.
+  by exists l; rewrite natz gtz0_abs.
+by exists 0; apply/eqP; rewrite eq_le {1}pE psi_aux_0_ge0 psi_max.
 Qed.
 
 Lemma psi_sub e1 e2 : e1 `<=` e2 -> psi e1 <= psi e2.
@@ -327,7 +324,7 @@ have [->|_] := e =P fset0; first by rewrite inE.
 move=> xIe.
 suff : psi e > 0 by case: psi.
 rewrite -(ltr_nat int_numDomainType).
-apply: ltr_le_trans (psi_max _ 0).
+apply: lt_le_trans (psi_max _ 0).
 by rewrite /psi_aux add0n subr0 ltr_nat (big_fsetD1 x).
 Qed.
 
@@ -429,19 +426,19 @@ Qed.
 Lemma psi_aux_sint n : ((psi `[n])%:R)%R = psi_aux (troot n).-1 `[n].
 Proof.
 apply/eqP.
-rewrite eqr_le psi_max andbT.
+rewrite eq_le psi_max andbT.
 case: (psiE `[n]) => l ->.
 have [E|E] := leqP (troot n).-1 l.
   rewrite -(subnK E).
   elim: (_ - _) => [|k IH] //.
-  apply: ler_trans IH.
+  apply: le_trans IH.
   rewrite addSn.
   apply: psi_aux_decr => //.
   by rewrite leq_addl.
 rewrite -(subKn (ltnW E)).
 elim: (_ - l) => [|k IH].
   by rewrite subn0.
-apply: ler_trans IH.
+apply: le_trans IH.
 rewrite subnS.
 have [|E1] := leqP (troot n).-1 k.
   by rewrite -subn_eq0 => /eqP->.
@@ -632,7 +629,7 @@ Lemma psi_exp e : psi e <= (2 ^ #|`e|).-1.
 Proof.
 rewrite -(ler_nat int_numDomainType).
 have [l ->] := psiE e.
-apply: ler_trans (_ : ((2 ^ l).-1 + \sum_(i <- e) 2 ^ l)%:R - 
+apply: le_trans (_ : ((2 ^ l).-1 + \sum_(i <- e) 2 ^ l)%:R - 
                       (l * 2 ^ l)%:R <= _)%R.
   apply: ler_sub => //.
   rewrite ler_nat leq_add2l.
@@ -658,7 +655,7 @@ Lemma psi_diff e1 e2 : psi e1 - psi e2 <= \sum_(i <- e1 `\` e2) 2 ^ troot i.
 Proof.
 rewrite leq_subLR -(ler_nat int_numDomainType) natrD addrC -ler_subl_addr.
 have [l ->] := psiE e1.
-apply: ler_trans (ler_sub (lerr _) (psi_max _ l)) _.
+apply: le_trans (ler_sub (lexx _) (psi_max _ l)) _.
 rewrite /psi_aux opprB addrA subrK addnC !natrD opprD addrA addrK.
 rewrite ler_subl_addr -natrD ler_nat addnC -leq_subLR.
 set s1 := \sum_(_ <- _) _; set s2 := \sum_(_ <- _) _; set s3 := \sum_(_ <- _) _.
@@ -712,15 +709,15 @@ have -> : ((psi e)%:R = psi_aux l1 e)%R.
   have [/minn_idPl U|E] := leqP l s.-1; first by rewrite [l1]U.
   have /ltnW/minn_idPr U := E.
   rewrite [l1]U.
-  apply/eqP; rewrite eqr_le psi_max andbT Hl.
+  apply/eqP; rewrite eq_le psi_max andbT Hl.
   rewrite -(subnK (ltnW E)).
   elim: (_ - _) => [|k IH] //.
-  apply: ler_trans IH.
+  apply: le_trans IH.
   rewrite addSn.
   apply: F => //.
   case: (s) => // s1.
   by rewrite ltnS /= leq_addl.
-apply: ler_trans (ler_sub (lerr _) (psi_max _ l1)) _.
+apply: le_trans (ler_sub (lexx _) (psi_max _ l1)) _.
 rewrite /psi_aux opprB addrA subrK addnC !natrD opprD addrA addrK.
 rewrite ler_subl_addr -natrD ler_nat addnC -leq_subLR.
 rewrite (big_fsetD1  a) //= addnK leq_exp2l //.
@@ -803,12 +800,12 @@ have nG : n >= delta l.
   rewrite -[n]/(n.+3.-2.-1) [n.+3]tmodE /l -/m.
   case: (m) mG2 => // [] [|] // m1 _.
   by rewrite deltaS deltaS /= !(addSn, addnS, subSS, subn0) -!addnA leq_addr.
-apply: ler_trans (_ : ((psi_aux l `[0] + psi_aux l `[n]) *+ 4 + 5%:R <= _))%R; 
+apply: le_trans (_ : ((psi_aux l `[0] + psi_aux l `[n]) *+ 4 + 5%:R <= _))%R; 
      last first.
   rewrite ler_add2r ler_muln2r orFb.
-  apply: ler_trans (_ : psi_aux l e1 + psi_aux l e2 <= _)%R; last first.
+  apply: le_trans (_ : psi_aux l e1 + psi_aux l e2 <= _)%R; last first.
     by apply: ler_add; apply: psi_max.
-  apply: ler_trans (_ : psi_aux l (e1 `&` e2) + psi_aux l (e1 `|` e2) <= _)%R.
+  apply: le_trans (_ : psi_aux l (e1 `&` e2) + psi_aux l (e1 `|` e2) <= _)%R.
     apply: ler_add; last by apply: psi_aux_card_le.
     apply: psi_aux_sub; rewrite sint0_set0.
     by apply/fsubsetP=> i; rewrite inE.
@@ -837,7 +834,7 @@ have pdE : ((phi (delta l))%:R = 1 + (l%:R - 1) * (2 ^ l)%:R :> int)%R.
   rewrite phi_deltaE natrB; last first.
     by case: (l) => // l1; rewrite mulSn addnCA leq_addr.
   by rewrite natrD /= mulrBl mul1r addrA -natrM.
-rewrite ler_eqVlt; apply/orP; left; apply/eqP.
+rewrite le_eqVlt; apply/orP; left; apply/eqP.
 (* right part *)
 rewrite psi_aux_sintE // psi_auxE_le.
 pose f i := 2 ^ minn (∇i) l.

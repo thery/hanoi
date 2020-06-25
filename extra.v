@@ -343,11 +343,10 @@ Lemma card_isO n t : #|isO n t| = minn n t.
 Proof.
 apply/sym_equal.
 case: (leqP n t) => [nLt|tLn].
-  rewrite isOE_ge //= cardsT card_ord.
-  by apply/minn_idPl.
+  by rewrite isOE_ge //= cardsT card_ord.
 case: n tLn => // n tLn.
 rewrite isOE_le // card_imset // => [|i j /val_eqP/eqP /=].
-  by rewrite card_ord; apply/minn_idPr/ltnW.
+  by rewrite card_ord.
 by rewrite !inordK ?(leq_trans _ tLn) ?ltnS 1?ltnW // => /eqP/val_eqP.
 Qed.
 
