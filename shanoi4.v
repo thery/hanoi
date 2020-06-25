@@ -3313,7 +3313,6 @@ have [|b_gt0] := leqP b 0; last first.
     rewrite -(leq_add2r (S_[b.+3] n.+2)); applyr F5; gsimpl.
     have [b_gt2|b_le3] := leqP 3 b.
 (*    subcase b >= 3 *)
-      rewrite (maxn_idPr _) //.
       have F7 := dsum_alphaL_S b n; rewrite {}F7; gsimpl.
       have F8 : S_[b.+3] n.+2 <= S_[b.+2] n.+1 + (α_[1] n.+1).*2.
         by apply: dsum_alphaL_alpha.
@@ -3334,7 +3333,7 @@ have [|b_gt0] := leqP b 0; last first.
 (*  subcase b = 2 *)
     have bE2 : b = 2.
       by case: (b) b_gt1 b_le3 => // [] [|[|]].
-    rewrite bE2 -[maxn 3 2]/3.
+    rewrite bE2.
     rewrite ![in X in _ <= X]mul2n -!addnn.
     have F1 := dsum_alphaL_S 2 n; rewrite {1}F1.
     have F2 := dsum_alphaL_S 3 n; rewrite {1}F2.
