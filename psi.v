@@ -35,7 +35,7 @@ Qed.
 Lemma eq_fbigmax (e : {fset I}) (F : I -> nat) :
   0 < #|`e| -> {i0 : I | i0 \in e /\ \max_(i <- e) F i = F i0}.
 Proof.
-elim: {e}_.+1 {-2}e (leqnn #|`e|.+1) => // n IH e cI.
+have [n cI] := ubnP #|`e|; elim: n => // n IH e cI in e cI *.
 rewrite cardfs_gt0 => /diff_fset0_elem[i iH].
 have [|H] := leqP #|`(e `\ i)| 0.
   rewrite leqn0 cardfs_eq0 => /eqP eZ.
@@ -581,7 +581,7 @@ Qed.
 
 Lemma max_set_nat (e : {fset nat}) : #|`e|.-1 <= \max_(i <- e) i.
 Proof.
-elim: {e}_.+1 {-2}e (leqnn #|`e|.+1) => // [] [|n] IH e cI.
+have [n cI] := ubnP #|`e|; elim: n => // [] [|n] IH e cI in e cI *.
   by move: cI; rewrite ltnS leqn0 => /eqP->.
 move: cI; rewrite leq_eqVlt => /orP[/eqP eC|]; last first.
   by apply: IH.
@@ -602,7 +602,7 @@ Lemma psi_aux_card_le l e : (psi_aux l `[#|`e|] <= psi_aux l e)%R.
 Proof.
 rewrite ler_sub // ler_nat leq_add2l.
 rewrite (sum_sint (fun i =>  2 ^ minn (∇i) l)) //.
-elim: {e}_.+1 {-2}e (leqnn #|`e|.+1) => // [] [|n] IH e cI.
+have [n cI] := ubnP #|`e|; elim: n => // [] [|n] IH e cI in e cI *.
   by move: cI; rewrite ltnS leqn0 => /eqP-> ; rewrite big_ord0.
 move: cI; rewrite leq_eqVlt => /orP[/eqP [] eC|]; last first.
   by apply: IH.

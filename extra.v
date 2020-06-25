@@ -302,8 +302,8 @@ Proof. by rewrite s2fD s2f1. Qed.
 
 Lemma card_s2f n (s : {set 'I_n}) : #|` s2f s| = #|s|.
 Proof.
-elim: {s}_.+1 {-2}s (leqnn #|s|.+1) => // [] m IH s sLm.
-case: (set_0Vmem s) => [->|[i iIs]]; first by rewrite s2f_set0 cards0.
+have [m sLm] := ubnP #|s|; elim: m => // m IH s sLm in s sLm *.
+ case: (set_0Vmem s) => [->|[i iIs]]; first by rewrite s2f_set0 cards0.
 rewrite (cardsD1 i) iIs /= -IH //; last first.
   by move: sLm; rewrite (cardsD1 i) iIs.
 rewrite [LHS](cardfsD1 (nat_of_ord i)) (_ : _ \in _); last first.

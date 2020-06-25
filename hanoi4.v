@@ -38,7 +38,7 @@ Lemma gdist_leq (n : nat) (p1 p2 : peg 4) :
    d[`cf[p1, n], `cf[p2, n]]  <= ϕ(n).
 Proof.
 have [/eqP->|p1Dp2] := boolP (p1 == p2); first by rewrite gdist0.
-elim: {n}_.+1 {-2}n (ltnSn n) p1 p2 p1Dp2 => // n IH [_ |[_|m mLn]] p1 p2 p1Dp2.
+elim/ltn_ind: n p1 p2 p1Dp2 => [] [|[|n]] IH p1 p2 p1Dp2.
 - rewrite (_ : perfect p1 = perfect p2) ?gdist0 //.
   by apply/ffunP => [] [].
 - rewrite -[phi 1]/(size [:: (@perfect 4 1 p2)]).
@@ -49,12 +49,12 @@ elim: {n}_.+1 {-2}n (ltnSn n) p1 p2 p1Dp2 => // n IH [_ |[_|m mLn]] p1 p2 p1Dp2.
   - by apply/on_topP => [] [].
   by apply/on_topP => [] [].
 pose p3 := `p[p1, p2].
-set k := gmin m.+2.
+set k := gmin n.+2.
 set k1 := k.-1.+1.
 have kP : 0 < k by apply: gmin_gt0.
-have k1Lm : k1 < m.+2 by rewrite [k1]prednK //; apply: gmin_lt.
-have k1L1m : k1 <= m.+2 by apply: ltnW.
-rewrite -[in X in X <= _](subnK k1L1m); set k2 := _ - _.
+have k1Lm2 : k1 < n.+2 by rewrite [k1]prednK //; apply: gmin_lt.
+have k1Lm2S : k1 <= n.+2 by apply: ltnW.
+rewrite -[in X in X <= _](subnK k1Lm2S); set k2 := _ - _.
 rewrite -perfect_liftrn; set c1 := cliftrn _ _ _.
 rewrite -perfect_liftrn; set c4 := cliftrn _ _ _.
 pose c2 : _ _ (k2 + k1) := cliftrn k2 p1 (perfect p3).
@@ -62,8 +62,6 @@ pose c3 : _ _ (k2 + k1) := cliftrn k2 p2 (perfect p3).
 apply: leq_trans (_ : _ <= gdist hmove c1 c2 + _) _.
   by apply: gdist_triangular.
 rewrite phi_gmin /g -/k -/k1 -addnn -addnA.
-have kLn : k1 < n.
-  by rewrite -ltnS; apply: leq_trans mLn.
 apply: leq_add.
   apply: leq_trans.
     apply: gdist_merger => //.
@@ -107,13 +105,13 @@ Lemma gdist_le_psi n (u v : configuration 4 n) (p0 p2 p3 : peg 4) :
   psi (s2f [set i | u i == p0]) <= d[u, v].
 Proof.
 move=> pH.
-elim: {n}_.+1 {-2}n (leqnn n.+1) u v p0 p2 p3 pH => //
-   [] m IH [|n] nLm u v p0 p2 p3 [p3Dp2 p3Dp0 p2Dp0] cH.
+elim/ltn_ind : n u v p0 p2 p3 pH => 
+      // [] [|n] IH u v p0 p2 p3 [p3Dp2 p3Dp0 p2Dp0] cH.
   set E := [set i | _].
   suff ->: E = set0 by rewrite s2f_set0 psi_set0.
   by apply/setP=> [] [].
 set E := [set i | _].
-pose N : disk n.+1 := ord_max.
+pose N : disk n.+1 := ldisk.
 have [NiE|NniE] := boolP (N \in E); last first.
   have->: E = E :\ N.
     apply/setP=> i; move: NniE; rewrite !inE.
@@ -318,8 +316,7 @@ have dux0_leq : psi ((s2f E) `&` `[T]) <= d[u, x0].
     - by rewrite eqxx orbT.
     - by rewrite (negPf (move_on_toplDr x0Mx0s x0TDx0sT _)) //= // ltnW.
     by rewrite -x0T0 (negPf (move_on_toplDl x0Mx0s x0TDx0sT _)) /=.
-  apply: IH cH1 => //.
-  by apply: leq_trans (ltn_ord _) _.
+  by apply: IH cH1.
 have [KLT|TLK] := leqP (delta K) T; last first.
   have K_gt0 : 0 < K by case: (K) TLK.
   have TLN : T < N by apply: leq_trans KTE; rewrite -addn1 leq_add2l.

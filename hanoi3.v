@@ -170,10 +170,9 @@ Proof.
 (* and not just for initial perfect configuration the proof is more  *)
 (* intricate. We need a double  induction :                          *)
 (* The first induction is used when the path has duplicates (1 case) *)
-elim: {n cs}(size _).+1 {-4}(n) c p {-2}cs (leqnn (size cs).+1) => 
-      // m IHm.
+have [m sLm] := ubnP (size cs); elim: m => // m IHm in n c p cs sLm *.
 (* The usual induction on the number of disks                       *)
-elim => [c1 p [|] //=|n IH c1 p cs Scs c1Pcs lc1csEp /=].
+elim : n c p cs sLm => [c1 p [|] //=|n IH c1 p cs Scs c1Pcs lc1csEp /=].
 case: (_ =P p) => [c1nEp |/eqP c1nDp].
   (* the largest disk is already well-placed *)
   have lcsnEc1n : last c1 cs ldisk = c1 ldisk.
@@ -517,7 +516,7 @@ have HHr := @dirr 3.
 have HHs := @dsym 3.
 elim: n c1 c2 cs => [p c1 [|]//|n IH c1 c2 cs /=].
 set p := `p[_, _]; set p1 := _ ldisk; set p2 := _ ldisk.
-case: eqP => [p1Ep2 c1Pcs lc1csEc2|/eqP p1Dp2 c1Pcs lcsEc2].
+case: eqP => [p1Ep2 c1Pcs lc1csEc2|/eqP p1Dp2 c1Pcs lc1csEc2].
   have lcsmEc1m : last c1 cs ldisk = p1 by rewrite lc1csEc2.
   have [cs1 [c1Pcs1 lc1csElcs1 /leq_of_leqif/(leq_trans _)->//]] := 
       pathS_restrict (@dirr 3) c1Pcs.
@@ -533,8 +532,7 @@ suff : minn u v < size cs.
   rewrite -[2 ^ _]prednK ?expn_gt0 // ltnS.
   by rewrite -size_rpegE; apply: size_rpeg_up.
 pose f (c : configuration 3 n.+1) := c ldisk.
-elim: {cs}(size _).+1 {-2}cs (leqnn (size cs).+1) c1Pcs lcsEc2 => //=
-    m IH1 cs Lcs c1Pcs lc1csEc2.
+have [m Lcs] := ubnP (size cs); elim: m => // m IH1 in cs Lcs c1Pcs lc1csEc2 *.
 case: path3SP c1Pcs => // [c1' cs' /= csE c1'Pcs' _|
                            cs1 cs2 p1' p3 p4 c1' c3 p1Dp3 p1Rp3 lc1'cs1Epp4 csE
                           c1'Pcs1 c3Pcs2 _].

@@ -164,12 +164,12 @@ Lemma lhanoi_min n c1 c2 cs :
   path (@hmove n) c1 cs -> last c1 cs = c2 ->
   size (lhanoi c1 c2) <= size cs ?= iff (cs == lhanoi c1 c2).
 Proof.
-(* we adapt the proof for the standard hanoi problem
+(* we adapt the proof for the standard ha
+noi problem
    surely a shorter proof exists *)
-elim: {n cs}(size _).+1 {-5}(n) c1 c2 {-2}cs (leqnn (size cs).+1) =>
-      // m IHm.
+have [m sLm] := ubnP (size cs); elim: m => // m IHm in n c1 c2 cs sLm *.
 (* The usual induction on the number of disks                       *)
-elim => [c1 p [|] //=|n IH c1 c cs Scs c1Pcs lc1csEp /=].
+elim : n c1 c2 cs sLm => [c1 p [|] //=|n IH c1 c cs Scs c1Pcs lc1csEp /=].
 set (p := c ldisk).
 rewrite !fun_if !size_cat /= !size_cat /= !size_map.
 case: (c1 _ =P p) => [lc1Ep |/eqP lc1Dp].
