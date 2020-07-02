@@ -1,0 +1,21 @@
+div.code {
+  width: 50%;
+  float:left;
+}
+
+div.goal {
+  width: 50%;
+  position: fixed;
+  left: 55%;
+  bottom: 0;
+}
+
+div.doc {
+  clear: both;
+}
+
+span.command:hover {
+  background-color: #ccc;
+}
+
+
