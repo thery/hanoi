@@ -51,7 +51,7 @@
 (******************************************************************************)
 
 From mathcomp Require Import all_ssreflect finmap.
-Require Import extra gdist.
+From hanoi Require Import extra gdist.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

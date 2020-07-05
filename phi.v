@@ -8,7 +8,7 @@
 (******************************************************************************)
 
 From mathcomp Require Import all_ssreflect.
-Require Import triangular.
+From hanoi Require Import triangular.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

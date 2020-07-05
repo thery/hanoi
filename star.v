@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect finmap.
-Require Import extra.
+From hanoi Require Import extra.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

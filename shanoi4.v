@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect finmap.
-Require Import extra star gdist lhanoi3 ghanoi ghanoi4 shanoi.
+From hanoi Require Import extra star gdist lhanoi3 ghanoi ghanoi4 shanoi.
 
 Open Scope nat_scope.
 

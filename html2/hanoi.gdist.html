@@ -73,22 +73,22 @@
           
 
             i = 11;
-            data = "";
+            data = "<infomsg>T is declared</infomsg>	";
             responses[i]=data;
           
 
             i = 12;
-            data = "";
+            data = "<infomsg>r is declared</infomsg>	";
             responses[i]=data;
           
 
             i = 13;
-            data = "";
+            data = "<infomsg>connectn is defined</infomsg>	<infomsg>connectn is recursively defined (decreasing on 1st argument)	</infomsg>	";
             responses[i]=data;
           
 
             i = 14;
-            data = "";
+            data = "1 subgoal (ID 7722)	  	  T : finType	  r : rel T	  n : nat	  x, y : T	  ============================	  reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	    (y \in connectn n x)	";
             responses[i]=data;
           
 
@@ -98,57 +98,57 @@
           
 
             i = 16;
-            data = "";
+            data = "2 subgoals (ID 7737)	  	  T : finType	  r : rel T	  x, y : T	  ============================	  reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = 0])	    (y \in connectn 0 x)		subgoal 2 (ID 7743) is:	 reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n.+1])	   (y \in \bigcup_(y0 in rgraph r x) connectn n y0)	";
             responses[i]=data;
           
 
             i = 17;
-            data = "";
+            data = "2 subgoals (ID 7955)	  	  T : finType	  r : rel T	  x, y : T	  ============================	  exists p : seq T, [/\ path r x p, last x p = x & size p = 0]		subgoal 2 (ID 7743) is:	 reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n.+1])	   (y \in \bigcup_(y0 in rgraph r x) connectn n y0)	";
             responses[i]=data;
           
 
             i = 18;
-            data = "";
+            data = "1 subgoal (ID 7743)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y : T	  ============================	  reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n.+1])	    (y \in \bigcup_(y0 in rgraph r x) connectn n y0)	";
             responses[i]=data;
           
 
             i = 19;
-            data = "";
+            data = "3 subgoals (ID 8176)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  ============================	  i \in rgraph r x ->	  y \in connectn n i ->	  exists p0 : seq T, [/\ path r x p0, last x p0 = y & size p0 = n.+1]		subgoal 2 (ID 8162) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	subgoal 3 (ID 8175) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	";
             responses[i]=data;
           
 
             i = 20;
-            data = "";
+            data = "3 subgoals (ID 8241)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  iRk : r x i	  p : seq T	  H1 : path r i p	  H2 : last i p = y	  H3 : size p = n	  ============================	  exists p0 : seq T, [/\ path r x p0, last x p0 = y & size p0 = n.+1]		subgoal 2 (ID 8162) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	subgoal 3 (ID 8175) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	";
             responses[i]=data;
           
 
             i = 21;
-            data = "";
+            data = "2 subgoals (ID 8162)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y : T	  H1 : true	  H2 : x = y	  H3 : 0 = n.+1	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0		subgoal 2 (ID 8175) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	";
             responses[i]=data;
           
 
             i = 22;
-            data = "";
+            data = "1 subgoal (ID 8175)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H1 : r x i && path r i p	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0	";
             responses[i]=data;
           
 
             i = 23;
-            data = "";
+            data = "1 subgoal (ID 8328)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  H11 : r x i	  H12 : path r i p	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0	";
             responses[i]=data;
           
 
             i = 24;
-            data = "";
+            data = "1 subgoal (ID 8353)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  H11 : r x i	  H12 : path r i p	  F : i \in rgraph r x	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0	";
             responses[i]=data;
           
 
             i = 25;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 8405)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  H11 : r x i	  H12 : path r i p	  F : i \in rgraph r x	  ============================	  y \in connectn n i	";
             responses[i]=data;
           
 
             i = 26;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -158,17 +158,17 @@
           
 
             i = 28;
-            data = "";
+            data = "<infomsg>gdist is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 29;
-            data = "";
+            data = "<infomsg>Setting notation at level 0.</infomsg>	";
             responses[i]=data;
           
 
             i = 30;
-            data = "<infomsg>T is declared</infomsg>	<infomsg>r is declared</infomsg>	<infomsg>connectn is defined</infomsg>	<infomsg>connectn is recursively defined (decreasing on 1st argument)	</infomsg>	1 subgoal (ID 7722)	  	  T : finType	  r : rel T	  n : nat	  x, y : T	  ============================	  reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	    (y \in connectn n x)	2 subgoals (ID 7737)	  	  T : finType	  r : rel T	  x, y : T	  ============================	  reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = 0])	    (y \in connectn 0 x)		subgoal 2 (ID 7743) is:	 reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n.+1])	   (y \in \bigcup_(y0 in rgraph r x) connectn n y0)	2 subgoals (ID 7955)	  	  T : finType	  r : rel T	  x, y : T	  ============================	  exists p : seq T, [/\ path r x p, last x p = x & size p = 0]		subgoal 2 (ID 7743) is:	 reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n.+1])	   (y \in \bigcup_(y0 in rgraph r x) connectn n y0)	1 subgoal (ID 7743)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y : T	  ============================	  reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n.+1])	    (y \in \bigcup_(y0 in rgraph r x) connectn n y0)	3 subgoals (ID 8176)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  ============================	  i \in rgraph r x ->	  y \in connectn n i ->	  exists p0 : seq T, [/\ path r x p0, last x p0 = y & size p0 = n.+1]		subgoal 2 (ID 8162) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	subgoal 3 (ID 8175) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	3 subgoals (ID 8241)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  iRk : r x i	  p : seq T	  H1 : path r i p	  H2 : last i p = y	  H3 : size p = n	  ============================	  exists p0 : seq T, [/\ path r x p0, last x p0 = y & size p0 = n.+1]		subgoal 2 (ID 8162) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	subgoal 3 (ID 8175) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	2 subgoals (ID 8162)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y : T	  H1 : true	  H2 : x = y	  H3 : 0 = n.+1	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0		subgoal 2 (ID 8175) is:	 y \in \bigcup_(y0 in rgraph r x) connectn n y0	1 subgoal (ID 8175)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H1 : r x i && path r i p	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0	1 subgoal (ID 8328)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  H11 : r x i	  H12 : path r i p	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0	1 subgoal (ID 8353)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  H11 : r x i	  H12 : path r i p	  F : i \in rgraph r x	  ============================	  y \in \bigcup_(y0 in rgraph r x) connectn n y0	1 focused subgoal	(shelved: 1) (ID 8405)	  	  T : finType	  r : rel T	  n : nat	  IH : forall x y : T,	       reflect (exists p : seq T, [/\ path r x p, last x p = y & size p = n])	         (y \in connectn n x)	  x, y, i : T	  p : seq T	  H2 : last i p = y	  H3 : (size p).+1 = n.+1	  H11 : r x i	  H12 : path r i p	  F : i \in rgraph r x	  ============================	  y \in connectn n i	No more subgoals.	<infomsg>gdist is defined</infomsg>	<infomsg>Setting notation at level 0.</infomsg>	1 subgoal (ID 7745)	  	  T : finType	  r : rel T	  t1, t2 : T	  ============================	  ( `d[t1, t2]  == 0) = (t1 == t2)	";
+            data = "1 subgoal (ID 7745)	  	  T : finType	  r : rel T	  t1, t2 : T	  ============================	  ( `d[t1, t2]  == 0) = (t1 == t2)	";
             responses[i]=data;
           
 

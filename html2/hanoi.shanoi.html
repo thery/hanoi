@@ -78,7 +78,7 @@
           
 
             i = 12;
-            data = "";
+            data = "<infomsg>m is declared</infomsg>	";
             responses[i]=data;
           
 
@@ -88,17 +88,17 @@
           
 
             i = 14;
-            data = "";
+            data = "<infomsg>smove is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 15;
-            data = "";
+            data = "<infomsg>smove_sym is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 16;
-            data = "";
+            data = "<infomsg>sconnect is defined</infomsg>	";
             responses[i]=data;
           
 
@@ -118,17 +118,17 @@
           
 
             i = 20;
-            data = "";
+            data = "<infomsg>p0 is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 21;
-            data = "";
+            data = "<infomsg>so1 is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 22;
-            data = "";
+            data = "1 subgoal (ID 7705)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p : peg m.+3	  ============================	  so1 p != p0 /\ so1 p != p	";
             responses[i]=data;
           
 
@@ -138,17 +138,17 @@
           
 
             i = 24;
-            data = "";
+            data = "4 subgoals (ID 7811)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p : peg m.+3	  ============================	  inord 2 != p0		subgoal 2 (ID 7812) is:	 inord 2 != inord 1	subgoal 3 (ID 7814) is:	 inord 1 != p0	subgoal 4 (ID 7815) is:	 inord 1 != p	";
             responses[i]=data;
           
 
             i = 25;
-            data = "";
+            data = "3 subgoals (ID 7812)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p : peg m.+3	  ============================	  inord 2 != inord 1		subgoal 2 (ID 7814) is:	 inord 1 != p0	subgoal 3 (ID 7815) is:	 inord 1 != p	";
             responses[i]=data;
           
 
             i = 26;
-            data = "";
+            data = "2 subgoals (ID 7814)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p : peg m.+3	  pD1 : p != inord 1	  ============================	  inord 1 != p0		subgoal 2 (ID 7815) is:	 inord 1 != p	";
             responses[i]=data;
           
 
@@ -158,7 +158,7 @@
           
 
             i = 28;
-            data = "";
+            data = "1 subgoal (ID 7815)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p : peg m.+3	  pD1 : p != inord 1	  ============================	  inord 1 != p	No more subgoals.	";
             responses[i]=data;
           
 
@@ -168,12 +168,12 @@
           
 
             i = 30;
-            data = "";
+            data = "<infomsg>so2 is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 31;
-            data = "";
+            data = "1 subgoal (ID 7747)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  ============================	  0 < m -> [/\ so2 p1 p2 != p0, so2 p1 p2 != p1 & so2 p1 p2 != p2]	";
             responses[i]=data;
           
 
@@ -183,42 +183,42 @@
           
 
             i = 33;
-            data = "";
+            data = "1 subgoal (ID 7748)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  ============================	  [/\ so2 p1 p2 != p0, so2 p1 p2 != p1 & so2 p1 p2 != p2]	";
             responses[i]=data;
           
 
             i = 34;
-            data = "";
+            data = "4 subgoals (ID 7883)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  ============================	  [/\ inord 3 != p0, inord 3 != inord 1 & inord 3 != inord 2]		subgoal 2 (ID 7957) is:	 [/\ inord 2 != p0, inord 2 != inord 1 & inord 2 != p2]	subgoal 3 (ID 7986) is:	 [/\ (if p1 == inord 2 then inord 3 else inord 2) != p0,	     (if p1 == inord 2 then inord 3 else inord 2) != p1	   & (if p1 == inord 2 then inord 3 else inord 2) != inord 1]	subgoal 4 (ID 8060) is:	 [/\ inord 1 != p0, inord 1 != p1 & inord 1 != p2]	";
             responses[i]=data;
           
 
             i = 35;
-            data = "<infomsg>m is declared</infomsg>	";
+            data = "3 subgoals (ID 7957)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  p2D : p2 != inord 2	  ============================	  [/\ inord 2 != p0, inord 2 != inord 1 & inord 2 != p2]		subgoal 2 (ID 7986) is:	 [/\ (if p1 == inord 2 then inord 3 else inord 2) != p0,	     (if p1 == inord 2 then inord 3 else inord 2) != p1	   & (if p1 == inord 2 then inord 3 else inord 2) != inord 1]	subgoal 3 (ID 8060) is:	 [/\ inord 1 != p0, inord 1 != p1 & inord 1 != p2]	";
             responses[i]=data;
           
 
             i = 36;
-            data = "";
+            data = "2 subgoals (ID 7986)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  p1D1 : p1 != inord 1	  ============================	  [/\ (if p1 == inord 2 then inord 3 else inord 2) != p0,	      (if p1 == inord 2 then inord 3 else inord 2) != p1	    & (if p1 == inord 2 then inord 3 else inord 2) != inord 1]		subgoal 2 (ID 8060) is:	 [/\ inord 1 != p0, inord 1 != p1 & inord 1 != p2]	";
             responses[i]=data;
           
 
             i = 37;
-            data = "";
+            data = "3 subgoals (ID 9138)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  p1D1 : p1 != inord 1	  ============================	  [/\ inord 3 != p0, inord 3 != inord 2 & inord 3 != inord 1]		subgoal 2 (ID 9212) is:	 [/\ inord 2 != p0, inord 2 != p1 & inord 2 != inord 1]	subgoal 3 (ID 8060) is:	 [/\ inord 1 != p0, inord 1 != p1 & inord 1 != p2]	";
             responses[i]=data;
           
 
             i = 38;
-            data = "";
+            data = "2 subgoals (ID 9212)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  p1D1 : p1 != inord 1	  p1D2 : p1 != inord 2	  ============================	  [/\ inord 2 != p0, inord 2 != p1 & inord 2 != inord 1]		subgoal 2 (ID 8060) is:	 [/\ inord 1 != p0, inord 1 != p1 & inord 1 != p2]	";
             responses[i]=data;
           
 
             i = 39;
-            data = "";
+            data = "1 subgoal (ID 8060)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  p1, p2 : peg m.+3	  m_gt0 : 0 < m	  p1D1 : p1 != inord 1	  p2D : p2 != inord 1	  ============================	  [/\ inord 1 != p0, inord 1 != p1 & inord 1 != p2]	";
             responses[i]=data;
           
 
             i = 40;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -228,7 +228,7 @@
           
 
             i = 42;
-            data = "";
+            data = "1 subgoal (ID 7757)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  n : nat	  c : configuration m.+3 n	  p : peg m.+3	  ============================	  c `-->* (`c[p])	";
             responses[i]=data;
           
 
@@ -238,172 +238,172 @@
           
 
             i = 44;
-            data = "";
+            data = "1 subgoal (ID 7762)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  n : nat	  c : configuration m.+3 n	  p : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  ============================	  c `-->* (`c[p])	";
             responses[i]=data;
           
 
             i = 45;
-            data = "";
+            data = "1 subgoal (ID 7781)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  ============================	  c `-->* (`c[p])	";
             responses[i]=data;
           
 
             i = 46;
-            data = "";
+            data = "1 subgoal (ID 8139)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  ============================	  c `-->* (`c[p])	";
             responses[i]=data;
           
 
             i = 47;
-            data = "";
+            data = "1 subgoal (ID 8163)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 48;
-            data = "";
+            data = "1 subgoal (ID 8266)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 49;
-            data = "";
+            data = "2 subgoals (ID 8676)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p		subgoal 2 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 50;
-            data = "";
+            data = "2 subgoals (ID 8679)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  ============================	  ↑[↓[c]]_p0 `-->* ↑[`c[p]]_p		subgoal 2 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 51;
-            data = "";
+            data = "2 subgoals (ID 8688)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  sDp0 : so1 p != p0	  sDp : so1 p != p	  ============================	  ↑[↓[c]]_p0 `-->* ↑[`c[p]]_p		subgoal 2 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 52;
-            data = "";
+            data = "3 focused subgoals	(shelved: 2) (ID 8801)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  sDp0 : so1 p != p0	  sDp : so1 p != p	  ============================	  connect smove ↑[`c[so1 p]]_p ↑[`c[p]]_p		subgoal 2 (ID 8800) is:	 connect smove ↑[↓[c]]_p0 ↑[`c[so1 p]]_p	subgoal 3 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 53;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 8800)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  sDp0 : so1 p != p0	  sDp : so1 p != p	  ============================	  connect smove ↑[↓[c]]_p0 ↑[`c[so1 p]]_p		subgoal 2 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 54;
-            data = "";
+            data = "3 focused subgoals	(shelved: 2) (ID 9224)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  sDp0 : so1 p != p0	  sDp : so1 p != p	  ============================	  connect smove ↑[↓[c]]_p0 ↑[`c[so1 p]]_p0		subgoal 2 (ID 9225) is:	 connect smove ↑[`c[so1 p]]_p0 ↑[`c[so1 p]]_p	subgoal 3 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 55;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 9225)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  sDp0 : so1 p != p0	  sDp : so1 p != p	  ============================	  connect smove ↑[`c[so1 p]]_p0 ↑[`c[so1 p]]_p		subgoal 2 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 56;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 9947)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Ep0 : p1 = p0	  sDp0 : so1 p != p0	  sDp : so1 p != p	  ============================	  srel p0 p		subgoal 2 (ID 8677) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 57;
-            data = "";
+            data = "1 subgoal (ID 8677)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 58;
-            data = "";
+            data = "2 subgoals (ID 10072)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p		subgoal 2 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 59;
-            data = "";
+            data = "2 subgoals (ID 10082)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p		subgoal 2 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 60;
-            data = "";
+            data = "3 focused subgoals	(shelved: 2) (ID 10194)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  connect smove ↑[↓[c]]_p1 ↑[`c[so1 p1]]_p1		subgoal 2 (ID 10195) is:	 connect smove ↑[`c[so1 p1]]_p1 ↑[`c[p]]_p	subgoal 3 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 61;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 10195)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  connect smove ↑[`c[so1 p1]]_p1 ↑[`c[p]]_p		subgoal 2 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 62;
-            data = "";
+            data = "3 focused subgoals	(shelved: 2) (ID 10618)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  connect smove ↑[`c[so1 p1]]_p1 ↑[`c[so1 p1]]_p		subgoal 2 (ID 10619) is:	 connect smove ↑[`c[so1 p1]]_p ↑[`c[p]]_p	subgoal 3 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 63;
-            data = "";
+            data = "4 focused subgoals	(shelved: 3) (ID 11030)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  srel p1 p		subgoal 2 (ID 11032) is:	 p != so1 p1	subgoal 3 (ID 10619) is:	 connect smove ↑[`c[so1 p1]]_p ↑[`c[p]]_p	subgoal 4 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 64;
-            data = "";
+            data = "3 focused subgoals	(shelved: 2) (ID 11032)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  p != so1 p1		subgoal 2 (ID 10619) is:	 connect smove ↑[`c[so1 p1]]_p ↑[`c[p]]_p	subgoal 3 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 65;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 10619)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pEp0 : p = p0	  sDp0 : so1 p1 != p0	  sDp1 : so1 p1 != p1	  ============================	  connect smove ↑[`c[so1 p1]]_p ↑[`c[p]]_p		subgoal 2 (ID 10073) is:	 ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 66;
-            data = "";
+            data = "1 subgoal (ID 10073)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  ↑[↓[c]]_p1 `-->* ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 67;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 11513)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[↓[c]]_p1 ↑[`c[p]]_p1		subgoal 2 (ID 11514) is:	 connect smove ↑[`c[p]]_p1 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 68;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 11514)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p]]_p1 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 69;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 11937)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p]]_p1 ↑[`c[p]]_p0		subgoal 2 (ID 11938) is:	 connect smove ↑[`c[p]]_p0 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 70;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 12349)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  srel p1 p0		subgoal 2 (ID 11938) is:	 connect smove ↑[`c[p]]_p0 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 71;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 11938)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p]]_p0 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 72;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 12485)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p]]_p0 ↑[`c[p1]]_p0		subgoal 2 (ID 12486) is:	 connect smove ↑[`c[p1]]_p0 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 73;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 12486)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p1]]_p0 ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 74;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 12909)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p1]]_p0 ↑[`c[p1]]_p		subgoal 2 (ID 12910) is:	 connect smove ↑[`c[p1]]_p ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 75;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 13321)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  srel p0 p		subgoal 2 (ID 12910) is:	 connect smove ↑[`c[p1]]_p ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 76;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 12910)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  sirr : irreflexive (srel (n:=m.+3))	  n : nat	  IH : forall (c : configuration m.+3 n) (p : peg m.+3), c `-->* (`c[p])	  c : configuration m.+3 n.+1	  p : peg m.+3	  p1 := c ldisk : (fun=> peg m.+3) ldisk	  pDp1 : p != p1	  p1Dp0 : p1 != p0	  pDp0 : p != p0	  ============================	  connect smove ↑[`c[p1]]_p ↑[`c[p]]_p	";
             responses[i]=data;
           
 
             i = 77;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -413,7 +413,7 @@
           
 
             i = 79;
-            data = "";
+            data = "1 subgoal (ID 7767)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  n : nat	  c1, c2 : configuration m.+3 n	  ============================	  c1 `-->* c2	";
             responses[i]=data;
           
 
@@ -423,17 +423,17 @@
           
 
             i = 81;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 7811)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  n : nat	  c1, c2 : configuration m.+3 n	  ============================	  connect smove (`c[p0]) c2	";
             responses[i]=data;
           
 
             i = 82;
-            data = "";
+            data = "1 subgoal (ID 7822)	  	  m : nat	  smove := [eta @move m.+3 (srel (n:=m.+3))]	   : forall n : nat, rel (configuration m.+3 n)	  smove_sym := fun (n : nat) (c1 : configuration m.+3 n) =>	               [eta move_sym (ssym (n:=m.+3)) c1]	   : forall (n : nat) (c1 c2 : configuration m.+3 n), c1 `--> c2 = c2 `--> c1	  sconnect := fun n : nat => connect smove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType m.+3))	  p0 := ord0 : peg m.+3	  n : nat	  c1, c2 : configuration m.+3 n	  ============================	  connect (move (srel (n:=m.+3))) c2 (`c[p0])	";
             responses[i]=data;
           
 
             i = 83;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -533,7 +533,7 @@
       " onmouseover="
       mouseover(7, '0_3_3');
       "><br>
-<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="hanoi.gdist.html#"><span class="id" title="library">gdist</span></a> <a class="idref" href="hanoi.ghanoi.html#"><span class="id" title="library">ghanoi</span></a>.</span><span class="command" onmouseout="
+<span class="id" title="keyword">From</span> <span class="id" title="var">hanoi</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="hanoi.gdist.html#"><span class="id" title="library">gdist</span></a> <a class="idref" href="hanoi.ghanoi.html#"><span class="id" title="library">ghanoi</span></a>.</span><span class="command" onmouseout="
       mouseout('0_3_3');
       " onmouseover="
       mouseover(8, '0_3_3');

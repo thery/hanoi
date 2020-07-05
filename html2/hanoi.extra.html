@@ -68,12 +68,12 @@
           
 
             i = 10;
-            data = "";
+            data = "1 subgoal (ID 7685)	  	  A : Type	  a : seq A	  ============================	  injective (rcons a)	";
             responses[i]=data;
           
 
             i = 11;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -83,7 +83,7 @@
           
 
             i = 13;
-            data = "";
+            data = "1 subgoal (ID 7693)	  	  A : Type	  a : A	  ============================	  injective (rcons^~ a)	";
             responses[i]=data;
           
 
@@ -93,12 +93,12 @@
           
 
             i = 15;
-            data = "";
+            data = "1 subgoal (ID 7820)	  	  A : Type	  a, b : A	  s1 : seq A	  IH : forall x2 : seq A, rcons s1 a = rcons x2 a -> s1 = x2	  ============================	  rcons s1 a = [::] -> a :: s1 = [::]	";
             responses[i]=data;
           
 
             i = 16;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -108,7 +108,7 @@
           
 
             i = 18;
-            data = "";
+            data = "1 subgoal (ID 7699)	  	  A : Type	  a : seq A	  ============================	  injective (cat a)	";
             responses[i]=data;
           
 
@@ -118,12 +118,12 @@
           
 
             i = 20;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
             i = 21;
-            data = "1 subgoal (ID 7685)	  	  A : Type	  a : seq A	  ============================	  injective (rcons a)	No more subgoals.	1 subgoal (ID 7693)	  	  A : Type	  a : A	  ============================	  injective (rcons^~ a)	1 subgoal (ID 7820)	  	  A : Type	  a, b : A	  s1 : seq A	  IH : forall x2 : seq A, rcons s1 a = rcons x2 a -> s1 = x2	  ============================	  rcons s1 a = [::] -> a :: s1 = [::]	No more subgoals.	1 subgoal (ID 7699)	  	  A : Type	  a : seq A	  ============================	  injective (cat a)	No more subgoals.	";
+            data = "";
             responses[i]=data;
           
 
@@ -758,12 +758,12 @@
           
 
             i = 148;
-            data = "";
+            data = "1 subgoal (ID 8961)	  	  a, b, i : nat	  ============================	  [&& i != b, a <= i & i <= b] = (a <= i < b)	";
             responses[i]=data;
           
 
             i = 149;
-            data = "1 subgoal (ID 8961)	  	  a, b, i : nat	  ============================	  [&& i != b, a <= i & i <= b] = (a <= i < b)	No more subgoals.	";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -783,12 +783,12 @@
           
 
             i = 153;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
             i = 154;
-            data = "No more subgoals.	";
+            data = "";
             responses[i]=data;
           
 
@@ -978,22 +978,22 @@
           
 
             i = 192;
-            data = "";
+            data = "1 subgoal (ID 8437)	  	  n : nat	  s1, s2 : {set 'I_n}	  j : nat_choiceType	  ============================	  (j \in s2f (n:=n) (s1 :\: s2)) =	  (j \notin s2f (n:=n) s2) && (j \in s2f (n:=n) s1)	";
             responses[i]=data;
           
 
             i = 193;
-            data = "1 subgoal (ID 8437)	  	  n : nat	  s1, s2 : {set 'I_n}	  j : nat_choiceType	  ============================	  (j \in s2f (n:=n) (s1 :\: s2)) =	  (j \notin s2f (n:=n) s2) && (j \in s2f (n:=n) s1)	2 subgoals (ID 9164)	  	  n : nat	  s1, s2 : {set 'I_n}	  j : nat_choiceType	  k : 'I_n	  ============================	  k \in s1 :\: s2 -> j = k -> j \notin s2f (n:=n) s2 /\ j \in s2f (n:=n) s1		subgoal 2 (ID 9227) is:	 exists2 x : 'I_n, x \in s1 :\: s2 & j = x	";
+            data = "2 subgoals (ID 9164)	  	  n : nat	  s1, s2 : {set 'I_n}	  j : nat_choiceType	  k : 'I_n	  ============================	  k \in s1 :\: s2 -> j = k -> j \notin s2f (n:=n) s2 /\ j \in s2f (n:=n) s1		subgoal 2 (ID 9227) is:	 exists2 x : 'I_n, x \in s1 :\: s2 & j = x	";
             responses[i]=data;
           
 
             i = 194;
-            data = "";
+            data = "1 subgoal (ID 9227)	  	  n : nat	  s1, s2 : {set 'I_n}	  j : nat_choiceType	  jDi : j \notin s2f (n:=n) s2	  k : 'I_n	  kIs : k \in s1	  jEk : j = k	  ============================	  exists2 x : 'I_n, x \in s1 :\: s2 & j = x	";
             responses[i]=data;
           
 
             i = 195;
-            data = "1 subgoal (ID 9227)	  	  n : nat	  s1, s2 : {set 'I_n}	  j : nat_choiceType	  jDi : j \notin s2f (n:=n) s2	  k : 'I_n	  kIs : k \in s1	  jEk : j = k	  ============================	  exists2 x : 'I_n, x \in s1 :\: s2 & j = x	No more subgoals.	";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 

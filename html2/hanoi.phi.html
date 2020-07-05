@@ -73,22 +73,22 @@
           
 
             i = 11;
-            data = "";
+            data = "<infomsg>phi is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 12;
-            data = "";
+            data = "<infomsg>Identifier 'ϕ' now a keyword</infomsg>	";
             responses[i]=data;
           
 
             i = 13;
-            data = "";
+            data = "     = [:: (0, 0); (1, 1); (2, 3); (3, 5); (4, 9); 	          (5, 13); (6, 17); (7, 25); (8, 33); (9, 41); 	          (10, 49)]	     : seq (nat * nat)	";
             responses[i]=data;
           
 
             i = 14;
-            data = "";
+            data = "1 subgoal (ID 7696)	  	  n : nat	  ============================	  ϕ(n) = \sum_(i < n) 2 ^ ∇i	";
             responses[i]=data;
           
 
@@ -98,17 +98,17 @@
           
 
             i = 16;
-            data = "";
+            data = "1 subgoal (ID 7718)	  	  n : nat	  ============================	  ϕ(n) = \sum_(0 <= i < n | predT i) 2 ^ ∇i	";
             responses[i]=data;
           
 
             i = 17;
-            data = "";
+            data = "1 subgoal (ID 7725)	  	  n : nat	  ============================	  foldr (addn \o (fun i : nat => 2 ^ ∇i)) 0 (iota 0 n) =	  foldr (applybig \o (fun i : nat => BigBody i addn (predT i) (2 ^ ∇i))) 0	    (index_iota 0 n)	";
             responses[i]=data;
           
 
             i = 18;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -118,7 +118,7 @@
           
 
             i = 20;
-            data = "";
+            data = "1 subgoal (ID 7701)	  	  n : nat	  ============================	  ϕ(n.+1) = ϕ(n) + 2 ^ ∇n	";
             responses[i]=data;
           
 
@@ -128,7 +128,7 @@
           
 
             i = 22;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -138,7 +138,7 @@
           
 
             i = 24;
-            data = "";
+            data = "1 subgoal (ID 7706)	  	  m, n : nat	  ============================	  m <= n -> ϕ(m) <= ϕ(n)	";
             responses[i]=data;
           
 
@@ -148,17 +148,17 @@
           
 
             i = 26;
-            data = "";
+            data = "1 subgoal (ID 7733)	  	  n : nat	  IH : forall m : nat, m <= n -> ϕ(m) <= ϕ(n)	  m : nat	  ============================	  m <= n.+1 -> ϕ(m) <= ϕ(n.+1)	";
             responses[i]=data;
           
 
             i = 27;
-            data = "";
+            data = "1 subgoal (ID 8060)	  	  n : nat	  IH : forall m : nat, m <= n -> ϕ(m) <= ϕ(n)	  m : nat	  ============================	  ϕ(n) <= ϕ(n.+1)	";
             responses[i]=data;
           
 
             i = 28;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -168,7 +168,7 @@
           
 
             i = 30;
-            data = "";
+            data = "1 subgoal (ID 7711)	  	  n : nat	  ============================	  (0 < ϕ(n)) = (0 < n)	";
             responses[i]=data;
           
 
@@ -178,7 +178,7 @@
           
 
             i = 32;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -188,7 +188,7 @@
           
 
             i = 34;
-            data = "<infomsg>Identifier 'ϕ' now a keyword</infomsg>	";
+            data = "1 subgoal (ID 7718)	  	  n, p : nat	  ============================	  p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	";
             responses[i]=data;
           
 
@@ -198,72 +198,72 @@
           
 
             i = 36;
-            data = "";
+            data = "1 subgoal (ID 7731)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  forall p : nat,	  p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 37;
-            data = "";
+            data = "2 subgoals (ID 7819)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  ϕ(Δn.+1 + 0) = 1 + (n.+1 + 0) * 2 ^ n.+1 - 2 ^ n.+1		subgoal 2 (ID 7818) is:	 ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 38;
-            data = "";
+            data = "3 subgoals (ID 7869)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  2 ^ n <= (n + n.+1) * 2 ^ n		subgoal 2 (ID 7868) is:	 1 + ((n + n.+1) * 2 ^ n - 2 ^ n) = 1 + n.+1 * 2 ^ n.+1 - 2 ^ n.+1	subgoal 3 (ID 7818) is:	 ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 39;
-            data = "";
+            data = "2 subgoals (ID 7868)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  1 + ((n + n.+1) * 2 ^ n - 2 ^ n) = 1 + n.+1 * 2 ^ n.+1 - 2 ^ n.+1		subgoal 2 (ID 7818) is:	 ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 40;
-            data = "";
+            data = "2 subgoals (ID 7920)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  1 + (n + n) * 2 ^ n = 1 + n.+1 * 2 ^ n.+1 - 2 ^ n.+1		subgoal 2 (ID 7818) is:	 ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 41;
-            data = "";
+            data = "2 subgoals (ID 7937)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  1 + n * 2 ^ n.+1 = 1 + n.+1 * 2 ^ n.+1 - 2 ^ n.+1		subgoal 2 (ID 7818) is:	 ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 42;
-            data = "";
+            data = "2 subgoals (ID 7966)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  ============================	  2 ^ n.+1 <= n.+1 * 2 ^ n.+1		subgoal 2 (ID 7818) is:	 ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 43;
-            data = "";
+            data = "1 subgoal (ID 7818)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  p : nat	  IHp : p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	  pLn : p < n.+2	  ============================	  ϕ(Δn.+1 + p.+1) = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 44;
-            data = "";
+            data = "1 subgoal (ID 8016)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  p : nat	  IHp : p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	  pLn : p < n.+2	  ============================	  1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1 + 2 ^ ∇(Δn.+1 + p) =	  1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1	";
             responses[i]=data;
           
 
             i = 45;
-            data = "";
+            data = "2 subgoals (ID 8060)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  p : nat	  IHp : p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	  pLn : p < n.+2	  ============================	  1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1 + 2 ^ n.+1 =	  1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1		subgoal 2 (ID 8061) is:	 ∇(Δn.+1 + p) = n.+1	";
             responses[i]=data;
           
 
             i = 46;
-            data = "";
+            data = "3 subgoals (ID 8066)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  p : nat	  IHp : p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	  pLn : p < n.+2	  ============================	  1 + (n.+1 + p) * 2 ^ n.+1 = 1 + (n.+1 + p.+1) * 2 ^ n.+1 - 2 ^ n.+1		subgoal 2 (ID 8067) is:	 2 ^ n.+1 <= 1 + (n.+1 + p) * 2 ^ n.+1	subgoal 3 (ID 8061) is:	 ∇(Δn.+1 + p) = n.+1	";
             responses[i]=data;
           
 
             i = 47;
-            data = "";
+            data = "2 subgoals (ID 8067)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  p : nat	  IHp : p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	  pLn : p < n.+2	  ============================	  2 ^ n.+1 <= 1 + (n.+1 + p) * 2 ^ n.+1		subgoal 2 (ID 8061) is:	 ∇(Δn.+1 + p) = n.+1	";
             responses[i]=data;
           
 
             i = 48;
-            data = "";
+            data = "1 subgoal (ID 8061)	  	  n : nat	  IHn : forall p : nat, p <= n.+1 -> ϕ(Δn + p) = 1 + (n + p) * 2 ^ n - 2 ^ n	  p : nat	  IHp : p <= n.+2 -> ϕ(Δn.+1 + p) = 1 + (n.+1 + p) * 2 ^ n.+1 - 2 ^ n.+1	  pLn : p < n.+2	  ============================	  ∇(Δn.+1 + p) = n.+1	";
             responses[i]=data;
           
 
             i = 49;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -273,7 +273,7 @@
           
 
             i = 51;
-            data = "1 subgoal (ID 7684)	  	  a, n, p, q : nat	  ============================	  0 < n -> a + (n + p) * 2 ^ q - 2 ^ q = a + (n.-1 + p) * 2 ^ q	";
+            data = "1 subgoal (ID 7729)	  	  a, n, p, q : nat	  ============================	  0 < n -> a + (n + p) * 2 ^ q - 2 ^ q = a + (n.-1 + p) * 2 ^ q	";
             responses[i]=data;
           
 
@@ -283,12 +283,12 @@
           
 
             i = 53;
-            data = "1 subgoal (ID 7746)	  	  a, p, q, n : nat	  ============================	  a + (n.+1 + p) * 2 ^ q - 2 ^ q = a + (n.+1.-1 + p) * 2 ^ q	";
+            data = "1 subgoal (ID 7791)	  	  a, p, q, n : nat	  ============================	  a + (n.+1 + p) * 2 ^ q - 2 ^ q = a + (n.+1.-1 + p) * 2 ^ q	";
             responses[i]=data;
           
 
             i = 54;
-            data = "1 subgoal (ID 7752)	  	  a, p, q, n : nat	  ============================	  a + ((n.+1 + p) * 2 ^ q - 2 ^ q) = a + (n.+1.-1 + p) * 2 ^ q	";
+            data = "1 subgoal (ID 7797)	  	  a, p, q, n : nat	  ============================	  a + ((n.+1 + p) * 2 ^ q - 2 ^ q) = a + (n.+1.-1 + p) * 2 ^ q	";
             responses[i]=data;
           
 
@@ -303,7 +303,7 @@
           
 
             i = 57;
-            data = "1 subgoal (ID 7695)	  	  a, n, p, q : nat	  ============================	  0 < p -> a + (n + p) * 2 ^ q - 2 ^ q = a + (n + p.-1) * 2 ^ q	";
+            data = "1 subgoal (ID 7740)	  	  a, n, p, q : nat	  ============================	  0 < p -> a + (n + p) * 2 ^ q - 2 ^ q = a + (n + p.-1) * 2 ^ q	";
             responses[i]=data;
           
 
@@ -323,7 +323,7 @@
           
 
             i = 61;
-            data = "";
+            data = "1 subgoal (ID 7745)	  	  n : nat	  ============================	  ϕ(n) = 1 + (∇n + tmod n) * 2 ^ ∇n - 2 ^ ∇n	";
             responses[i]=data;
           
 
@@ -333,7 +333,7 @@
           
 
             i = 63;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -343,7 +343,7 @@
           
 
             i = 65;
-            data = "";
+            data = "1 subgoal (ID 7750)	  	  n : nat	  ============================	  ϕ(Δn) = 1 + n * 2 ^ n - 2 ^ n	";
             responses[i]=data;
           
 
@@ -353,7 +353,7 @@
           
 
             i = 67;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -363,7 +363,7 @@
           
 
             i = 69;
-            data = "";
+            data = "1 subgoal (ID 7755)	  	  n : nat	  ============================	  ϕ(n.+1) = 1 + (∇n + tmod n) * 2 ^ ∇n	";
             responses[i]=data;
           
 
@@ -373,27 +373,27 @@
           
 
             i = 71;
-            data = "";
+            data = "1 subgoal (ID 7758)	  	  n : nat	  ============================	  1 + (∇n.+1 + tmod n.+1) * 2 ^ ∇n.+1 - 2 ^ ∇n.+1 =	  1 + (∇n + tmod n) * 2 ^ ∇n	";
             responses[i]=data;
           
 
             i = 72;
-            data = "";
+            data = "2 subgoals (ID 8063)	  	  n : nat	  ============================	  1 + (∇n + (tmod n).+1) * 2 ^ ∇n - 2 ^ ∇n = 1 + (∇n + tmod n) * 2 ^ ∇n		subgoal 2 (ID 8064) is:	 1 + ((∇n).+1 + 0) * 2 ^ (∇n).+1 - 2 ^ (∇n).+1 = 1 + (∇n + ∇n) * 2 ^ ∇n	";
             responses[i]=data;
           
 
             i = 73;
-            data = "";
+            data = "1 subgoal (ID 8064)	  	  n : nat	  ============================	  1 + ((∇n).+1 + 0) * 2 ^ (∇n).+1 - 2 ^ (∇n).+1 = 1 + (∇n + ∇n) * 2 ^ ∇n	";
             responses[i]=data;
           
 
             i = 74;
-            data = "";
+            data = "1 subgoal (ID 8129)	  	  n : nat	  ============================	  1 + ∇n * 2 ^ (∇n).+1 = 1 + (∇n + ∇n) * 2 ^ ∇n	";
             responses[i]=data;
           
 
             i = 75;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -403,7 +403,7 @@
           
 
             i = 77;
-            data = "";
+            data = "1 subgoal (ID 7760)	  	  n : nat	  ============================	  odd ϕ(n) = (0 < n)	";
             responses[i]=data;
           
 
@@ -413,22 +413,22 @@
           
 
             i = 79;
-            data = "";
+            data = "1 subgoal (ID 7804)	  	  n : nat	  ============================	  odd ϕ(n.+2) = (0 < n.+2)	";
             responses[i]=data;
           
 
             i = 80;
-            data = "";
+            data = "1 subgoal (ID 7846)	  	  n : nat	  ============================	  odd 1 (+) odd (∇n.+1 + tmod n.+1) && (∇n.+1 == 0) = (0 < n.+2)	";
             responses[i]=data;
           
 
             i = 81;
-            data = "";
+            data = "1 subgoal (ID 7908)	  	  n, k : nat	  ============================	  0 < k.+1 -> odd 1 (+) odd (k.+1 + tmod n.+1) && (k.+1 == 0) = (0 < n.+2)	";
             responses[i]=data;
           
 
             i = 82;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -438,17 +438,17 @@
           
 
             i = 84;
-            data = "";
+            data = "<infomsg>g is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 85;
-            data = "";
+            data = "<infomsg>gmin is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 86;
-            data = "";
+            data = "1 subgoal (ID 7766)	  	  n : nat	  ============================	  1 < n -> 0 < gmin n	";
             responses[i]=data;
           
 
@@ -458,32 +458,32 @@
           
 
             i = 88;
-            data = "";
+            data = "1 subgoal (ID 7823)	  	  n : nat	  ============================	  0 < gmin n.+3	";
             responses[i]=data;
           
 
             i = 89;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 7861)	  	  n : nat	  ============================	  0 < Δ(∇n.+3).-1	";
             responses[i]=data;
           
 
             i = 90;
-            data = "";
+            data = "1 subgoal (ID 7968)	  	  n : nat	  ============================	  ∇3 <= ∇n.+3 -> 0 < Δ(∇n.+3).-1	";
             responses[i]=data;
           
 
             i = 91;
-            data = "";
+            data = "1 subgoal (ID 7969)	  	  n : nat	  ============================	  1 < ∇n.+3 -> 0 < Δ(∇n.+3).-1	";
             responses[i]=data;
           
 
             i = 92;
-            data = "";
+            data = "1 subgoal (ID 8008)	  	  n, m : nat	  ============================	  1 < m.+1 -> 0 < Δm	";
             responses[i]=data;
           
 
             i = 93;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -493,7 +493,7 @@
           
 
             i = 95;
-            data = "";
+            data = "1 subgoal (ID 7772)	  	  n : nat	  ============================	  n = gmin n + ∇n	";
             responses[i]=data;
           
 
@@ -503,22 +503,22 @@
           
 
             i = 97;
-            data = "";
+            data = "1 subgoal (ID 7808)	  	  n : nat	  ============================	  n.+1 = gmin n.+1 + ∇n.+1	";
             responses[i]=data;
           
 
             i = 98;
-            data = "";
+            data = "1 subgoal (ID 7812)	  	  n : nat	  ============================	  Δ(∇n.+1) + tmod n.+1 = Δ(∇n.+1).-1 + tmod n.+1 + ∇n.+1	";
             responses[i]=data;
           
 
             i = 99;
-            data = "";
+            data = "1 subgoal (ID 7878)	  	  n, t : nat	  ============================	  Δt.+1 + tmod n.+1 = Δt + tmod n.+1 + t.+1	";
             responses[i]=data;
           
 
             i = 100;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -528,7 +528,7 @@
           
 
             i = 102;
-            data = "";
+            data = "1 subgoal (ID 7775)	  	  n : nat	  ============================	  gmin n <= n	";
             responses[i]=data;
           
 
@@ -538,7 +538,7 @@
           
 
             i = 104;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -548,7 +548,7 @@
           
 
             i = 106;
-            data = "";
+            data = "1 subgoal (ID 7778)	  	  n : nat	  ============================	  0 < n -> gmin n < n	";
             responses[i]=data;
           
 
@@ -558,17 +558,17 @@
           
 
             i = 108;
-            data = "";
+            data = "1 subgoal (ID 7817)	  	  n : nat	  ============================	  gmin n.+1 < n.+1	";
             responses[i]=data;
           
 
             i = 109;
-            data = "";
+            data = "1 subgoal (ID 7835)	  	  n : nat	  ============================	  0 < ∇n.+1	";
             responses[i]=data;
           
 
             i = 110;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -578,7 +578,7 @@
           
 
             i = 112;
-            data = "";
+            data = "1 subgoal (ID 7784)	  	  n : nat	  ============================	  ∇(gmin n) = ∇n - (tmod n != ∇n)	";
             responses[i]=data;
           
 
@@ -588,47 +588,47 @@
           
 
             i = 114;
-            data = "";
+            data = "2 subgoals (ID 7837)	  	  n : nat	  mEt : tmod n = ∇n	  ============================	  ∇(gmin n) = ∇n - ~~ true		subgoal 2 (ID 7838) is:	 ∇(gmin n) = ∇n - ~~ false	";
             responses[i]=data;
           
 
             i = 115;
-            data = "";
+            data = "2 subgoals (ID 7846)	  	  n : nat	  mEt : tmod n = ∇n	  ============================	  ∇(Δ(tmod n).-1 + tmod n) = tmod n		subgoal 2 (ID 7838) is:	 ∇(gmin n) = ∇n - ~~ false	";
             responses[i]=data;
           
 
             i = 116;
-            data = "";
+            data = "1 subgoal (ID 7838)	  	  n : nat	  mDt : tmod n != ∇n	  ============================	  ∇(gmin n) = ∇n - ~~ false	";
             responses[i]=data;
           
 
             i = 117;
-            data = "";
+            data = "1 subgoal (ID 7900)	  	  n : nat	  mDt : tmod n != ∇n	  mLt : tmod n < ∇n	  ============================	  ∇(gmin n) = ∇n - ~~ false	";
             responses[i]=data;
           
 
             i = 118;
-            data = "";
+            data = "1 subgoal (ID 7903)	  	  n : nat	  mDt : tmod n != ∇n	  mLt : tmod n < ∇n	  ============================	  ∇(gmin n) = (∇n).-1	";
             responses[i]=data;
           
 
             i = 119;
-            data = "";
+            data = "1 subgoal (ID 7963)	  	  n : nat	  mDt : tmod n != ∇n	  mLt : tmod n < ∇n	  ============================	  Δ(∇n).-1 <= Δ(∇n).-1 + tmod n < Δ(∇n).-1.+1	";
             responses[i]=data;
           
 
             i = 120;
-            data = "";
+            data = "1 subgoal (ID 8040)	  	  n : nat	  mLt : tmod n.+2 < ∇n.+2	  ============================	  Δ(∇n.+2).-1 <= Δ(∇n.+2).-1 + tmod n.+2 < Δ(∇n.+2).-1.+1	";
             responses[i]=data;
           
 
             i = 121;
-            data = "";
+            data = "1 subgoal (ID 8123)	  	  n, t : nat	  mLt : tmod n.+2 < t.+1	  ============================	  Δt <= Δt + tmod n.+2 < Δt.+1	";
             responses[i]=data;
           
 
             i = 122;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -638,7 +638,7 @@
           
 
             i = 124;
-            data = "";
+            data = "1 subgoal (ID 7790)	  	  n : nat	  ============================	  tmod (gmin n) = (tmod n != ∇n) * tmod n	";
             responses[i]=data;
           
 
@@ -648,32 +648,32 @@
           
 
             i = 126;
-            data = "";
+            data = "2 subgoals (ID 7843)	  	  n : nat	  mEt : tmod n = ∇n	  ============================	  tmod (gmin n) = ~~ true * tmod n		subgoal 2 (ID 7844) is:	 tmod (gmin n) = ~~ false * tmod n	";
             responses[i]=data;
           
 
             i = 127;
-            data = "";
+            data = "2 subgoals (ID 7852)	  	  n : nat	  mEt : tmod n = ∇n	  ============================	  tmod (Δ(tmod n).-1 + tmod n) = 0		subgoal 2 (ID 7844) is:	 tmod (gmin n) = ~~ false * tmod n	";
             responses[i]=data;
           
 
             i = 128;
-            data = "";
+            data = "2 subgoals (ID 7884)	  	  n : nat	  mEt : tmod n = ∇n	  t : nat	  ============================	  tmod (Δt.+1.-1 + t.+1) = 0		subgoal 2 (ID 7844) is:	 tmod (gmin n) = ~~ false * tmod n	";
             responses[i]=data;
           
 
             i = 129;
-            data = "";
+            data = "1 subgoal (ID 7844)	  	  n : nat	  mDt : tmod n != ∇n	  ============================	  tmod (gmin n) = ~~ false * tmod n	";
             responses[i]=data;
           
 
             i = 130;
-            data = "";
+            data = "1 subgoal (ID 7902)	  	  n : nat	  mDt : tmod n != ∇n	  mLt : tmod n < ∇n	  ============================	  tmod (gmin n) = ~~ false * tmod n	";
             responses[i]=data;
           
 
             i = 131;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -683,7 +683,7 @@
           
 
             i = 133;
-            data = "";
+            data = "1 subgoal (ID 7795)	  	  m, n : nat	  ============================	  m < gmin n -> ∇m < ∇n	";
             responses[i]=data;
           
 
@@ -693,67 +693,67 @@
           
 
             i = 135;
-            data = "";
+            data = "1 subgoal (ID 7796)	  	  m, n : nat	  mLg : m < gmin n	  ============================	  ∇m < ∇n	";
             responses[i]=data;
           
 
             i = 136;
-            data = "";
+            data = "1 subgoal (ID 7813)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  ============================	  ∇m < ∇n	";
             responses[i]=data;
           
 
             i = 137;
-            data = "";
+            data = "2 subgoals (ID 8058)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  ============================	  n < m -> false		subgoal 2 (ID 8057) is:	 false	";
             responses[i]=data;
           
 
             i = 138;
-            data = "";
+            data = "1 subgoal (ID 8057)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  ============================	  false	";
             responses[i]=data;
           
 
             i = 139;
-            data = "";
+            data = "2 subgoals (ID 8108)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  ============================	  ∇n == ∇(gmin n)		subgoal 2 (ID 8143) is:	 false	";
             responses[i]=data;
           
 
             i = 140;
-            data = "";
+            data = "1 subgoal (ID 8143)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  ============================	  false	";
             responses[i]=data;
           
 
             i = 141;
-            data = "";
+            data = "1 subgoal (ID 8249)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  ============================	  tmod m < tmod (gmin n) -> false	";
             responses[i]=data;
           
 
             i = 142;
-            data = "";
+            data = "1 subgoal (ID 8302)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  ============================	  tmod (gmin n) = 0	";
             responses[i]=data;
           
 
             i = 143;
-            data = "";
+            data = "1 subgoal (ID 8310)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  ============================	  (tmod n != ∇n) * tmod n = 0	";
             responses[i]=data;
           
 
             i = 144;
-            data = "";
+            data = "1 subgoal (ID 8344)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  ============================	  tmod n <> ∇n -> ∇(gmin n) = ∇n - ~~ false -> ~~ false * tmod n = 0	";
             responses[i]=data;
           
 
             i = 145;
-            data = "";
+            data = "1 subgoal (ID 8381)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  F : ∇n = (∇n).-1	  ============================	  ~~ false * tmod n = 0	";
             responses[i]=data;
           
 
             i = 146;
-            data = "";
+            data = "1 subgoal (ID 8385)	  	  m, n : nat	  mLg : m < gmin n	  nP : 0 < n	  tnEtm : ∇n = ∇m	  tnEtg : ∇n = ∇(gmin n)	  F : ∇n = (∇n).-1	  ============================	  (∇n < ∇n) = false -> ~~ false * tmod n = 0	";
             responses[i]=data;
           
 
             i = 147;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -763,7 +763,7 @@
           
 
             i = 149;
-            data = "";
+            data = "1 subgoal (ID 7800)	  	  n : nat	  ============================	  ϕ(n) = g n (gmin n)	";
             responses[i]=data;
           
 
@@ -773,77 +773,77 @@
           
 
             i = 151;
-            data = "";
+            data = "1 subgoal (ID 7834)	  	  n : nat	  ============================	  ϕ(n.+1) = g n.+1 (gmin n.+1)	";
             responses[i]=data;
           
 
             i = 152;
-            data = "";
+            data = "1 subgoal (ID 7839)	  	  n : nat	  ============================	  1 + (∇n.+1 + tmod n.+1) * 2 ^ ∇n.+1 - 2 ^ ∇n.+1 =	  ϕ(Δ(∇n.+1).-1 + tmod n.+1).*2 + (2 ^ (n.+1 - (Δ(∇n.+1).-1 + tmod n.+1))).-1	";
             responses[i]=data;
           
 
             i = 153;
-            data = "";
+            data = "1 subgoal (ID 7844)	  	  n : nat	  ============================	  1 + (∇n.+1 + tmod n.+1) * 2 ^ ∇n.+1 - 2 ^ ∇n.+1 =	  (1 + ((∇n.+1).-1 + tmod n.+1) * 2 ^ (∇n.+1).-1 - 2 ^ (∇n.+1).-1).*2 +	  (2 ^ (n.+1 - (Δ(∇n.+1).-1 + tmod n.+1))).-1	";
             responses[i]=data;
           
 
             i = 154;
-            data = "";
+            data = "1 subgoal (ID 7883)	  	  n : nat	  x := ∇n.+1 : nat	  y := tmod n.+1 : nat	  ============================	  1 + (x + y) * 2 ^ x - 2 ^ x =	  (1 + (x.-1 + y) * 2 ^ x.-1 - 2 ^ x.-1).*2 + (2 ^ (n.+1 - (Δx.-1 + y))).-1	";
             responses[i]=data;
           
 
             i = 155;
-            data = "";
+            data = "1 subgoal (ID 7890)	  	  n : nat	  x := ∇n.+1 : nat	  y := tmod n.+1 : nat	  ============================	  1 + (x.-1 + y) * 2 ^ x =	  (1 + (x.-1 + y) * 2 ^ x.-1 - 2 ^ x.-1).*2 + (2 ^ (n.+1 - (Δx.-1 + y))).-1	";
             responses[i]=data;
           
 
             i = 156;
-            data = "";
+            data = "1 subgoal (ID 7953)	  	  n : nat	  x := ∇n.+1 : nat	  y := tmod n.+1 : nat	  ============================	  1 + (x.-1 + y) * 2 ^ x =	  1 * 2 + (x.-1 + y) * 2 ^ x - 2 ^ x + (2 ^ (n.+1 - (Δx.-1 + y))).-1	";
             responses[i]=data;
           
 
             i = 157;
-            data = "";
+            data = "2 subgoals (ID 7983)	  	  n : nat	  x := ∇n.+1 : nat	  y := tmod n.+1 : nat	  ============================	  n.+1 = Δx.-1 + x + y		subgoal 2 (ID 7988) is:	 1 + (x.-1 + y) * 2 ^ x =	 1 * 2 + (x.-1 + y) * 2 ^ x - 2 ^ x + (2 ^ (Δx.-1 + x + y - (Δx.-1 + y))).-1	";
             responses[i]=data;
           
 
             i = 158;
-            data = "";
+            data = "1 subgoal (ID 7988)	  	  n : nat	  x := ∇n.+1 : nat	  y := tmod n.+1 : nat	  ============================	  1 + (x.-1 + y) * 2 ^ x =	  1 * 2 + (x.-1 + y) * 2 ^ x - 2 ^ x + (2 ^ (Δx.-1 + x + y - (Δx.-1 + y))).-1	";
             responses[i]=data;
           
 
             i = 159;
-            data = "";
+            data = "1 subgoal (ID 8072)	  	  n : nat	  x := ∇n.+1 : nat	  y := tmod n.+1 : nat	  ============================	  1 + (x.-1 + y) * 2 ^ x = 1 * 2 + (x.-1 + y) * 2 ^ x - 2 ^ x + (2 ^ x).-1	";
             responses[i]=data;
           
 
             i = 160;
-            data = "";
+            data = "1 subgoal (ID 8076)	  	  n : nat	  ============================	  1 + ((∇n.+1).-1 + tmod n.+1) * 2 ^ ∇n.+1 =	  1 * 2 + ((∇n.+1).-1 + tmod n.+1) * 2 ^ ∇n.+1 - 2 ^ ∇n.+1 + (2 ^ ∇n.+1).-1	";
             responses[i]=data;
           
 
             i = 161;
-            data = "";
+            data = "1 subgoal (ID 8120)	  	  n : nat	  ============================	  1 + ((∇n.+3).-1 + tmod n.+3) * 2 ^ ∇n.+3 =	  1 * 2 + ((∇n.+3).-1 + tmod n.+3) * 2 ^ ∇n.+3 - 2 ^ ∇n.+3 + (2 ^ ∇n.+3).-1	";
             responses[i]=data;
           
 
             i = 162;
-            data = "";
+            data = "1 subgoal (ID 8149)	  	  n : nat	  ============================	  1 + ((∇n.+3).-1 + tmod n.+3) * 2 ^ ∇n.+3 =	  1 * 2 + ((∇n.+3).-2 + tmod n.+3) * 2 ^ ∇n.+3 + (2 ^ ∇n.+3).-1	";
             responses[i]=data;
           
 
             i = 163;
-            data = "";
+            data = "1 subgoal (ID 8205)	  	  n : nat	  ============================	  (0 + ((∇n.+3).-2.+1 + tmod n.+3) * 2 ^ ∇n.+3).+1 =	  1 * 2 + ((∇n.+3).-2.+1.-1 + tmod n.+3) * 2 ^ ∇n.+3 + (2 ^ ∇n.+3).-1	";
             responses[i]=data;
           
 
             i = 164;
-            data = "";
+            data = "1 subgoal (ID 8269)	  	  n, u : nat	  __ : (0 < u.+1) = (0 < 2) || (∇n.+3 == 0)	  ============================	  (0 + ((∇n.+3).-2.+1 + tmod n.+3) * u.+1).+1 =	  1 * 2 + ((∇n.+3).-2.+1.-1 + tmod n.+3) * u.+1 + u.+1.-1	";
             responses[i]=data;
           
 
             i = 165;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -853,7 +853,7 @@
           
 
             i = 167;
-            data = "";
+            data = "1 subgoal (ID 7807)	  	  n, m : nat	  ============================	  m.+1 < n -> g n m.+1 + 2 ^ (n - m.+1) = g n m + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
@@ -863,92 +863,92 @@
           
 
             i = 169;
-            data = "";
+            data = "1 subgoal (ID 7815)	  	  n, m : nat	  H : m.+1 < n	  ============================	  (1 + (∇m.+1 + tmod m.+1) * 2 ^ ∇m.+1 - 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 + (2 ^ (n - m)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 170;
-            data = "";
+            data = "1 subgoal (ID 7823)	  	  n, m : nat	  H : m.+1 < n	  ============================	  (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 + (2 ^ (n - m)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 171;
-            data = "";
+            data = "2 subgoals (ID 7834)	  	  n, m : nat	  H : m.+1 < n	  ============================	  0 < n - m		subgoal 2 (ID 7833) is:	 (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	 2 ^ (n - m.+1) =	 (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 + (2 ^ (n - m).-1.+1).-1 +	 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 172;
-            data = "";
+            data = "1 subgoal (ID 7833)	  	  n, m : nat	  H : m.+1 < n	  ============================	  (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 + (2 ^ (n - m).-1.+1).-1 +	  2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 173;
-            data = "";
+            data = "1 subgoal (ID 7865)	  	  n, m : nat	  H : m.+1 < n	  ============================	  (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	  (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 174;
-            data = "";
+            data = "1 subgoal (ID 7869)	  	  n, m : nat	  H : m.+1 < n	  ============================	  (∇m.+1 == ∇m) && (tmod m.+1 == (tmod m).+1)	  || [&& ∇m.+1 == (∇m).+1, tmod m.+1 == 0 & tmod m == ∇m] ->	  (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	  (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 175;
-            data = "";
+            data = "2 subgoals (ID 8148)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = ∇m	  H2 : tmod m.+1 = (tmod m).+1	  ============================	  (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	  (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1		subgoal 2 (ID 8149) is:	 (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	 2 ^ (n - m.+1) =	 (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	 (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 176;
-            data = "";
+            data = "2 subgoals (ID 8161)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = ∇m	  H2 : tmod m.+1 = (tmod m).+1	  ============================	  (1 + ((∇m).-1 + (tmod m).+1) * 2 ^ ∇m).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + ((∇m).-1 + tmod m) * 2 ^ ∇m).*2 + (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 +	  2 ^ (∇m).+1		subgoal 2 (ID 8149) is:	 (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	 2 ^ (n - m.+1) =	 (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	 (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 177;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 8234)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = ∇m	  H2 : tmod m.+1 = (tmod m).+1	  ============================	  (2 ^ ∇m).*2 + ((2 ^ (n - m.+1)).-1 + 2 ^ (n - m.+1)) =	  (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1		subgoal 2 (ID 8149) is:	 (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	 2 ^ (n - m.+1) =	 (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	 (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 178;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 8271)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = ∇m	  H2 : tmod m.+1 = (tmod m).+1	  ============================	  (2 ^ (n - m.+1)).-1 + 2 ^ (n - m.+1) = (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1		subgoal 2 (ID 8149) is:	 (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	 2 ^ (n - m.+1) =	 (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	 (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 179;
-            data = "";
+            data = "1 subgoal (ID 8149)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  ============================	  (1 + ((∇m.+1).-1 + tmod m.+1) * 2 ^ ∇m.+1).*2 + (2 ^ (n - m.+1)).-1 +	  2 ^ (n - m.+1) =	  (1 + (∇m + tmod m) * 2 ^ ∇m - 2 ^ ∇m).*2 +	  (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 + 2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 180;
-            data = "";
+            data = "1 subgoal (ID 8301)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  ============================	  (1 + ∇m * 2 ^ (∇m).+1).*2 + (2 ^ (n - m.+1)).-1 + 2 ^ (n - m.+1) =	  (1 + (∇m).*2 * 2 ^ ∇m - 2 ^ ∇m).*2 + (2 ^ (n - m.+1) + 2 ^ (n - m.+1)).-1 +	  2 ^ (∇m).+1	";
             responses[i]=data;
           
 
             i = 181;
-            data = "";
+            data = "1 subgoal (ID 8309)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  x := ∇m : nat	  y := n - m.+1 : nat	  ============================	  (1 + x * 2 ^ x.+1).*2 + (2 ^ y).-1 + 2 ^ y =	  (1 + x.*2 * 2 ^ x - 2 ^ x).*2 + (2 ^ y + 2 ^ y).-1 + 2 ^ x.+1	";
             responses[i]=data;
           
 
             i = 182;
-            data = "";
+            data = "2 subgoals (ID 8343)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  x := ∇m : nat	  y := n - m.+1 : nat	  ============================	  2 ^ x.+1 <= (1 + x.*2 * 2 ^ x).*2		subgoal 2 (ID 8342) is:	 (1 + x * 2 ^ x.+1).*2 + (2 ^ y).-1 + 2 ^ y =	 (1 + x.*2 * 2 ^ x).*2 + (2 ^ y + 2 ^ y).-1	";
             responses[i]=data;
           
 
             i = 183;
-            data = "";
+            data = "2 subgoals (ID 8354)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  x := ∇m : nat	  y := n - m.+1 : nat	  ============================	  2 ^ x <= 1 + x.*2 * 2 ^ x		subgoal 2 (ID 8342) is:	 (1 + x * 2 ^ x.+1).*2 + (2 ^ y).-1 + 2 ^ y =	 (1 + x.*2 * 2 ^ x).*2 + (2 ^ y + 2 ^ y).-1	";
             responses[i]=data;
           
 
             i = 184;
-            data = "";
+            data = "1 subgoal (ID 8342)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  x := ∇m : nat	  y := n - m.+1 : nat	  ============================	  (1 + x * 2 ^ x.+1).*2 + (2 ^ y).-1 + 2 ^ y =	  (1 + x.*2 * 2 ^ x).*2 + (2 ^ y + 2 ^ y).-1	";
             responses[i]=data;
           
 
             i = 185;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 8444)	  	  n, m : nat	  H : m.+1 < n	  H1 : ∇m.+1 = (∇m).+1	  H2 : tmod m.+1 = 0	  H3 : tmod m = ∇m	  x := ∇m : nat	  y := n - m.+1 : nat	  ============================	  (2 ^ y).-1 + 2 ^ y = (2 ^ y + 2 ^ y).-1	";
             responses[i]=data;
           
 
             i = 186;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -958,7 +958,7 @@
           
 
             i = 188;
-            data = "";
+            data = "1 subgoal (ID 7812)	  	  n, m : nat	  ============================	  m < gmin n -> g n m.+1 <= g n m	";
             responses[i]=data;
           
 
@@ -968,72 +968,72 @@
           
 
             i = 190;
-            data = "";
+            data = "1 subgoal (ID 7873)	  	  m, n : nat	  mLg : m < gmin n.+1	  ============================	  g n.+1 m.+1 <= g n.+1 m	";
             responses[i]=data;
           
 
             i = 191;
-            data = "";
+            data = "2 subgoals (ID 7874)	  	  m, n : nat	  mLg : m < gmin n.+1	  ============================	  m < n		subgoal 2 (ID 7876) is:	 g n.+1 m.+1 <= g n.+1 m	";
             responses[i]=data;
           
 
             i = 192;
-            data = "";
+            data = "1 subgoal (ID 7876)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  g n.+1 m.+1 <= g n.+1 m	";
             responses[i]=data;
           
 
             i = 193;
-            data = "";
+            data = "2 subgoals (ID 7912)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  mtLm : m.+1 + ∇m <= n	  ============================	  g n.+1 m.+1 <= g n.+1 m		subgoal 2 (ID 7911) is:	 m.+1 + ∇m <= n	";
             responses[i]=data;
           
 
             i = 194;
-            data = "";
+            data = "2 subgoals (ID 7924)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  mtLm : m.+1 + ∇m <= n	  ============================	  g n.+1 m + 2 ^ (∇m).+1 <= g n.+1 m + 2 ^ (n.+1 - m.+1)		subgoal 2 (ID 7911) is:	 m.+1 + ∇m <= n	";
             responses[i]=data;
           
 
             i = 195;
-            data = "";
+            data = "1 subgoal (ID 7911)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  m.+1 + ∇m <= n	";
             responses[i]=data;
           
 
             i = 196;
-            data = "";
+            data = "2 subgoals (ID 8004)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  m.+1 + ∇m <= gmin n.+1 + ∇m		subgoal 2 (ID 8005) is:	 gmin n.+1 + ∇m <= n	";
             responses[i]=data;
           
 
             i = 197;
-            data = "";
+            data = "1 subgoal (ID 8005)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  gmin n.+1 + ∇m <= n	";
             responses[i]=data;
           
 
             i = 198;
-            data = "";
+            data = "1 subgoal (ID 8062)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  gmin n.+1 + (∇m).+1 <= n.+1	";
             responses[i]=data;
           
 
             i = 199;
-            data = "";
+            data = "1 subgoal (ID 8078)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  Δ(∇n.+1).-1 + (∇m).+1 <= Δ(∇n.+1)	";
             responses[i]=data;
           
 
             i = 200;
-            data = "";
+            data = "1 subgoal (ID 8080)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  ============================	  0 < ∇n.+1 -> Δ(∇n.+1).-1 + (∇m).+1 <= Δ(∇n.+1)	";
             responses[i]=data;
           
 
             i = 201;
-            data = "";
+            data = "1 subgoal (ID 8132)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  t : nat	  E : ∇n.+1 = t.+1	  ============================	  Δt + (∇m).+1 <= Δt.+1	";
             responses[i]=data;
           
 
             i = 202;
-            data = "";
+            data = "1 subgoal (ID 8142)	  	  m, n : nat	  mLg : m < gmin n.+1	  mLn : m < n	  t : nat	  E : ∇n.+1 = t.+1	  ============================	  ∇m < ∇n.+1	";
             responses[i]=data;
           
 
             i = 203;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -1043,7 +1043,7 @@
           
 
             i = 205;
-            data = "";
+            data = "1 subgoal (ID 7817)	  	  n, m : nat	  ============================	  gmin n <= m -> m.+1 < n -> g n m <= g n m.+1	";
             responses[i]=data;
           
 
@@ -1053,47 +1053,47 @@
           
 
             i = 207;
-            data = "";
+            data = "1 subgoal (ID 7819)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  ============================	  g n m <= g n m.+1	";
             responses[i]=data;
           
 
             i = 208;
-            data = "";
+            data = "2 subgoals (ID 7822)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  mtLm : n <= m.+1 + (∇m).+1	  ============================	  g n m <= g n m.+1		subgoal 2 (ID 7821) is:	 n <= m.+1 + (∇m).+1	";
             responses[i]=data;
           
 
             i = 209;
-            data = "";
+            data = "2 subgoals (ID 7834)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  mtLm : n <= m.+1 + (∇m).+1	  ============================	  g n m + 2 ^ (n - m.+1) <= g n m + 2 ^ (∇m).+1		subgoal 2 (ID 7821) is:	 n <= m.+1 + (∇m).+1	";
             responses[i]=data;
           
 
             i = 210;
-            data = "";
+            data = "1 subgoal (ID 7821)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  ============================	  n <= m.+1 + (∇m).+1	";
             responses[i]=data;
           
 
             i = 211;
-            data = "";
+            data = "1 subgoal (ID 7915)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  ============================	  ∇n <= (∇m).+2	";
             responses[i]=data;
           
 
             i = 212;
-            data = "";
+            data = "2 focused subgoals	(shelved: 2) (ID 7970)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  ============================	  ∇n <= (∇(gmin n)).+2		subgoal 2 (ID 7971) is:	 (∇(gmin n)).+1 < (∇m).+2	";
             responses[i]=data;
           
 
             i = 213;
-            data = "";
+            data = "2 focused subgoals	(shelved: 1) (ID 8004)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  ============================	  tmod n <> ∇n -> ∇n <= (∇n - ~~ false).+2		subgoal 2 (ID 7971) is:	 (∇(gmin n)).+1 < (∇m).+2	";
             responses[i]=data;
           
 
             i = 214;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 7971)	  	  n, m : nat	  gLm : gmin n <= m	  mLn : m.+1 < n	  ============================	  (∇(gmin n)).+1 < (∇m).+2	";
             responses[i]=data;
           
 
             i = 215;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -1103,7 +1103,7 @@
           
 
             i = 217;
-            data = "";
+            data = "1 subgoal (ID 7822)	  	  n, m : nat	  ============================	  m < n -> g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
@@ -1113,62 +1113,62 @@
           
 
             i = 219;
-            data = "";
+            data = "1 subgoal (ID 7823)	  	  n, m : nat	  mLn : m < n	  ============================	  g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
             i = 220;
-            data = "";
+            data = "2 subgoals (ID 7847)	  	  n, m : nat	  mLn : m < n	  gLm : gmin n <= m	  ============================	  g n (gmin n) <= g n m		subgoal 2 (ID 7848) is:	 g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
             i = 221;
-            data = "";
+            data = "2 subgoals (ID 7856)	  	  n, m : nat	  gLm : gmin n <= m	  ============================	  m - gmin n + gmin n < n -> g n (gmin n) <= g n (m - gmin n + gmin n)		subgoal 2 (ID 7848) is:	 g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
             i = 222;
-            data = "";
+            data = "2 subgoals (ID 7899)	  	  n, m : nat	  gLm : gmin n <= m	  k : nat	  IH : k + gmin n < n -> g n (gmin n) <= g n (k + gmin n)	  H1 : k.+1 + gmin n < n	  ============================	  g n (gmin n) <= g n (k.+1 + gmin n)		subgoal 2 (ID 7848) is:	 g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
             i = 223;
-            data = "";
+            data = "2 subgoals (ID 7924)	  	  n, m : nat	  gLm : gmin n <= m	  k : nat	  IH : k + gmin n < n -> g n (gmin n) <= g n (k + gmin n)	  H1 : k.+1 + gmin n < n	  ============================	  k + gmin n < n		subgoal 2 (ID 7848) is:	 g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
             i = 224;
-            data = "";
+            data = "1 subgoal (ID 7848)	  	  n, m : nat	  mLn : m < n	  mLg : m < gmin n	  ============================	  g n (gmin n) <= g n m	";
             responses[i]=data;
           
 
             i = 225;
-            data = "";
+            data = "1 subgoal (ID 8002)	  	  n, m : nat	  mLn : m < n	  mLg : m < gmin n	  ============================	  g n (gmin n) <= g n (gmin n - (gmin n - m))	";
             responses[i]=data;
           
 
             i = 226;
-            data = "";
+            data = "2 subgoals (ID 8009)	  	  n, m : nat	  mLn : m < n	  mLg : m < gmin n	  ============================	  0 <= gmin n -> g n (gmin n) <= g n (gmin n - 0)		subgoal 2 (ID 8013) is:	 g n (gmin n) <= g n (gmin n - k.+1)	";
             responses[i]=data;
           
 
             i = 227;
-            data = "";
+            data = "1 subgoal (ID 8013)	  	  n, m : nat	  mLn : m < n	  mLg : m < gmin n	  k : nat	  IH : k <= gmin n -> g n (gmin n) <= g n (gmin n - k)	  kLm : k < gmin n	  ============================	  g n (gmin n) <= g n (gmin n - k.+1)	";
             responses[i]=data;
           
 
             i = 228;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 8042)	  	  n, m : nat	  mLn : m < n	  mLg : m < gmin n	  k : nat	  IH : k <= gmin n -> g n (gmin n) <= g n (gmin n - k)	  kLm : k < gmin n	  ============================	  g n (gmin n - k) <= g n (gmin n - k.+1)	";
             responses[i]=data;
           
 
             i = 229;
-            data = "";
+            data = "1 subgoal (ID 8051)	  	  n, m : nat	  mLn : m < n	  mLg : m < gmin n	  k : nat	  IH : k <= gmin n -> g n (gmin n) <= g n (gmin n - k)	  kLm : k < gmin n	  ============================	  g n (gmin n - k.+1).+1 <= g n (gmin n - k.+1)	";
             responses[i]=data;
           
 
             i = 230;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -1178,7 +1178,7 @@
           
 
             i = 232;
-            data = "";
+            data = "1 subgoal (ID 7827)	  	  a, b : nat	  ============================	  ϕ(a + b) <= ϕ(a).*2 + (2 ^ b).-1	";
             responses[i]=data;
           
 
@@ -1188,22 +1188,22 @@
           
 
             i = 234;
-            data = "";
+            data = "1 subgoal (ID 7837)	  	  a, b : nat	  ============================	  ϕ(a + b.+1) <= ϕ(a).*2 + (2 ^ b.+1).-1	";
             responses[i]=data;
           
 
             i = 235;
-            data = "";
+            data = "1 subgoal (ID 7872)	  	  a, b : nat	  ============================	  g (a + b.+1) (gmin (a + b.+1)) <= ϕ(a).*2 + (2 ^ (a + b.+1 - a)).-1	";
             responses[i]=data;
           
 
             i = 236;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 7884)	  	  a, b : nat	  ============================	  a < a + b.+1	";
             responses[i]=data;
           
 
             i = 237;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -1299,7 +1299,7 @@
       " onmouseover="
       mouseover(7, '0_3_3');
       "><br>
-<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="hanoi.triangular.html#"><span class="id" title="library">triangular</span></a>.</span><span class="command" onmouseout="
+<span class="id" title="keyword">From</span> <span class="id" title="var">hanoi</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="hanoi.triangular.html#"><span class="id" title="library">triangular</span></a>.</span><span class="command" onmouseout="
       mouseout('0_3_3');
       " onmouseover="
       mouseover(8, '0_3_3');

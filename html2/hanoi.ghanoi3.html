@@ -83,22 +83,22 @@
           
 
             i = 13;
-            data = "";
+            data = "<infomsg>peg1 is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 14;
-            data = "";
+            data = "<infomsg>peg2 is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 15;
-            data = "";
+            data = "<infomsg>peg3 is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 16;
-            data = "";
+            data = "1 subgoal (ID 7684)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  p : peg 3	  ============================	  [\/ p = peg1, p = peg2 | p = peg3]	";
             responses[i]=data;
           
 
@@ -108,7 +108,7 @@
           
 
             i = 18;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -118,7 +118,7 @@
           
 
             i = 20;
-            data = "";
+            data = "1 subgoal (ID 7699)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  p, p1, p2 : peg 3	  ============================	  p1 != p2 -> (`p[p1, p2] == p) = (p1 != p) && (p2 != p)	";
             responses[i]=data;
           
 
@@ -128,22 +128,22 @@
           
 
             i = 22;
-            data = "";
+            data = "1 subgoal (ID 7700)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  p, p1, p2 : peg 3	  p1Dp2 : p1 != p2	  ============================	  (`p[p1, p2] == p) = (p1 != p) && (p2 != p)	";
             responses[i]=data;
           
 
             i = 23;
-            data = "";
+            data = "2 subgoals (ID 7717)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  p, p1, p2 : peg 3	  p1Dp2 : p1 != p2	  p3, p4 : peg 3	  ============================	  (p3 == p4) = (val p3 == val p4)		subgoal 2 (ID 7718) is:	 (`p[p1, p2] == p) = (p1 != p) && (p2 != p)	";
             responses[i]=data;
           
 
             i = 24;
-            data = "";
+            data = "1 subgoal (ID 7718)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  p, p1, p2 : peg 3	  p1Dp2 : p1 != p2	  D : forall p3 p4 : peg 3, (p3 == p4) = (val p3 == val p4)	  ============================	  (`p[p1, p2] == p) = (p1 != p) && (p2 != p)	";
             responses[i]=data;
           
 
             i = 25;
-            data = "";
+            data = "1 subgoal (ID 7883)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  p, p1, p2 : peg 3	  D : forall p3 p4 : peg 3, (p3 == p4) = (val p3 == val p4)	  ============================	  p1 != p2 ->	  `p[p1, p2] != p1 ->	  `p[p1, p2] != p2 -> (`p[p1, p2] == p) = (p1 != p) && (p2 != p)	";
             responses[i]=data;
           
 
@@ -193,7 +193,7 @@
           
 
             i = 35;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -213,47 +213,47 @@
           
 
             i = 39;
-            data = "";
+            data = "<infomsg>hrel is declared</infomsg>	<infomsg>hirr is declared</infomsg>	<infomsg>hsym is declared</infomsg>	<infomsg>hmove is defined</infomsg>	<infomsg>hmove_sym is defined</infomsg>	<infomsg>hconnect is defined</infomsg>	1 subgoal (ID 7734)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  ============================	  c1 `--> c2 ->	  c1 ldisk != c2 ldisk -> ↓[c2] = perfect (`p[c1 ldisk, c2 ldisk])	1 subgoal (ID 7736)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  ============================	  ↓[c2] = perfect (`p[c1 ldisk, c2 ldisk])	1 subgoal (ID 7856)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  ============================	  c2 (extra.trshift 1 i) = `p[c1 ldisk, c2 ldisk]	";
             responses[i]=data;
           
 
             i = 40;
-            data = "";
+            data = "1 subgoal (ID 7995)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  ============================	  c2 (extra.trshift 1 i) = `p[c1 ldisk, c2 ldisk]	";
             responses[i]=data;
           
 
             i = 41;
-            data = "";
+            data = "2 subgoals (ID 8265)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  ============================	  c1 ldisk != c2 (extra.trshift 1 i)		subgoal 2 (ID 8266) is:	 c2 ldisk != c2 (extra.trshift 1 i)	";
             responses[i]=data;
           
 
             i = 42;
-            data = "";
+            data = "2 subgoals (ID 8309)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  c1lEc1r : c1 ldisk = c1 (extra.trshift 1 i)	  ============================	  False		subgoal 2 (ID 8266) is:	 c2 ldisk != c2 (extra.trshift 1 i)	";
             responses[i]=data;
           
 
             i = 43;
-            data = "";
+            data = "2 subgoals (ID 8354)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  c1lEc1r : c1 ldisk = c1 (extra.trshift 1 i)	  ============================	  ldisk <= extra.trshift 1 i -> False		subgoal 2 (ID 8266) is:	 c2 ldisk != c2 (extra.trshift 1 i)	";
             responses[i]=data;
           
 
             i = 44;
-            data = "";
+            data = "1 subgoal (ID 8266)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  ============================	  c2 ldisk != c2 (extra.trshift 1 i)	";
             responses[i]=data;
           
 
             i = 45;
-            data = "";
+            data = "1 subgoal (ID 8432)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  c2lEc2r : c2 ldisk = c2 (extra.trshift 1 i)	  ============================	  False	";
             responses[i]=data;
           
 
             i = 46;
-            data = "";
+            data = "1 subgoal (ID 8477)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  c1Mc2 : c1 `--> c2	  c1lDc2l : c1 ldisk != c2 ldisk	  i : ordinal_finType n	  c1Ec2 : c1 (extra.trshift 1 i) = c2 (extra.trshift 1 i)	  c2lEc2r : c2 ldisk = c2 (extra.trshift 1 i)	  ============================	  ldisk <= extra.trshift 1 i -> False	";
             responses[i]=data;
           
 
             i = 47;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -263,7 +263,7 @@
           
 
             i = 49;
-            data = "";
+            data = "1 subgoal (ID 7753)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  ============================	  c1 `--> c2 ->	  c1 ldisk != c2 ldisk -> ↓[c1] = perfect (`p[c1 ldisk, c2 ldisk])	";
             responses[i]=data;
           
 
@@ -273,12 +273,12 @@
           
 
             i = 51;
-            data = "";
+            data = "1 subgoal (ID 7768)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c1, c2 : configuration 3 n.+1	  ============================	  c2 `--> c1 ->	  c2 ldisk != c1 ldisk -> ↓[c1] = perfect (`p[c2 ldisk, c1 ldisk])	";
             responses[i]=data;
           
 
             i = 52;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -288,12 +288,12 @@
           
 
             i = 54;
-            data = "";
+            data = "<infomsg>path3S_spec is defined</infomsg>	<infomsg>path3S_spec_rect is defined</infomsg>	<infomsg>path3S_spec_ind is defined</infomsg>	<infomsg>path3S_spec_rec is defined</infomsg>	<infomsg>path3S_spec_sind is defined</infomsg>	";
             responses[i]=data;
           
 
             i = 55;
-            data = "";
+            data = "1 subgoal (ID 7824)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  ============================	  path3S_spec c cs (path hmove c cs)	";
             responses[i]=data;
           
 
@@ -303,42 +303,42 @@
           
 
             i = 57;
-            data = "";
+            data = "1 subgoal (ID 7872)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  ============================	  let p1 := c ldisk in	  forall (p2 : peg 3) (cs1 : seq (configuration 3 n))	    (cs2 : seq (configuration 3 n.+1)),	  let c1 := ↓[c] in	  let c2 := ↑[last c1 cs1]_p2 in	  p1 != p2 ->	  hrel p1 p2 ->	  cs = [seq ↑[i1]_p1 | i1 <- cs1] ++ c2 :: cs2 ->	  path (move hrel) c1 cs1 ->	  move hrel ↑[last c1 cs1]_p1 c2 ->	  path (move hrel) c2 cs2 -> path3S_spec c cs true	";
             responses[i]=data;
           
 
             i = 58;
-            data = "";
+            data = "1 subgoal (ID 8033)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  p1 := c ldisk : peg 3	  p2 : peg 3	  cs1 : seq (configuration 3 n)	  cs2 : seq (configuration 3 n.+1)	  c1 := ↓[c] : configuration 3 n	  c2 := ↑[last c1 cs1]_p2 : configuration 3 n.+1	  p1Dp2 : p1 != p2	  p1Rp2 : hrel p1 p2	  csE : cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2	  c1Pcs1 : path (move hrel) c1 cs1	  lMc2 : move hrel ↑[last c1 cs1]_p1 c2	  c2Pcs2 : path (move hrel) c2 cs2	  ============================	  path3S_spec c cs true	";
             responses[i]=data;
           
 
             i = 59;
-            data = "";
+            data = "2 subgoals (ID 8040)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  p1 := c ldisk : peg 3	  p2 : peg 3	  cs1 : seq (configuration 3 n)	  cs2 : seq (configuration 3 n.+1)	  c1 := ↓[c] : configuration 3 n	  c2 := ↑[last c1 cs1]_p2 : configuration 3 n.+1	  p1Dp2 : p1 != p2	  p1Rp2 : hrel p1 p2	  csE : cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2	  c1Pcs1 : path (move hrel) c1 cs1	  lMc2 : move hrel ↑[last c1 cs1]_p1 c2	  c2Pcs2 : path (move hrel) c2 cs2	  ============================	  last c1 cs1 = perfect (`p[p1, p2])		subgoal 2 (ID 8042) is:	 path3S_spec c cs true	";
             responses[i]=data;
           
 
             i = 60;
-            data = "";
+            data = "2 subgoals (ID 8049)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  p1 := c ldisk : peg 3	  p2 : peg 3	  cs1 : seq (configuration 3 n)	  cs2 : seq (configuration 3 n.+1)	  c1 := ↓[c] : configuration 3 n	  c2 := ↑[last c1 cs1]_p2 : configuration 3 n.+1	  p1Dp2 : p1 != p2	  p1Rp2 : hrel p1 p2	  csE : cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2	  c1Pcs1 : path (move hrel) c1 cs1	  lMc2 : move hrel ↑[last c1 cs1]_p1 c2	  c2Pcs2 : path (move hrel) c2 cs2	  ============================	  (↑[last c1 cs1]_p1 ldisk != c2 ldisk ->	   ↓[↑[last c1 cs1]_p1] = perfect (`p[↑[last c1 cs1]_p1 ldisk, c2 ldisk])) ->	  last c1 cs1 = perfect (`p[p1, p2])		subgoal 2 (ID 8042) is:	 path3S_spec c cs true	";
             responses[i]=data;
           
 
             i = 61;
-            data = "";
+            data = "1 subgoal (ID 8042)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  p1 := c ldisk : peg 3	  p2 : peg 3	  cs1 : seq (configuration 3 n)	  cs2 : seq (configuration 3 n.+1)	  c1 := ↓[c] : configuration 3 n	  c2 := ↑[last c1 cs1]_p2 : configuration 3 n.+1	  p1Dp2 : p1 != p2	  p1Rp2 : hrel p1 p2	  csE : cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2	  c1Pcs1 : path (move hrel) c1 cs1	  lMc2 : move hrel ↑[last c1 cs1]_p1 c2	  c2Pcs2 : path (move hrel) c2 cs2	  lc1cs1E : last c1 cs1 = perfect (`p[p1, p2])	  ============================	  path3S_spec c cs true	";
             responses[i]=data;
           
 
             i = 62;
-            data = "";
+            data = "2 focused subgoals	(shelved: 3) (ID 8126)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  p1 := c ldisk : peg 3	  p2 : peg 3	  cs1 : seq (configuration 3 n)	  cs2 : seq (configuration 3 n.+1)	  c1 := ↓[c] : configuration 3 n	  c2 := ↑[last c1 cs1]_p2 : configuration 3 n.+1	  p1Dp2 : p1 != p2	  p1Rp2 : hrel p1 p2	  csE : cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2	  c1Pcs1 : path (move hrel) c1 cs1	  lMc2 : move hrel ↑[last c1 cs1]_p1 c2	  c2Pcs2 : path (move hrel) c2 cs2	  lc1cs1E : last c1 cs1 = perfect (`p[p1, p2])	  ============================	  cs =	  [seq ↑[i]_(c ldisk) | i <- cs1] ++ ↑[perfect (`p[c ldisk, p2])]_p2 :: ?Goal		subgoal 2 (ID 8128) is:	 path hmove ↑[perfect (`p[c ldisk, p2])]_p2 ?Goal	";
             responses[i]=data;
           
 
             i = 63;
-            data = "";
+            data = "1 focused subgoal	(shelved: 1) (ID 8128)	  	  peg1 := ord0 : peg 3	  peg2 := inord 1 : peg 3	  peg3 := inord 2 : peg 3	  hrel : rel (peg 3)	  hirr : irreflexive hrel	  hsym : symmetric hrel	  hmove := [eta @move 3 hrel] : forall n : nat, rel (configuration 3 n)	  hmove_sym := fun (n : nat) (c1 : configuration 3 n) =>	               [eta move_sym hsym c1]	   : forall (n : nat) (c1 c2 : configuration 3 n), c1 `--> c2 = c2 `--> c1	  hconnect := fun n : nat => connect hmove	   : forall n : nat,	     rel (finfun_finType (ordinal_finType n) (ordinal_finType 3))	  n : nat	  c : configuration 3 n.+1	  cs : seq (configuration 3 n.+1)	  p1 := c ldisk : peg 3	  p2 : peg 3	  cs1 : seq (configuration 3 n)	  cs2 : seq (configuration 3 n.+1)	  c1 := ↓[c] : configuration 3 n	  c2 := ↑[last c1 cs1]_p2 : configuration 3 n.+1	  p1Dp2 : p1 != p2	  p1Rp2 : hrel p1 p2	  csE : cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2	  c1Pcs1 : path (move hrel) c1 cs1	  lMc2 : move hrel ↑[last c1 cs1]_p1 c2	  c2Pcs2 : path (move hrel) c2 cs2	  lc1cs1E : last c1 cs1 = perfect (`p[p1, p2])	  ============================	  path hmove ↑[perfect (`p[c ldisk, p2])]_p2 cs2	";
             responses[i]=data;
           
 
             i = 64;
-            data = "";
+            data = "No more subgoals.	";
             responses[i]=data;
           
 
@@ -438,7 +438,7 @@
       " onmouseover="
       mouseover(7, '0_3_3');
       "><br>
-<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="hanoi.ghanoi.html#"><span class="id" title="library">ghanoi</span></a> <a class="idref" href="hanoi.gdist.html#"><span class="id" title="library">gdist</span></a>.</span><span class="command" onmouseout="
+<span class="id" title="keyword">From</span> <span class="id" title="var">hanoi</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="hanoi.ghanoi.html#"><span class="id" title="library">ghanoi</span></a> <a class="idref" href="hanoi.gdist.html#"><span class="id" title="library">gdist</span></a>.</span><span class="command" onmouseout="
       mouseout('0_3_3');
       " onmouseover="
       mouseover(8, '0_3_3');

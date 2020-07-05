@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Import gdist ghanoi ghanoi3.
+From hanoi Require Import gdist ghanoi ghanoi3.
 
 (******************************************************************************)
 (*                                                                            *)

@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Import extra gdist ghanoi ghanoi3.
+From hanoi Require Import extra gdist ghanoi ghanoi3.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
