@@ -66,15 +66,10 @@ by case: (peg3E p1) => ->;
    rewrite !D /lrel /= ?inordK.
 Qed.
 
-Let hmove {n} := @move 3 (@lrel 3) n.
-Let hmove_sym n (c1 c2 : configuration 3 n) : hmove c1 c2 = hmove c2 c1
-  := move_sym (@lsym 3) c1 c2.
-Let hconnect n := connect (@hmove n).
-
-Local Notation "c1 `--> c2" := (hmove c1 c2)
-    (format "c1  `-->  c2", at level 60).
-Local Notation "c1 `-->* c2" := (hconnect c1 c2)
-    (format "c1  `-->*  c2", at level 60).
+Local Notation "c1 `-->_r c2" := (lmove c1 c2)
+    (format "c1  `-->_r  c2", at level 60).
+Local Notation "c1 `-->*_r c2" := (connect lmove c1 c2)
+    (format "c1  `-->*_r  c2", at level 60).
 Local Notation "`c[ p ] " := (perfect p )
     (format "`c[ p ]", at level 60).
 
@@ -110,7 +105,7 @@ by rewrite H.
 Qed.
 
 Lemma lhanoi_correct n (c1 c2 : _ _ n) (cs := lhanoi c1 c2) :
-  path (@hmove n) c1 cs /\ last c1 cs = c2.
+  path lmove c1 cs /\ last c1 cs = c2.
 Proof.
 have HH := @lirr 3.
 rewrite /cs; elim: n c1 c2 {cs} => /= [c1 c2| n IH c1 c2].
@@ -152,7 +147,7 @@ by rewrite eq_sym.
 Qed.
 
 (* Two configurations are always connected *)
-Lemma move_lconnect n (c1 c2 : configuration _ n) : c1 `-->* c2.
+Lemma move_lconnect n (c1 c2 : configuration 3 n) : c1 `-->*_r c2.
 Proof.
 have [H1 H2] := lhanoi_correct c1 c2.
 by apply/connectP; exists (lhanoi c1 c2).
@@ -160,8 +155,8 @@ Qed.
 
 (* lhanoi gives the smallest path connecting c1 to c2    *)
 (* This path is unique                                               *)
-Lemma lhanoi_min n c1 c2 cs :
-  path (@hmove n) c1 cs -> last c1 cs = c2 ->
+Lemma lhanoi_min n (c1 c2 : configuration 3 n) cs :
+  path lmove c1 cs -> last c1 cs = c2 ->
   size (lhanoi c1 c2) <= size cs ?= iff (cs == lhanoi c1 c2).
 Proof.
 (* we adapt the proof for the standard ha
@@ -267,7 +262,7 @@ have [p1Rp| p1NRp] := boolP (lrel p1 p).
   have scs5Lscs : size cs5 < size cs.
     rewrite /cs5 csE cs2E !size_cat /= !size_cat /= !size_map.
     by rewrite ltn_add2l // !addnS! ltnS -addSn leq_addl.
-  have c1Mcs5 : path hmove c1 cs5.
+  have c1Mcs5 : path lmove c1 cs5.
     rewrite cat_path -{1}[c1]cunliftrK /= !path_liftr //=.
     rewrite c1'Pcs1.
     rewrite -{1}[c1]cunliftrK  last_map lc1'cs1Epp3 //.
@@ -318,7 +313,7 @@ case: (p5 =P p1) => [p5Ep1|/eqP p5Dp1].
   have scs5Lscs : size cs5 < size cs.
     rewrite /cs5 csE cs2E !size_cat /= !size_cat /= !size_map.
     by rewrite ltn_add2l // addnS !ltnS -addSn leq_addl.
-  have c1Mcs5 : path hmove c1 cs5.
+  have c1Mcs5 : path lmove c1 cs5.
     rewrite cat_path -{1}[c1]cunliftrK /= !path_liftr //=.
     rewrite c1'Pcs1.
     rewrite -{1}[c1]cunliftrK  last_map lc1'cs1Epp3 //.
@@ -414,7 +409,7 @@ have scs7Lscs7: size cs7 < size cs.
   rewrite /cs7 csE cs2E cs4E.
   rewrite size_cat /= size_cat /= size_cat /= size_cat /= size_cat /= !size_map.
   by rewrite !addnS ltnS -!addnS !leq_add2l addnS ltnS -addSnnS leq_addl.
-have c1Mcs7 : path hmove c1 cs7.
+have c1Mcs7 : path lmove c1 cs7.
   rewrite cat_path -{1}[c1]cunliftrK /= !path_liftr //=.
   rewrite c1'Pcs1.
   rewrite -{1}[c1]cunliftrK  last_map lc1'cs1Epp3 //.
@@ -507,18 +502,18 @@ Lemma size_lhanoi_p n p1 p2 :
 Proof. by rewrite size_lhanoiE size_app_lhanoi_p. Qed.
 
 Lemma gdist_lhanoi_size n (c1 c2 : _ _ n) :
-  `d[c1, c2]_hmove = size_lhanoi c1 c2.     
+  `d[c1, c2]_lmove = size_lhanoi c1 c2.     
 Proof.
 apply/eqP; rewrite eqn_leq [size_lhanoi _ _]size_lhanoiE.
 have [H1 H2] := lhanoi_correct c1 c2.
 rewrite gdist_path_le //.
-have /gpath_connect[p1 p1H] : hconnect c1 c2 by apply: move_lconnect.
+have /gpath_connect[p1 p1H] : connect lmove c1 c2 by apply: move_lconnect.
 rewrite (gpath_dist p1H) lhanoi_min //; first by apply: gpath_path p1H.
 by apply: gpath_last p1H.
 Qed.
 
 Lemma gdist_lhanoi_p n p1 p2 :
-  `d[perfect p1 : _ _ n, perfect p2]_hmove = 
+  `d[perfect p1 : configuration 3 n, perfect p2]_lmove = 
    if lrel p1 p2 then (3 ^ n).-1./2 else (3 ^ n).-1 * (p1 != p2).
 Proof. by rewrite gdist_lhanoi_size size_lhanoi_p. Qed.
 

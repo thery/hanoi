@@ -22,11 +22,11 @@
 (*                         are on peg p                                       *)
 (*    on_top d c        == the disk c is on top of its peg on the             *)
 (*                         configuration c                                    *)
-(*    drel              == a diff relation between pegs, drel p1 p2 is true   *)
-(*                         iff peg p1 is different from peg p2                *)
+(*    rrel              == a regular relation between pegs, rrel p1 p2 is     *)
+(*                         true iff peg p1 is different from peg p2           *)
 (*    lrel              == a linear relation between pegs, lrel p1 p2 is      *)
 (*                         true iff peg p1 is next to peg p2                  *)
-(*    srel              == a star relation between pegs, lrel p1 p2 is        *)
+(*    srel              == a star relation between pegs, srel p1 p2 is        *)
 (*                         true iff p1 != p2 and p1 or p2 is the 0 peg        *)
 (*    move r c1 c2      == checks if going from configuration c1              *)
 (*                         to configuration c2 is a move compatible with      *)
@@ -1128,31 +1128,32 @@ by have := hirr p1; rewrite -{2}p2Ep1 p1Rp2.
 Qed.
 
 (*****************************************************************************)
-(*  Difference relation                                                      *)
+(*  Regular relation                                                         *)
 (*****************************************************************************)
 
-Section Drel.
+Section Rrel.
 
 Variable n : nat.
 
-Definition drel : rel (peg n) := [rel x  y | x != y].
+Definition rrel : rel (peg n) := [rel x  y | x != y].
 
-Definition dirr : irreflexive drel.
+Definition rirr : irreflexive rrel.
 by move=> x; apply/eqP.
 Qed.
 
-Definition dsym : symmetric drel.
-by move=> x y; rewrite /drel /= eq_sym.
+Definition rsym : symmetric rrel.
+by move=> x y; rewrite /rrel /= eq_sym.
 Qed.
 
-End Drel.
+Definition rmove m : rel (configuration n m) := move rrel.
+
+End Rrel.
 
 Section Srel.
 
 Variable n : nat.
 
-Definition srel : rel (peg n) := [rel x y | ((x : peg n) != y) && (x * y == 0)].
-
+Definition srel : rel (peg n) := [rel x y  : peg n | (x != y) && (x * y == 0)].
 Definition sirr : irreflexive srel.
 by move=> x; apply/idP/negP; rewrite negb_and eqxx.
 Qed.
@@ -1161,7 +1162,10 @@ Definition ssym : symmetric srel.
 by move=> x y; rewrite /srel /= mulnC eq_sym.
 Qed.
 
+Definition smove m : rel (configuration n m) := move srel.
+
 End Srel.
+
 
 (******************************************************************************)
 (*  Linear relation                                                           *)
@@ -1172,7 +1176,7 @@ Section Lrel.
 Variable n : nat.
 
 Definition lrel : rel (peg n) := 
-  [rel x y | ((nat_of_ord x).+1 == y) || (y.+1 == x)].
+  [rel x y : peg n | (x.+1 == y) || (y.+1 == x)].
 
 Definition lirr : irreflexive lrel.
 Proof. by move=> k; rewrite /lrel /= (gtn_eqF (leqnn _)). Qed.
@@ -1181,10 +1185,16 @@ Definition lsym : symmetric lrel.
 Proof. by move=> x y; rewrite /lrel /= orbC.
 Qed.
 
+Definition lmove m : rel (configuration n m) := move lrel.
+
 End Lrel.
 
+Arguments rmove {n m}.
+Arguments lmove {n m}.
+Arguments smove {n m}.
+
 Lemma connect_move p n (c1 c2 : configuration p.+3 n) : 
-   connect (move (@drel p.+3)) c1 c2.
+   connect rmove c1 c2.
 Proof.
 elim: n c1 c2 => [c1 c2 | n IH c1 c2].
   rewrite (_ : c1 = c2) ?connect0 //.
@@ -1192,13 +1202,13 @@ elim: n c1 c2 => [c1 c2 | n IH c1 c2].
 rewrite -[c1]cunliftrK -[c2]cunliftrK.
 set p1 := c1 ldisk; set p2 := c2 ldisk.
 have [<-|/eqP p1Dp2] := p1 =P p2.
-  by apply: connect_liftr => // i; rewrite dirr.
+  by apply: connect_liftr => // i; rewrite rirr.
 pose p3 := opeg p1 p2.
 apply: connect_trans (_ : connect _ (cliftr p1 (perfect p3)) _).
-  apply: connect_liftr; first by apply: dirr.
+  apply: connect_liftr; first by apply: rirr.
   by apply: IH.
 apply: connect_trans (_ : connect _ (cliftr p2 (perfect p3)) _); last first.
-  apply: connect_liftr; first by apply: dirr.
+  apply: connect_liftr; first by apply: rirr.
   by apply: IH.
 apply: connect1.
 apply: move_liftr_perfect => //.
@@ -1207,7 +1217,7 @@ rewrite eq_sym; apply: opegDr.
 Qed.
 
 Lemma gdist_leq_move p n (c1 c2 : configuration p.+3 n) : 
-   `d[c1, c2]_(move (@drel _)) <= (2 ^ n).-1.
+   `d[c1, c2]_rmove <= (2 ^ n).-1.
 Proof.
 elim: n c1 c2 => [c1 c2 | n IH c1 c2].
   rewrite (_ : c1 = c2) ?gdist0 //.
@@ -1216,7 +1226,7 @@ rewrite -[c1]cunliftrK -[c2]cunliftrK.
 set p1 := c1 ldisk; set p2 := c2 ldisk.
 have [<-|/eqP p1Dp2] := p1 =P p2.
   apply: leq_trans.
-    apply: gdist_liftr => [i|]; first by rewrite dirr.
+    apply: gdist_liftr => [i|]; first by rewrite rirr.
     apply: connect_move.
   apply: leq_trans; first by apply: IH.
   rewrite -ltnS !prednK ?expn_gt0 //.
@@ -1229,17 +1239,17 @@ have tnP : 0 < 2 ^ n by rewrite expn_gt0.
 rewrite -(prednK tnP) addSn /=.
 apply: leq_add.
   apply: leq_trans.
-    apply: gdist_liftr => [i|]; first by rewrite dirr.
+    apply: gdist_liftr => [i|]; first by rewrite rirr.
     by apply: connect_move.
   by apply: IH.
 apply: leq_trans.
   apply: (@gdist_triangular _ _ _ _ (cliftr p2 (perfect p3))).
 rewrite gdist_liftr_perfect ?ltnS //; last 3 first.
-- by apply: dirr.
+- by apply: rirr.
 - by rewrite eq_sym opegDl.
 - by rewrite eq_sym opegDr.
 apply: leq_trans.
-  apply: gdist_liftr => [i|]; first by rewrite dirr.
+  apply: gdist_liftr => [i|]; first by rewrite rirr.
   by apply: connect_move.
 by apply: IH.
 Qed.
@@ -1410,6 +1420,8 @@ by apply: gpath_path gH.
 Qed.
 
 End ISetd.
+
+Arguments gpath [T].
 
 Section CSet.
 

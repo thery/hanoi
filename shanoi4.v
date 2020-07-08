@@ -17,19 +17,10 @@ Unset Strict Implicit.
 
 Section sHanoi4.
 
-Let srel : rel (peg 4) := @srel 4.
-Let hirr : irreflexive srel := @sirr 4.
-Let hsym : symmetric srel := @ssym 4.
-
-Let smove {n} := @move 4 srel n.
-Let smove_sym n (c1 c2 : configuration 4 n) : smove c1 c2 = smove c2 c1
-  := move_sym hsym c1 c2.
-Let hconnect n := connect (@smove n).
-
-Local Notation "c1 `--> c2" := (smove c1 c2)
-    (format "c1  `-->  c2", at level 60).
-Local Notation "c1 `-->* c2" := (hconnect c1 c2) 
-    (format "c1  `-->*  c2", at level 60).
+Local Notation "c1 `-->_s c2" := (smove c1 c2)
+    (format "c1  `-->_s  c2", at level 60).
+Local Notation "c1 `-->*_s c2" := (connect smove c1 c2) 
+    (format "c1  `-->*_s  c2", at level 60).
 Local Notation "`c[ p ] " := (perfect p )
     (format "`c[ p ]", at level 60).
 Local Notation "`cf[ p , n ] ":= (perfect p : configuration _ n).
@@ -106,7 +97,7 @@ by rewrite leq_add2r oH //; apply: val_inj; rewrite /= cyE2.
 Qed.
 
 Lemma move_clmerge c1 c2 :
-  move (@lrel 3) c1 c2 ->  clmerge c1 `--> clmerge c2.
+  lmove c1 c2 ->  clmerge c1 `-->_s clmerge c2.
 Proof.
 move=> /moveP [d1 [H1d1 H2d1 H3d1 H4d1]].
 apply/moveP; exists (tlshift m d1); split => //.
@@ -189,10 +180,10 @@ apply: leq_trans (_ : _ <= d[c1, c2] + d[c2, c3] + d[c3, c4]) _.
   apply: gdist_triangular.
 rewrite -addnn !mulnDl [X in _ <= X]addnAC !muln2.
 repeat apply: leq_add; first 2 last.
-- apply: leq_trans (gdist_merger _ _ _) _  => //.
+- apply: leq_trans (gdist_merger _ _ _) _; first by apply: sirr.
     by apply: shanoi_connect.
   by rewrite -S1E; apply: IH.
-- apply: leq_trans (gdist_merger _ _ _) _  => //.
+- apply: leq_trans (gdist_merger _ _ _) _; first by apply: sirr.
     by apply: shanoi_connect.
   by rewrite -S1E; apply: IH => //; rewrite eq_sym.
 rewrite div2K; last first.
@@ -260,7 +251,7 @@ case: (@split_first _ cs (fun c => c ldisk != p1)) => [|[[sp cs1] cs2]].
   by rewrite eq_sym (negPf p1Dp3).
 case=> /allP spH spLE csE.
 pose s := last u cs1.
-have sMsp : s `--> sp.
+have sMsp : s `-->_s sp.
   by have := gpath_path csH; rewrite csE cat_path => /and3P[].
 have sLp1 : s ldisk = p1.
   move: (spH s); rewrite /s; case: (cs1) => //= c cs3 /(_ (mem_last _ _)).
@@ -297,7 +288,7 @@ have vIcs4 : v \in cs4.
   case: (cs4) => /= [tEv|c1 cs5 <-]; last by apply: mem_last.
   by case/eqP: tLE; rewrite tEv.
   case: cs4 tH scs2E vIcs4 => // tp cs4 /allP tH scs2E vItpcs4.
-have tMtp : t `--> tp.
+have tMtp : t `-->_s tp.
   by have := gpath_path csH; rewrite csE scs2E !cat_path /= => /and5P[].
 have tpLp3 : tp ldisk = p3.
   by move: (tH _ (mem_head _ _)); rewrite /= -topredE negbK => /eqP.
@@ -324,7 +315,7 @@ rewrite addn0.
 move: csH; rewrite csE => csH.
 rewrite (gdist_cat csH) -[@move _ _ _]/smove -/s.
 move: csH => /gpath_catr; rewrite -/s => csH.
-rewrite gdist_cunlift_eq //; last by apply: shanoi_connect.
+rewrite gdist_cunlift_eq //; try apply: sirr; last by apply: shanoi_connect.
 rewrite -!addnS.
 congr (_ + _).
 have ->: ↓[s] = ↓[sp].
@@ -343,18 +334,18 @@ case: cs3 scs2E => [[spEt cs2E]|c3 cs3 /= [spE cs2E]].
   move: csH; rewrite spEt cs2E => csH.
   rewrite gdist0 add0n (gdist_cons csH) ctEctp.
   move: csH => /gpath_consr csH.
-  rewrite gdist_cunlift_eq //.
+  rewrite gdist_cunlift_eq //; try by apply: sirr.
   by apply: shanoi_connect.
 move: csH; rewrite cs2E -cat_rcons => csH.
 rewrite (gdist_cat csH) last_rcons.
-rewrite gdist_cunlift_eq //; last 2 first.
+rewrite gdist_cunlift_eq //; try apply: sirr; last 2 first.
 - by apply: shanoi_connect.
 - by rewrite tLp0.
 congr (_ + _).
 move: csH => /gpath_catr; rewrite last_rcons => csH.
 rewrite (gdist_cons csH); congr (_).+1.
 move: csH => /gpath_consr csH.
-rewrite ctEctp gdist_cunlift_eq //.
+rewrite ctEctp gdist_cunlift_eq //; try apply: sirr.
 by apply: shanoi_connect.
 Qed.
 
@@ -1677,7 +1668,8 @@ wlog aLl1Ba1 : u p1 p3 p1Dp3 p2Dp3 p3Dp0 apegpaD2 apegpaD0 p1Dp2 p1Dp0
     have iLl2 : i < l.+2 by apply: leq_trans (ltn_ord _) _.
     have lBiLl : l - i < l.+1 by rewrite ltn_subLR ?leq_addl // -ltnS.
     have iLl : i <= l by rewrite -ltnS.
-    rewrite gdistC //; congr (d[u _,u _]).
+    rewrite gdistC; last by apply/move_sym/ssym.
+    congr (d[u _,u _]).
       by apply/val_eqP; rewrite /= !inordK ?subSn.
     by apply/val_eqP; rewrite /= !inordK // ?subSS ltnS // ltnW.
   pose p1' := if odd l.+1 then p3 else p1.
@@ -3750,7 +3742,8 @@ case: ltngtP => //= KE _ _ l_gt0; last first.
     have iLl2 : i < l.+2 by apply: leq_trans (ltn_ord _) _.
     have lBiLl : l - i < l.+1 by rewrite ltn_subLR ?leq_addl // -ltnS.
     have iLl : i <= l by rewrite -ltnS.
-    rewrite gdistC //; congr (d[u _,u _]).
+    rewrite gdistC; last by apply/move_sym/ssym.
+    congr (d[u _,u _]).
       by apply/val_eqP; rewrite /= !inordK ?subSn.
     by apply/val_eqP; rewrite /= !inordK // ?subSS ltnS // ltnW.
   pose p1' := if odd l.+1 then p3 else p1.
