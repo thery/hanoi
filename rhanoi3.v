@@ -29,7 +29,6 @@ Fixpoint ppeg {n : nat} p1 p2 :=
     [seq ↑[i]_p2 | i <- `c[p3] :: ppeg p3 p2]
   else [::].
 
-
 Lemma size_ppeg n p1 p2 :
    size (ppeg p1 p2 : seq (configuration 3 n)) = (2^ n).-1.
 Proof. 
@@ -119,8 +118,8 @@ case:  path3SP => //=.
     rewrite -[`c[_]](cliftrK p2) last_map.
     by have := p1csLp2; rewrite csE last_cat /= => ->; rewrite perfect_unliftr.
   have HL2 := IH _ _ _ Scs2 (opegDr _ _) p1p3Pcs2 p1p2Lcs2.
-  case/leqifP : HL1; case: eqP => [<- /eqP HL1|_ HL1].
-    case/leqifP : HL2; case: eqP => [<- /eqP HL2|_ HL2].
+  move/leqifP : HL1; case: eqP => [<- /eqP HL1|_ HL1].
+    move/leqifP : HL2; case: eqP => [<- /eqP HL2|_ HL2].
       rewrite size_map in HL2.
       rewrite csE size_cat /= size_map -HL1 -HL2 -cs2E eqxx //= n2E.
       by apply/leqifP.
@@ -182,17 +181,16 @@ Qed.
 (* Function that builds a path from a configuration to a peg                 *)
 (*****************************************************************************)
 
-Fixpoint rpeg {n : nat} : configuration _ n -> _ -> _ :=
-  match n with
-  | 0 => fun _ _ => [::] : seq (configuration _ 0)
-  | n1.+1 =>
-      fun c p =>
-        let p1 := c ldisk in
-        if p1 == p then [seq ↑[i]_p | i <- rpeg ↓[c] p] else
-        let p2 := `p[p1, p] in
-        [seq ↑[i]_p1 | i <- rpeg ↓[c] p2] ++
-        [seq ↑[i]_p | i <- (`c[p2]) :: ppeg p2 p]
-  end.
+Fixpoint rpeg {n : nat} :=
+  if n is n1.+1 return configuration 3 n -> peg 3 -> seq (configuration 3 n) 
+  then
+    fun c p =>
+    let p1 := c ldisk in
+    if p1 == p then [seq ↑[i]_p | i <- rpeg ↓[c] p] else
+    let p2 := `p[p1, p] in
+    [seq ↑[i]_p1 | i <- rpeg ↓[c] p2] ++
+    [seq ↑[i]_p | i <- (`c[p2]) :: ppeg p2 p]
+  else fun _ _ => [::].
 
 Lemma rpeg_perfect n p : rpeg (`c[p]) p = [::] :> seq (configuration 3 n).
 Proof.
@@ -214,8 +212,6 @@ Proof.
 elim: n p1 p2 => //= n IH p1 p2 p1Dp2.
 by rewrite ffunE perfect_unliftr (negPf p1Dp2) !IH // eq_sym opegDl.
 Qed.
-
-
 
 Lemma last_rpeg n (c : configuration 3 n) p (cs := rpeg c p) :
   last c cs = `c[p].
@@ -559,14 +555,15 @@ case: eqP=> //; case: eqP => // pDl Hcs; case: pDl.
 by rewrite last_rpeg.
 Qed.
 
-Fixpoint hanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
-  if n is n1.+1 then
-      fun (c1 c2 : configuration _ n1.+1) =>
+Fixpoint rhanoi3 {n : nat} :=
+  if n is n1.+1 return configuration 3 n -> configuration 3 n -> _
+  _  then
+      fun c1 c2 =>
        let p1 := c1 ldisk in
        let p2 := c2 ldisk in
        let c1' := ↓[c1] in
        let c2' := ↓[c2] in
-       if p1 == p2 then [seq ↑[i]_p1 | i <- hanoi c1' c2'] else
+       if p1 == p2 then [seq ↑[i]_p1 | i <- rhanoi3 c1' c2'] else
        let p := `p[p1, p2] in
        (* one jump *)
        let m1 := size_rpeg c1' p + size_rpeg c2' p in 
@@ -581,7 +578,7 @@ Fixpoint hanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
             [seq ↑[i]_p2 | i <- `c[p1] :: lpeg p1 c2']
   else fun _ _ => [::].
 
-Lemma last_hanoi n (c1 c2 : _ _ n) (cs := hanoi c1 c2) :
+Lemma last_rhanoi3 n (c1 c2 : _ _ n) (cs := rhanoi3 c1 c2) :
   last c1 cs = c2.
 Proof.
 have HHr := @rirr 3.
@@ -596,7 +593,7 @@ case: leqP => _; first by rewrite last_cat /= last_map last_lpeg cunliftrK.
 by rewrite last_cat /= last_cat /= last_map last_lpeg cunliftrK.
 Qed.
 
-Lemma path_hanoi n (c1 c2 : _ _ n) (cs := hanoi c1 c2) :
+Lemma path_rhanoi3 n (c1 c2 : _ _ n) (cs := rhanoi3 c1 c2) :
   path rmove c1 cs.
 Proof.
 have HHr := @rirr 3.
@@ -658,9 +655,9 @@ rewrite cat_path /=; apply/and3P; split => //.
 by rewrite path_liftr // path_lpeg.
 Qed.
 
-Lemma hanoi_min n (c1 c2 : configuration 3 n) cs :
+Lemma rhanoi3_min n (c1 c2 : configuration 3 n) cs :
   path rmove c1 cs -> last c1 cs = c2 ->
-  size (hanoi c1 c2) <= size cs.
+  size (rhanoi3 c1 c2) <= size cs.
 Proof.
 have HHr := @rirr 3.
 have HHs := @rsym 3.
@@ -764,14 +761,14 @@ apply: leq_of_leqif (lpeg_min _ _) => //.
 by rewrite lc4'cs4'Elc4cs4 lc6cs4Ec2.
 Qed.
 
-Fixpoint size_hanoi {n : nat} : _ _ n -> _ _ n ->  nat :=
+Fixpoint size_rhanoi3 {n : nat} : _ _ n -> _ _ n ->  nat :=
   if n is n1.+1 then
       fun c1 c2 : configuration 3 n1.+1 =>
        let p1 := c1 ldisk in
        let p2 := c2 ldisk in
        let c1' := ↓[c1] in
        let c2' := ↓[c2] in
-       if p1 == p2 then size_hanoi c1' c2' else
+       if p1 == p2 then size_rhanoi3 c1' c2' else
        (* one jump *)
        let p := `p[p1, p2] in
        let m1 := size_rpeg c1' p + size_rpeg c2' p in 
@@ -781,7 +778,7 @@ Fixpoint size_hanoi {n : nat} : _ _ n -> _ _ n ->  nat :=
   else fun _ _ => 0.
 
 (* size computes the size *)
-Lemma size_hanoiE n (c1 c2 : _ _ n) : size_hanoi c1 c2 = size (hanoi c1 c2).
+Lemma size_rhanoi3E n (c1 c2 : _ _ n) : size_rhanoi3 c1 c2 = size (rhanoi3 c1 c2).
 Proof.
 elim: n c1 c2 => //= n IH c1 c2.
 case: eqP => [E|/eqP NE].
@@ -801,14 +798,14 @@ case: leqP => LL1; case: leqP => LL2 //.
 by congr (_.+1); apply/eqP; rewrite eqn_leq ltnW // ltnW.
 Qed.
 
-Lemma gdist_hanoi n (c1 c2 : _ _ n) : `d[c1, c2]_rmove = size_hanoi c1 c2.
+Lemma gdist_rhanoi3 n (c1 c2 : _ _ n) : `d[c1, c2]_rmove = size_rhanoi3 c1 c2.
 Proof.
 apply/eqP; rewrite eqn_leq.
-rewrite [size_hanoi _ _]size_hanoiE gdist_path_le //=; last 2 first.
-- by apply: path_hanoi.
-- by apply: last_hanoi.
+rewrite [size_rhanoi3 _ _]size_rhanoi3E gdist_path_le //=; last 2 first.
+- by apply: path_rhanoi3.
+- by apply: last_rhanoi3.
 have /gpath_connect [p1 p1H] : connect rmove c1 c2 by apply:  move_connect.
-rewrite (gpath_dist p1H) hanoi_min //; first apply: gpath_path p1H.
+rewrite (gpath_dist p1H) rhanoi3_min //; first apply: gpath_path p1H.
 by apply: gpath_last p1H.
 Qed.
 
