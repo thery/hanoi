@@ -60,8 +60,7 @@ Local Notation "c1 `-->* c2" := (hconnect c1 c2)
 
 (* In a move the largest disk has moved, all the smaller disks are pilled up *)
 Lemma move_perfectr n (c1 c2 : configuration 3 n.+1) : 
-  c1 `--> c2 -> c1 ldisk != c2 ldisk -> 
-   ↓[c2] = perfect (`p[c1 ldisk, c2 ldisk]).
+  c1 `--> c2 -> c1 ldisk != c2 ldisk -> ↓[c2] = `c[`p[c1 ldisk, c2 ldisk]].
 Proof.
 move=> c1Mc2 c1lDc2l.
 apply/ffunP => i; rewrite !ffunE.
@@ -77,7 +76,7 @@ Qed.
 
 Lemma move_perfectl n (c1 c2 : configuration 3 n.+1) : 
   c1 `--> c2 -> c1 ldisk != c2 ldisk -> 
-  ↓[c1] = perfect (`p[c1 ldisk, c2 ldisk]).
+  ↓[c1] = `c[`p[c1 ldisk, c2 ldisk]].
 Proof.
 rewrite hmove_sym eq_sym opeg_sym.
 exact: move_perfectr.
@@ -94,9 +93,9 @@ Inductive path3S_spec (n : nat)  (c : configuration 3 n.+1)
     forall cs1 cs2
            (p1 := c ldisk) p2 (p3 :=`p[p1, p2])
            (c1 := ↓[c]) 
-           (c2 := ↑[perfect p3]_p2),
+           (c2 := ↑[`c[p3]]_p2),
         p1 != p2 -> hrel p1 p2 ->
-        last c1 cs1 = perfect p3 ->
+        last c1 cs1 = `c[p3] ->
         cs = [seq ↑[i]_p1 | i <- cs1] ++ c2 :: cs2 ->
         path hmove c1 cs1 -> path hmove c2 cs2 ->
         path3S_spec c cs true |
@@ -107,7 +106,7 @@ Lemma path3SP  n (c : _ _ n.+1) cs : path3S_spec c cs (path hmove c cs).
 Proof.
 case: pathSP=> //; try by constructor.
 move=> p1 p2 cs1 cs2 c1 c2 p1Dp2 p1Rp2 csE c1Pcs1 lMc2 c2Pcs2.
-have lc1cs1E : last c1 cs1 =  perfect (opeg p1 p2).
+have lc1cs1E : last c1 cs1 = `c[`p[p1, p2]].
   have := move_perfectl lMc2.
   by rewrite !cliftr_ldisk cliftrK; apply.
 apply: path3S_spec_move (lc1cs1E) _ _ _  => //.

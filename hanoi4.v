@@ -18,15 +18,9 @@ Local Notation "c1 `-->_r c2" := (rmove c1 c2)
     (format "c1  `-->_r  c2", at level 60).
 Local Notation "c1 `-->*_r c2" := (connect rmove c1 c2) 
     (format "c1  `-->*_r  c2", at level 60).
-Local Notation "`c[ p ] " := (perfect p )
-    (format "`c[ p ]", at level 60).
-Local Notation "`cf[ p , n ] ":= (perfect p : configuration _ n).
-
-Local Notation " d[ a , b ] " := (gdist rmove a b)
-  (format " d[ a ,  b ]").
 
 Lemma gdist_leq (n : nat) (p1 p2 : peg 4) : 
-   d[`cf[p1, n], `cf[p2, n]]  <= ϕ(n).
+  `d[`c[p1, n], `c[p2, n]]_rmove  <= ϕ(n).
 Proof.
 have [/eqP->|p1Dp2] := boolP (p1 == p2); first by rewrite gdist0.
 elim/ltn_ind: n p1 p2 p1Dp2 => [] [|[|n]] IH p1 p2 p1Dp2.
@@ -93,7 +87,7 @@ Notation " `dup[ a , b ] " := (rm_rep a b).
 Lemma gdist_le_psi n (u v : configuration 4 n) (p0 p2 p3 : peg 4) :
   [/\ p3 != p2, p3 != p0 & p2 != p0] ->
   (codom v) \subset [:: p2 ; p3] -> 
-  psi (s2f [set i | u i == p0]) <= d[u, v].
+  psi (s2f [set i | u i == p0]) <= `d[u, v]_rmove.
 Proof.
 move=> pH.
 elim/ltn_ind : n u v p0 p2 p3 pH => 
@@ -279,7 +273,7 @@ have z2pMz2 : z2p `-->_r z2.
   move: gHz0z2; case: (z2b) z0Ez2p => [->// /gpath_path/andP[] |a l _] //=.
   by rewrite -cats1 => /gpath_catr; rewrite last_rcons => /gpath_path/andP[].
 (* This is 3.3 *)
-have duz0_leq : psi (s2f (E :\ N)) <= d[u, z0]. 
+have duz0_leq : psi (s2f (E :\ N)) <= `d[u, z0]_rmove. 
   rewrite s2f_liftr.
   have /peg4comp2[pp2 [pp3 [[H1 H2 H3] [H4 H5] H6]]] := z0sND0.
   have cH1 : codom ↓[z0] \subset [::pp2; pp3].
@@ -295,7 +289,7 @@ have duz0_leq : psi (s2f (E :\ N)) <= d[u, z0].
 (* This is 3.4 *)
 pose ST := isO n.+1 T.
 have cST : #|ST| = T by rewrite card_isO; apply/minn_idPr; rewrite ltnW.
-have dux0_leq : psi ((s2f E) `&` `[T]) <= d[u, x0].
+have dux0_leq : psi ((s2f E) `&` `[T]) <= `d[u, x0]_rmove.
   have TLN : T <= n.+1 by rewrite ltnW.
   apply: leq_trans (gpath_cut TLN gHux0).
   rewrite -(@isOE n.+1 T) // -s2fI s2f_cut.
@@ -320,7 +314,7 @@ have [KLT|TLK] := leqP (delta K) T; last first.
     apply/subsetP=> i; rewrite !inE -leqNgt.
     case: (_ == _); rewrite /= !(andbT, andbF) // => KLi.
     by apply: leq_trans KLi.
-  have gH5 : size (z0s :: z0sa) = d[z0, v] by have := gpath_dist gHz0v.
+  have gH5 : size (z0s :: z0sa) = `d[z0, v]_rmove by have := gpath_dist gHz0v.
   rewrite duvE1.
   apply: leq_trans (leq_add duz0_leq (leqnn _)).
   rewrite -leq_subLR; apply: leq_trans psiDN _.
@@ -408,7 +402,7 @@ have psiDN : psi (s2f E) - psi (s2f (E :\ N)) <= 2 ^ s.-1.
     by rewrite -root_delta_lt [K + _]addnC -/s.
   by rewrite s2fD_isO // isOE // -sint_split.
 (* This is 3.8 *)
-have duz0_leq2 : psi (s2f E) - 2 ^ s.-1 <= d[u, z0].
+have duz0_leq2 : psi (s2f E) - 2 ^ s.-1 <= `d[u, z0]_rmove.
   by apply: leq_trans duz0_leq; rewrite leq_subCl.
 have [|K_gt0] := leqP K 0.
   rewrite leqn0 => /eqP KE0.
@@ -498,7 +492,7 @@ have [|K_gt0] := leqP K 0.
       by apply: (move_on_toplDr x0Mx0s x0TDx0sT); rewrite TE ltnW /=.
     apply: (move_on_toprDl x3pMx3 x3pTDx3T).
     by rewrite TE /= ltnW.
-  have psiA_le :  psi (s2f A) <= d[↓[xa], ↓[z2]].
+  have psiA_le :  psi (s2f A) <= `d[↓[xa], ↓[z2]]_rmove.
     rewrite gdistC; last by apply/move_sym/rsym.
     apply: IH acodom; first by rewrite -ltnS.
     split => //.
@@ -512,12 +506,12 @@ have [|K_gt0] := leqP K 0.
     have /subsetP /(_ (v (trshift 1 j))) := cH.
     by rewrite !inE; apply; apply: codom_f.
   rewrite duvE1.
-  have psiB_le :  psi (s2f B) <= d[↓[z2], ↓[v]].
+  have psiB_le :  psi (s2f B) <= `d[↓[z2], ↓[v]]_rmove.
     apply: IH bcodom; first by rewrite -ltnS. 
     split => //.
       by have := bI; rewrite !inE => /orP[] /eqP->; rewrite // eq_sym.
     by have := bI; rewrite !inE => /orP[] /eqP->; rewrite // eq_sym.
-  have dz0z2_leq : (psi (s2f A)).+1 < d[z0, z2].
+  have dz0z2_leq : (psi (s2f A)).+1 < `d[z0, z2]_rmove.
     rewrite (gpath_dist gHz0z2) //.
     rewrite [size _](@path_shift _ _ _ 1 _ _ _ (gpath_path gHz0z2)); last first.
       by apply: rirr.
@@ -658,7 +652,7 @@ rewrite !cat_rcons !catA => /split_tail[[lE z2Ex3 _]|[zz x3aE]|[zz z2aE]];
       rewrite ffunE /d.
       by apply: (move_on_toprDl x3pMx3) => //; rewrite ltnW /=.
     by case: (Hza (ccut tln x3 i)); rewrite !ffunE => ->; rewrite ?(eqxx, orbT).
-  have dz2x3_leq : psi (s2f A) <= d[z2, x3].
+  have dz2x3_leq : psi (s2f A) <= `d[z2, x3]_rmove.
     rewrite gdistC; last by apply/move_sym/rsym.
     have cDnp2 : c != np2 by rewrite /c.
     have /peg4comp2[pp1 [pp2 [[H1 H2 H3] [H4 H5] H6]]] := cDnp2.
@@ -671,7 +665,7 @@ rewrite !cat_rcons !catA => /split_tail[[lE z2Ex3 _]|[zz x3aE]|[zz z2aE]];
       rewrite -z2N2 -[_ == z2 _]negbK => /negP[].
       apply: (move_on_toprDr z2pMz2) => //=.
       by apply: (leq_trans (ltn_ord _)) => /=; apply: ltnW.
-    apply: leq_trans (_ : d[ccut tln x3, ccut tln z2] <= _).
+    apply: leq_trans (_ : `d[ccut tln x3, ccut tln z2]_rmove <= _).
       apply: IH cH1; first by apply/(leq_trans TLN _)/ltnW.
       split => //.
         move: aI2c; rewrite !inE.
@@ -681,10 +675,10 @@ rewrite !cat_rcons !catA => /split_tail[[lE z2Ex3 _]|[zz x3aE]|[zz z2aE]];
       by move=> *; rewrite eq_sym.
     apply: gpath_cut (gpathC _ gHz2x3).
     by apply/move_sym/rsym.
-  have dx3v_leq : psi (s2f B) <= d[x3, v].
+  have dx3v_leq : psi (s2f B) <= `d[x3, v]_rmove.
     have cH1 : codom (ccut tln v) \subset [:: np2; np3].
       by apply: codom_cut.
-    apply: leq_trans (_ : d[ccut tln x3, ccut tln v] <= _).
+    apply: leq_trans (_ : `d[ccut tln x3, ccut tln v]_rmove <= _).
       apply: IH cH1; first by apply: leq_trans TLN _; apply: ltnW.
       by have := bI01; rewrite !inE => /orP[] /eqP->; split; rewrite // eq_sym.
     by apply: gpath_cut gHx3v.
@@ -781,7 +775,7 @@ have bsI (i : disk n.+1) : i \in E'' :\ N -> z2 i = b.
     by apply: val_inj.
   rewrite (negPf (memE'' _ _ _ _)) //=.
   by rewrite gE' z0sz0saE !(inE, mem_cat, mem_rcons, eqxx, orbT).
-have dz2''x3''_leq : psi (s2f A) <= d[z2'', x3''].
+have dz2''x3''_leq : psi (s2f A) <= `d[z2'', x3'']_rmove.
   pose a1 : peg 4 := x3p T.
   have a1Dnp3 : a1 != np3 by [].
   have /peg4comp2[pp1 [pp2 [[H1 H2 H3] [H4 H5] H6]]] := a1Dnp3.
@@ -793,7 +787,7 @@ have dz2''x3''_leq : psi (s2f A) <= d[z2'', x3''].
     rewrite -[_ == np3]negbK -x3T3 => /negP[].
     by apply: (move_on_toprDr x3pMx3) => /=.
   by apply: IH cH3 => //; apply/(leq_trans TLN)/ltnW.
-have du''x0''_leq : psi (s2f E `&` `[T]) <= d[u'', x0''].
+have du''x0''_leq : psi (s2f E `&` `[T]) <= `d[u'', x0'']_rmove.
   have -> : s2f E `&` `[T] = s2f [set i | u'' i == p0].
     by rewrite -(@isOE n.+1) // -s2fI -s2f_cut.
   have /peg4comp2[pp2 [pp3 [[H1 H2 H3] [H4 H5] H6]]] := x0sTD0.
@@ -839,7 +833,7 @@ have psiAB_leq : psi `[T + K + 1] <= (psi (s2f A) + psi (s2f B)).+1.*2.
   rewrite -3!ltnS => /phi_le/leq_trans-> //.
   rewrite !doubleS -[_.+4]addn1 !addSnnS.
   by apply: psi_cap_ge.
-have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
+have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_rmove.
   have := (gHuv); rewrite gE' z0sz0saE catA => /gpath_catl.
   rewrite last_cat last_rcons => gH1.
   rewrite (gpath_dist gH1) (size_cut_tuc tln _ (gpath_path gH1)); last first.
@@ -1008,7 +1002,7 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < d[u,z2].
   rewrite card_sd1 card_sp1 => /= cp1 cp2 cp1Dcp2.
   have := gdist_perfect K.-1 cp1 cp2.
   by rewrite eq_sym (negPf cp1Dcp2) muln1 => ->.
-have dz2v_leq : psi (s2f B) <= d[z2, v].
+have dz2v_leq : psi (s2f B) <= `d[z2, v]_rmove.
   have cH1 : codom ↓[v] \subset [:: np2; np3] by apply: codom_liftr.
   apply: leq_trans (gdist_cunlift (connect_move _ _)).
   by apply: IH cH1.
@@ -1034,24 +1028,24 @@ by apply: psi_leD.
 Qed.
 
 Lemma gdist_geq (n : nat) (p1 p2 : peg 4) : 
-  p1 != p2 -> ϕ(n) <= d[`cf[p1, n], `cf[p2, n]].
+  p1 != p2 -> ϕ(n) <= `d[`c[p1, n], `c[p2, n]]_rmove.
 Proof.
 case: n => // n p1Dp2.
-have /gpath_connect [g gHp1p2] := connect_move `cf[p1, n.+1] `cf[p2, n.+1].
+have /gpath_connect [g gHp1p2] := connect_move `c[p1, n.+1] `c[p2, n.+1].
 have p2Ig : `c[p2] \in g.
-  have := mem_last (`c[p1]) g.
+  have := mem_last `c[p1] g.
   by rewrite inE (gpath_last gHp1p2) eq_sym perfect_eqE (negPf p1Dp2).
 pose N : disk n.+1 := ldisk.
-have cH : codom `cf[p2, n.+1] \subset [:: p2].
+have cH : codom `c[p2, n.+1] \subset [:: p2].
   by apply/subsetP=> i /codomP[j]; rewrite inE ffunE => ->.
 case (@split_first _ g (fun c : configuration _ _ => c(N) != p1)) => /=.
   apply/negP=> /allP /(_ _ p2Ig); rewrite /= -topredE negbK.
   have /subsetP/(_ (`c[p2] N))/(_ (codom_f _ _)) := cH.
   by rewrite !inE !ffunE eq_sym (negPf p1Dp2).
 move=> [[z0s z0sb] z0sa] /= [/allP z0sbP0 z0sND0 gE'].
-pose z0 := last (`c[p1]) z0sb.
+pose z0 := last `c[p1] z0sb.
 have z0N1 : z0 N = p1.
-  have := mem_last (`c[p1]) z0sb; rewrite !inE /z0 => /orP[/eqP->|/z0sbP0].
+  have := mem_last `c[p1] z0sb; rewrite !inE /z0 => /orP[/eqP->|/z0sbP0].
     by rewrite ffunE.
   by rewrite !inE negbK => /eqP.
 have z0NDz0sN : z0 N != z0s N by rewrite z0N1 eq_sym.
@@ -1087,8 +1081,8 @@ have z2pNDz2N : z2p N != z2 N by rewrite z2N2.
 have z2pMz2 : z2p `-->_r z2.
   move: gHz0z2; case: (z2b) z0Ez2p => [->// /gpath_path/andP[] |a l _] //=.
   by rewrite -cats1 => /gpath_catr; rewrite last_rcons => /gpath_path/andP[].
-have dp1z0_leq :  psi `[N] <= d[`c[p1], z0].
-  have  -> : `[N] = s2f [set i | cunliftr (`cf[p1, n.+1]) i == p1].
+have dp1z0_leq :  psi `[N] <= `d[`c[p1], z0]_rmove.
+  have  -> : `[N] = s2f [set i | ↓[`c[p1, n.+1]] i == p1].
     apply/fsetP => i; rewrite mem_sint.
     apply/idP/imfsetP; last by move=> /= [j]; rewrite inE !ffunE // => _ ->.
     by move=> /= iLN; exists (Ordinal iLN);rewrite //= inE !ffunE.
@@ -1103,8 +1097,8 @@ have dp1z0_leq :  psi `[N] <= d[`c[p1], z0].
     move=> /eqP; rewrite -[_ == z0s N]negbK; case/negP.
     by apply: (move_on_toplDr z0Mz0s); rewrite //= ltnW.
   by apply: gdist_le_psi cH1; split => //; rewrite -z0N1.
-have dp2z2_leq :  psi `[N] <= d[`c[p2], z2].
-  have  -> : `[N] = s2f [set i | cunliftr (`cf[p2, n.+1]) i == p2].
+have dp2z2_leq :  psi `[N] <= `d[`c[p2], z2]_rmove.
+  have  -> : `[N] = s2f [set i | ↓[`c[p2, n.+1]] i == p2].
     apply/fsetP => i; rewrite mem_sint.
     apply/idP/imfsetP; last by move=> /= [j]; rewrite inE !ffunE // => _ ->.
     by move=> /= iLN; exists (Ordinal iLN);rewrite //= inE !ffunE.
@@ -1131,7 +1125,7 @@ by rewrite addSnnS prednK // leq_addl.
 Qed.
 
 Lemma gdist_phi (n : nat) (p1 p2 : peg 4) : 
-  p1 != p2 -> d[`cf[p1, n], `cf[p2, n]] = ϕ(n).
+  p1 != p2 -> `d[`c[p1, n], `c[p2, n]]_rmove = ϕ(n).
 Proof.
 by move=> p1Dp2; apply/eqP; rewrite eqn_leq gdist_leq // gdist_geq.
 Qed.

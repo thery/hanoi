@@ -16,17 +16,10 @@ Section sHanoi.
 Variable m : nat.
 Implicit Type p : peg m.+3.
 
-Let smove {n} := @move m.+3 (@srel m.+3) n.
-Let smove_sym n (c1 c2 : configuration m.+3 n) : smove c1 c2 = smove c2 c1
-  := move_sym (@ssym _) c1 c2.
-Let sconnect n := connect (@smove n).
-
 Local Notation "c1 `--> c2" := (smove c1 c2)
     (format "c1  `-->  c2", at level 60).
-Local Notation "c1 `-->* c2" := (sconnect c1 c2) 
+Local Notation "c1 `-->* c2" := (connect smove c1 c2) 
     (format "c1  `-->*  c2", at level 60).
-Local Notation "`c[ p ] " := (perfect p )
-    (format "`c[ p ]", at level 60).
 
 Let p0 : peg m.+3 := ord0.
 
@@ -64,8 +57,7 @@ rewrite /so2; case: (p1 =P _) => [->|/eqP p1D1];
 by split; try (by rewrite eq_sym); apply/eqP/val_eqP; rewrite /= !inordK.
 Qed. 
 
-Lemma shanoi_connect_perfect n (c : configuration _ n) p :
-  sconnect c (perfect p).
+Lemma shanoi_connect_perfect n (c : configuration _ n) p : c `-->* `c[p].
 Proof.
 have sirr := @sirr m.+3.
 elim: n c p => [c p | n IH c p]; first by apply/eq_connect0/ffunP=> [] [[]].
@@ -103,7 +95,7 @@ apply: connect_trans (_ : connect _ ↑[`c[p1]]_p _).
 by apply/connect_liftr/IH.
 Qed.
 
-Lemma shanoi_connect n (c1 c2 : configuration _ n) : sconnect c1 c2.
+Lemma shanoi_connect n (c1 c2 : configuration m.+3 n) : c1 `-->* c2.
 Proof.
 apply: connect_trans (shanoi_connect_perfect _ p0) _.
 rewrite (connect_sym (@ssym m.+3)).

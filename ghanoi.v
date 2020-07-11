@@ -16,7 +16,7 @@
 (*    sdisk             == the smallest disk                                  *)
 (*    d1 \larger d2     == disk d1 is larger than disk d2                     *)
 (*    c d               == the peg on which the disk d in the configuration c *)
-(*    perfect n p       == a configuration with n disk where all the disks    *)
+(*    `c[p]             == a configuration with n disk where all the disks    *)
 (*    `p[p1, p2]        == pick a peg (if possible) that is diffenent from p1 *)
 (*                         and p2                                             *)
 (*                         are on peg p                                       *)
@@ -93,6 +93,8 @@ Definition perfect p : configuration :=  [ffun d => p].
 
 End Disk.
 
+Local Notation "`c[ p ] " := (perfect p )
+    (format "`c[ p ]", at level 5).
 
 (* The smallest disk *)
 Definition sdisk {n} : disk n.+1 := ord0.
@@ -932,15 +934,17 @@ Arguments cunliftr {q n}.
 
 Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
 Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
+Notation "`c[ p ] " := (perfect p) (format "`c[ p ]", at level 5).
+Notation "`c[ p , n ] " := ((perfect p) : configuration _ n) 
+  (format "`c[ p  ,  n ]", only parsing, at level 5).
 
 Lemma on_top1 k (d : disk 1) (c : configuration k 1) : on_top d c.
 Proof. by apply/on_topP=> [] [] [] //=; case: d => [] []. Qed.
 
-Lemma perfect_eqE n k (p1 p2 : peg k) :
-   (@perfect k n.+1 p1 == perfect p2) = (p1 == p2).
+Lemma perfect_eqE n k (p1 p2 : peg k) : (`c[p1, n.+1] == `c[p2]) = (p1 == p2).
 Proof.
 apply/eqP/eqP => [|<-] // cp1Ecp2.
-rewrite -(_ : @perfect k n.+1 p1 sdisk = p1); last by rewrite ffunE.
+rewrite -(_ : `c[p1, n.+1] sdisk = p1); last by rewrite ffunE.
 by rewrite cp1Ecp2 ffunE.
 Qed.
 
@@ -997,10 +1001,10 @@ apply: gdist_path_le; first by rewrite plift_path (gpath_path p1H).
 by rewrite last_map (gpath_last p1H).
 Qed.
 
-Lemma plift_perfect p1 : plift (perfect p1) = perfect (lift i p1).
+Lemma plift_perfect p1 : plift `c[p1] = `c[lift i p1].
 Proof. by apply/ffunP => j; rewrite !ffunE. Qed.
 
-Lemma cdisjoint_plift_perfect m c : cdisjoint (plift c) (perfect i : _ _ m).
+Lemma cdisjoint_plift_perfect m c : cdisjoint (plift c) `c[i, m]. 
 Proof.
 apply/cdisjointP=> i1 j1; rewrite !ffunE /p; apply/eqP/val_eqP => /=.
 by rewrite eq_sym neq_bump.
@@ -1057,8 +1061,7 @@ apply: gdist_path_le; first by rewrite path_liftln (gpath_path p1H).
 by rewrite [LHS]last_map (gpath_last p1H).
 Qed.
 
-Lemma crliftn_perfect n m p1 :
-  cliftln n p (perfect p1) = cliftrn m p1 (perfect p).
+Lemma crliftn_perfect n m p1 : cliftln n p `c[p1] = cliftrn m p1 `c[p].
 Proof. by []. Qed.
 
 End Crlift.
@@ -1096,11 +1099,10 @@ by case: {HD}p1 => [] [|[|[|p1 Hp1]]] /=;
 Qed.
 
 Notation "`p[ p1 , p2 ] " := (opeg p1 p2)
-    (format "`p[ p1 ,  p2 ]", at level 60).
+    (format "`p[ p1 ,  p2 ]", at level 5).
 
 Lemma move_liftr_perfect q n (hrel : rel (peg q)) p1 p2 p3 :
-  hrel p1 p2 -> p1 != p3 -> p2 != p3 ->
- move hrel ↑[perfect p3 : configuration q n]_p1 ↑[perfect p3]_p2.
+  hrel p1 p2 -> p1 != p3 -> p2 != p3 -> move hrel ↑[`c[p3, n]]_p1 ↑[`c[p3]]_p2.
 Proof.
 move=> p1Rp2 p1Dp3 p2Dp3.
 apply: (@move_mergel_inv _ _ 1).
@@ -1117,12 +1119,12 @@ Lemma gdist_liftr_perfect q n (hrel : rel (peg q)) p1 p2 p3 :
 Proof.
 move=> hirr p1Rp2 p1Dp3 p2Dp3.
 apply/eqP; rewrite eqn_leq; apply/andP; split.
-  rewrite -[1]/(size [:: cliftr p2 (perfect p3 : _ _ n)]).
+  rewrite -[1]/(size [:: cliftr p2 `c[p3, n]]).
   apply: gdist_path_le => //=.
   by rewrite move_liftr_perfect.
 case E : gdist => //.
 move/eqP: E; rewrite gdist_eq0 => /eqP E.
-have := cliftr_ldisk p1 (perfect p3 : _ _ n).
+have := cliftr_ldisk p1 `c[p3, n].
 rewrite E cliftr_ldisk => p2Ep1.
 by have := hirr p1; rewrite -{2}p2Ep1 p1Rp2.
 Qed.
@@ -1204,10 +1206,10 @@ set p1 := c1 ldisk; set p2 := c2 ldisk.
 have [<-|/eqP p1Dp2] := p1 =P p2.
   by apply: connect_liftr => // i; rewrite rirr.
 pose p3 := opeg p1 p2.
-apply: connect_trans (_ : connect _ (cliftr p1 (perfect p3)) _).
+apply: connect_trans (_ : connect _ (cliftr p1 `c[p3]) _).
   apply: connect_liftr; first by apply: rirr.
   by apply: IH.
-apply: connect_trans (_ : connect _ (cliftr p2 (perfect p3)) _); last first.
+apply: connect_trans (_ : connect _ (cliftr p2 `c[p3]) _); last first.
   apply: connect_liftr; first by apply: rirr.
   by apply: IH.
 apply: connect1.
@@ -1233,7 +1235,7 @@ have [<-|/eqP p1Dp2] := p1 =P p2.
   by rewrite leq_exp2l.
 pose p3 := opeg p1 p2.
 apply: leq_trans.
-  apply: (@gdist_triangular _ _ _ _ (cliftr p1 (perfect p3))).
+  apply: (@gdist_triangular _ _ _ _ (cliftr p1 `c[p3])).
 rewrite expnS mul2n -addnn.
 have tnP : 0 < 2 ^ n by rewrite expn_gt0.
 rewrite -(prednK tnP) addSn /=.
@@ -1243,7 +1245,7 @@ apply: leq_add.
     by apply: connect_move.
   by apply: IH.
 apply: leq_trans.
-  apply: (@gdist_triangular _ _ _ _ (cliftr p2 (perfect p3))).
+  apply: (@gdist_triangular _ _ _ _ (cliftr p2 `c[p3])).
 rewrite gdist_liftr_perfect ?ltnS //; last 3 first.
 - by apply: rirr.
 - by rewrite eq_sym opegDl.

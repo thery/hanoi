@@ -5,7 +5,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-
 Section Hanoi3.
 
 (*****************************************************************************)
@@ -18,8 +17,166 @@ Local Notation "c1 `-->_r c2" := (rmove c1 c2)
     (format "c1  `-->_r  c2", at level 60).
 Local Notation "c1 `-->*_r c2" := (connect rmove c1 c2) 
     (format "c1  `-->*_r  c2", at level 60).
-Local Notation "`c[ p ] " := (perfect p)
-    (format "`c[ p ]", at level 60).
+
+(******************************************************************************)
+(* Function that builds a path from peg to peg                                *)
+(******************************************************************************)
+
+Fixpoint ppeg {n : nat} p1 p2 :=
+  if n is n1.+1 return seq (configuration 3 n) then
+    let p3 := `p[p1, p2] in
+    [seq ↑[i]_p1 | i <- ppeg p1 p3] ++
+    [seq ↑[i]_p2 | i <- `c[p3] :: ppeg p3 p2]
+  else [::].
+
+
+Lemma size_ppeg n p1 p2 :
+   size (ppeg p1 p2 : seq (configuration 3 n)) = (2^ n).-1.
+Proof. 
+elim: n p1 p2 => //= n IH p1 p2.
+rewrite size_cat /= !size_map !IH  expnS mul2n -addnn.
+by rewrite -(prednK (_ : 0 < 2 ^ n)) // expn_gt0.
+Qed.
+
+Lemma last_ppeg n p1 p2 c (cs := ppeg p1 p2 : seq (configuration 3 n)) :
+   last  c cs = `c[p2].
+Proof.
+have HH := @rirr 3.
+rewrite /cs; elim: n p1 p2 c {cs} => //= [_ p2 c | n IH p1 p2 p1Dp2].
+  by apply/ffunP=> [] [].
+by rewrite last_cat /= last_map IH perfect_liftr.
+Qed.
+
+Lemma path_ppeg n p1 p2 (cs := ppeg p1 p2 : seq (configuration 3 n)) :
+  p1 != p2 -> path rmove `c[p1] cs.
+Proof.
+have HH := @rirr 3.
+rewrite /cs; elim: n p1 p2 {cs} => //= n IH p1 p2 p1Dp2.
+set p3 := `p[_,_].
+have p1Dp3 : p1 != p3 by rewrite eq_sym opegDl.
+have p3Dp2 : p3 != p2 by rewrite opegDr.
+rewrite cat_path /= -{1}[`c[p1]]cunliftrK ffunE !path_liftr // perfect_unliftr.
+rewrite !IH // ?andbT /=.
+rewrite -{1}[`c[_]]cunliftrK ffunE last_map perfect_unliftr last_ppeg.
+by apply: move_liftr_perfect; rewrite // eq_sym opegDr.
+Qed.
+
+(* We can go from any perfect configuration to a perfect configuration *)
+Lemma move_connect_ppeg n p1 p2 : `c[p1, n] `-->*_r `c[p2].
+Proof.
+case: (p1 =P p2) => [->|/eqP p1Dp2] //.
+apply/connectP; exists (ppeg p1 p2); first by apply: path_ppeg.
+by rewrite last_ppeg.
+Qed.
+
+(* The proof is done by inspecting the moves that the last disk is doing in cs*)
+(* We use a double  induction :                                               *)
+(* The first induction is used when the path has duplicates                   *)
+(* The second induction is on n and to bound recursive call                   *)
+Lemma ppeg_min n p1 p2 (cs : seq (configuration 3 n)) :
+  p1 != p2 -> path rmove `c[p1] cs -> last `c[p1] cs = `c[p2] ->
+  (2^ n).-1 <= size cs ?= iff (cs == ppeg p1 p2).
+Proof.
+have irrH := @rirr 3; have symH := @rsym 3.
+(* The first induction is used when the path has duplicates (1 case) *)
+have [m sLm] := ubnP (size cs); elim: m => // m IHm in n p1 p2 cs sLm *.
+elim: n p1 p2 cs sLm => /= [p1 p2 [|] // p1Dp2 |]n IH p1 p2 cs sLm p1Dp2.
+have /= := size_ppeg n.+1 p1 p2.
+(* Is there a move of the last first disk *)
+case:  path3SP => //.
+  (* No move : impossible since p1 != p2 *)
+  case: cs sLm => /= [_ _ _ _  _ /ffunP /(_ ldisk)/eqP|a cs sLm].
+    by rewrite !ffunE (negPf p1Dp2).
+  rewrite !ffunE => acsE _ _ _ lacsE.
+  have := mem_last a cs.
+  rewrite acsE lacsE inE => /orP[/eqP/ffunP/(_ ldisk)/eqP|].
+    by rewrite cliftr_ldisk !ffunE eq_sym (negPf p1Dp2).
+  case/mapP => c _ /ffunP /(_ ldisk)/eqP.
+  by rewrite cliftr_ldisk ffunE eq_sym (negPf p1Dp2).
+(* There is a move from p1 to p3 *)
+rewrite !ffunE perfect_unliftr /= => cs1 cs2 p3 p1Dp3 _.
+move=> p1cs1Lp1p3 csE p1Pcs1.
+have Scs1 : size cs1 < m.+1.
+  by apply: leq_trans sLm; rewrite csE size_cat size_map ltnS leq_addr.
+have p1Dp1p3 : p1 != `p[p1, p3] by rewrite eq_sym opegDl.
+(* After the first move, last disk is on p3, the other disk is `p[p1, p3] *)
+have HL1 := IH _ _ _ Scs1 p1Dp1p3 p1Pcs1 p1cs1Lp1p3.
+have n2E : (2 ^ n.+1).-1 = (2 ^ n).-1 + (2 ^ n).-1.+1.
+  by rewrite expnS mul2n -addnn -[2 ^ n]prednK ?expn_gt0.
+(* Is there another move *)
+case:  path3SP => //=.
+  (* there is no move so p3 = p2 and simple induction should make it *)
+  rewrite cliftr_ldisk cliftrK /=.
+  move=> cs2E p1p3Pcs2 _ sH _ p1csLp2.
+  have p3E : p3 = p2.
+    move: p1csLp2; rewrite csE cs2E last_cat /= last_map.
+    by move=> /ffunP /(_ ldisk); rewrite cliftr_ldisk ffunE.
+  rewrite p3E in p1cs1Lp1p3 csE HL1 cs2E p1p3Pcs2.
+  have Scs2 : size [seq ↓[i] | i <- cs2] < m.+1.
+    apply: leq_trans sLm.
+    by rewrite csE size_cat !size_map /= ltnS -addSnnS leq_addl.
+  have p1p2Lcs2 : last `c[`p[p1, p2]] [seq ↓[i] | i <- cs2] = `c[p2].
+    rewrite -[`c[_]](cliftrK p2) last_map.
+    by have := p1csLp2; rewrite csE last_cat /= => ->; rewrite perfect_unliftr.
+  have HL2 := IH _ _ _ Scs2 (opegDr _ _) p1p3Pcs2 p1p2Lcs2.
+  case/leqifP : HL1; case: eqP => [<- /eqP HL1|_ HL1].
+    case/leqifP : HL2; case: eqP => [<- /eqP HL2|_ HL2].
+      rewrite size_map in HL2.
+      rewrite csE size_cat /= size_map -HL1 -HL2 -cs2E eqxx //= n2E.
+      by apply/leqifP.
+    apply/leqifP; case: eqP => [/(congr1 size)->|_].
+      by rewrite -sH !size_cat /= !size_map -HL1 size_ppeg.
+    rewrite csE size_cat /= !size_map in HL2 *.
+    by rewrite -HL1 n2E ltn_add2l.
+  apply/leqifP; case: eqP => [/(congr1 size)->|_]; first by rewrite -sH.
+  rewrite csE size_cat /= !size_map in HL2 *.
+  by rewrite n2E -addSn leq_add // ltnS HL2.
+move=> cs3 cs4 p4; rewrite -!/rmove !cliftr_ldisk cliftrK.
+move => p3Dp4 _ p1p3cs3Lp3p4 cs2E p1p3Pcs3 p3p4Pcs4 _ sH _ p1csLp2.
+(* we did two moves of the largest disk so we cannot be = *)
+apply/leqifP; case: eqP => [/(congr1 size)|_].
+  by rewrite size_cat /= !size_map !size_ppeg n2E => ->.
+(* Did we come back to p1 *)
+case: (p4 =P p1) => [p4Ep1 | /eqP p4Dp1].
+  rewrite p4Ep1 in p3Dp4 p1p3cs3Lp3p4 cs2E p3p4Pcs4.
+  (* if so cs has a repetition so we can use IHm *)
+  pose cs' := [seq ↑[i]_p1 | i <- cs1] ++ cs4.
+  have Scs' : size cs' < size cs.
+    rewrite csE /cs' cs2E !size_cat /= size_cat !size_map /=.
+    by rewrite ltn_add2l -!addSnnS ltnS leq_addl.
+  apply: leq_trans (Scs'); rewrite ltnS.
+  rewrite (IHm _ p1 p2) //; first by rewrite (leq_trans Scs').
+    rewrite cat_path /= -[`c[_]](cunliftrK) ffunE perfect_unliftr.
+    by rewrite path_liftr // p1Pcs1 /= last_map p1cs1Lp1p3 opeg_sym.
+  rewrite last_cat /= -[`c[_]](cunliftrK) ffunE perfect_unliftr.
+  rewrite last_map p1cs1Lp1p3.
+  have := p1csLp2.
+  by rewrite csE cs2E !last_cat /= last_cat /= opeg_sym.
+rewrite csE cs2E size_cat /= size_cat /= !size_map n2E !addnS !ltnS addnA.
+apply: leq_trans (leq_add _ _) (leq_addr _ _); first by rewrite HL1.
+have Scs3 : size cs3 < m.+1.
+  apply: leq_trans sLm.
+  rewrite csE cs2E size_cat /= size_cat /= !size_map addnC ltnS addnS !addSnnS.
+  by rewrite -addnA leq_addr.
+rewrite (IH _ _ _ Scs3 _ p1p3Pcs3 p1p3cs3Lp3p4) //.
+by rewrite opeg3E // eq_sym opeg3E // eq_sym p1Dp3 p4Dp1 eq_sym opegDl.
+Qed.
+
+Lemma gdist_perfect n p1 p2 :
+  `d[`c[p1, n], `c[p2]]_rmove = (2^ n).-1 * (p1 != p2).
+Proof.
+case: eqP => [<-|/eqP p1Dp2]; first by rewrite muln0 gdist0.
+rewrite muln1.
+apply/eqP; rewrite eqn_leq -(size_ppeg n p1 p2).
+rewrite gdist_path_le //=; last 2 first.
+- by apply: path_ppeg.
+- by rewrite last_ppeg.
+have /gpath_connect [cs csH] : connect rmove `c[p1, n] `c[p2].
+  by apply: move_connect_ppeg.
+rewrite size_ppeg (gpath_dist csH) /=.
+apply: ppeg_min p1Dp2 (gpath_path csH) _ => //.
+by apply: gpath_last csH.
+Qed.
 
 (*****************************************************************************)
 (* Function that builds a path from a configuration to a peg                 *)
@@ -34,18 +191,16 @@ Fixpoint rpeg {n : nat} : configuration _ n -> _ -> _ :=
         if p1 == p then [seq ↑[i]_p | i <- rpeg ↓[c] p] else
         let p2 := `p[p1, p] in
         [seq ↑[i]_p1 | i <- rpeg ↓[c] p2] ++
-        [seq ↑[i]_p | i <- (`c[p2]) :: rpeg (`c[p2]) p]
+        [seq ↑[i]_p | i <- (`c[p2]) :: ppeg p2 p]
   end.
 
-Lemma rpeg_perfect n p : 
-  rpeg (`c[p]) p = [::] :> seq (configuration 3 n).
+Lemma rpeg_perfect n p : rpeg (`c[p]) p = [::] :> seq (configuration 3 n).
 Proof.
 elim: n => //= n IH.
 by rewrite ffunE eqxx perfect_unliftr IH.
 Qed.
 
-Lemma rpeg_nil_inv n c p : 
-  rpeg c p = [::] -> c = `c[p] :> configuration _ n.
+Lemma rpeg_nil_inv n c p : rpeg c p = [::] -> c = `c[p] :> configuration _ n.
 Proof.
 elim: n c => [c _|n IH c] /=; first by apply/ffunP=> [] [].
 case: eqP => [H | H] //=; last by case: map.
@@ -54,35 +209,44 @@ case: rpeg (IH (↓[c])) => // -> // _.
 by rewrite H perfect_liftr.
 Qed.
 
-Lemma rpeg_correct n (c : configuration 3 n) p (cs := rpeg c p) :
-  path rmove c cs /\ last c cs = `c[p].
+Lemma rpeg_ppeg n p1 p2 : p1 != p2 -> rpeg `c[p1, n] p2  = ppeg p1 p2. 
+Proof.
+elim: n p1 p2 => //= n IH p1 p2 p1Dp2.
+by rewrite ffunE perfect_unliftr (negPf p1Dp2) !IH // eq_sym opegDl.
+Qed.
+
+
+
+Lemma last_rpeg n (c : configuration 3 n) p (cs := rpeg c p) :
+  last c cs = `c[p].
+Proof.
+rewrite /cs; elim: n c p {cs} => /= [c p| n IH c p].
+  by apply/ffunP=> [] [].
+case: eqP => [Ho|/eqP Do].
+  by rewrite -{1}[c](cunliftrK) Ho last_map IH perfect_liftr.
+by rewrite last_cat /= last_map last_ppeg perfect_liftr.
+Qed.
+
+Lemma path_rpeg n (c : configuration 3 n) p (cs := rpeg c p) :
+  path rmove c cs.
 Proof.
 have HH := @rirr 3.
-rewrite /cs; elim: n c p {cs} => /= [c p| n IH c p].
-  by split=> //; apply/ffunP=> [] [].
+rewrite /cs; elim: n c p {cs} => //= n IH c p.
 case: eqP => [Ho|/eqP Do].
-  have [Hp Hl] := IH (↓[c]) p.
-  split.
-  rewrite -{1}[c](cunliftrK) Ho path_liftr //.
-  by rewrite -{1}[c](cunliftrK) Ho last_map Hl perfect_liftr.
-set c2 := perfect _.
-split; last first.
-  rewrite last_cat /= last_map.
-  by have [_ ->] := IH c2 p; rewrite perfect_liftr.
-have [IH1 IH2] := IH (↓[c]) (`p[c ldisk, p]).
-have [IH3 IH4] := IH c2 p.
-rewrite cat_path /= -{1}[c]cunliftrK !path_liftr // IH1 IH3 ?andbT /=.
-rewrite -{1}[c]cunliftrK last_map IH2 -/c2.
-apply: move_liftr_perfect => //.
-  by rewrite eq_sym (opegDl _).
+  by rewrite -{1}[c](cunliftrK) Ho path_liftr.
+set c2 := `c[_].
+rewrite cat_path /= -{1}[c]cunliftrK !path_liftr // IH path_ppeg ?opegDr //.
+rewrite andbT /=.
+rewrite -{1}[c]cunliftrK last_map last_rpeg -/c2.
+apply: move_liftr_perfect => //; first by rewrite eq_sym (opegDl _).
 by rewrite eq_sym (opegDr _).
 Qed.
 
 (* We can go from any configuration to a perfect configuration *)
 Lemma move_connect_rpeg n (c : configuration _ n) p : c `-->*_r `c[p].
 Proof.
-have [H1 H2] := rpeg_correct c p.
-by apply/connectP; exists (rpeg c p).
+apply/connectP; exists (rpeg c p); first by apply: path_rpeg.
+by rewrite last_rpeg.
 Qed.
 
 (* So we can also from a perfect configuration c to any configuration *)
@@ -100,12 +264,13 @@ by apply: connect_trans (move_connect_rpeg c1 (inord 1))
          (move_connect_lpeg c2 (inord 1)).
 Qed.
 
-Definition is_path n k (l : k.-tuple _) (c1 c2 : configuration 3 n) := 
-   path rmove c1 l && ((last c1 l) == c2).
+(******************************************************************************)
+(* Function that builds a path from a configuration to a peg                  *)
+(******************************************************************************)
 
 
 (*****************************************************************************)
-(* Computes the size of rpeg                                            *)
+(* Computes the size of rpeg                                                 *)
 (*****************************************************************************)
 
 Fixpoint size_rpeg {n : nat} : (configuration _ n) -> _ -> nat :=
@@ -115,29 +280,14 @@ Fixpoint size_rpeg {n : nat} : (configuration _ n) -> _ -> nat :=
       fun c p =>
         let p1 := c ldisk in
         if p1 == p then size_rpeg ↓[c] p else
-        let p2 := `p[p1, p] in
-        size_rpeg ↓[c] p2 + 
-        (size_rpeg (`c[p2] : configuration _ n1) p).+1
+        let p2 := `p[p1, p] in size_rpeg ↓[c] p2 + 2 ^ n1
   end.
 
-(* size on a perfect configuration is a power of 2 *)
-Lemma size_rpeg_p n p1 p2 :
-   size_rpeg (`c[p1] : _ _ n) p2  = (2^ n).-1 * (p1 != p2).
+Lemma size_rpegE n p (c : _ _ n) : size_rpeg c p = size (rpeg c p).
 Proof.
-elim: n p1 p2 => [p1 p2|n IH p1 p2] //=.
-rewrite ffunE; case: eqP => [p1Ep2|/eqP p1Dp2].
-  by rewrite perfect_unliftr IH p1Ep2 eqxx !muln0.
-rewrite perfect_unliftr !IH eq_sym opegDl // opegDr // !muln1.
-rewrite expnS mul2n -addnn.
-by case: (2 ^n) (expn_gt0 2 n).
-Qed.
-
-(* size computes the size *)
-Lemma size_rpegE n (c : _ _ n) p : size_rpeg c p = size (rpeg c p).
-Proof.
-elim: n c p => //= n IH c p.
-case: eqP => [//|/eqP Hd]; first by rewrite size_map.
-by rewrite size_cat /= !size_map !IH.
+elim: n p c => //= n IH p c.
+case: eqP => [clEp|/eqP clDp]; first by rewrite size_map IH.
+by rewrite size_cat /= !size_map size_ppeg prednK ?expn_gt0 // IH.
 Qed.
 
 (* Upper bound on the size *)
@@ -149,14 +299,14 @@ case: eqP => _.
   case: (_ ^ _) (expn_eq0 2 n) (expn_eq0 2 n.+1) 
               (leq_pexp2l (isT: 0 < 2) (ltnW (leqnn n.+1))) => //= n1 _.
   by case: (_ ^ _).
-apply: leq_trans (_ : (2^n).-1 + (2^n).-1.+1  <= _).
-  by apply: leq_add; apply: IH.
+apply: leq_trans (_ : (2^n).-1 + (2^n)  <= _).
+  by rewrite leq_add2r IH.
 rewrite expnS mul2n -addnn.
 by case: (2 ^ n)  (expn_eq0 2 n)  => [|n1]; rewrite ?addn0.
 Qed.
 
-(* rpeg gives the smallest path to a perfect configuration.     *)
-(* This path is unique                                               *)
+(* rpeg gives the smallest path to a perfect configuration.                   *)
+(* This path is unique                                                        *)
 Lemma rpeg_min n (c : configuration 3 n) p cs :
   path rmove c cs -> last c cs = `c[p] ->
   size_rpeg c p <= size cs ?= iff (cs == rpeg c p).
@@ -226,26 +376,38 @@ case: (p2 =P p) => [p2Ep|/eqP p2Dp].
       have /leqifP := IHc2; case: eqP => [->_ |_ Lc2].
       (* the second part of cs is perfect, only case of equality *)
         apply/leqifP; case: eqP => [/(congr1 size)|[]].
-          by rewrite !size_cat /= !size_map !addnS !size_rpegE c2'Epp3 => ->.
+          rewrite !size_cat /= !size_map !addnS !size_rpegE c2'Epp3.
+          by rewrite !rpeg_ppeg ?opegDr // size_ppeg -addnS prednK ?expn_gt0.
         congr (_ ++ _ :: _).
-        by rewrite c2'Epp3 !cliftr_ldisk.
+        by rewrite /c2' /c2 cliftrK cliftr_ldisk rpeg_ppeg // opegDr.
       apply/leqifP; case: eqP => [/(congr1 size)|_].
-        by rewrite !size_cat /= !size_map !size_rpegE => ->.
-      by rewrite /= size_rpegE ltn_add2l ltnS size_map -c2'Epp3.
+        rewrite !size_cat /= !size_map !size_rpegE.
+        by rewrite size_ppeg prednK ?expn_gt0 // => ->.
+      rewrite /= size_rpegE ltn_add2l ltnS size_map.
+      rewrite c2'Epp3 size_rpegE rpeg_ppeg ?opegDr // size_ppeg in Lc2.
+      by rewrite prednK // expn_gt0 in Lc2.
     apply/leqifP; case: eqP => [/(congr1 size)|_].
-      by rewrite !size_cat /= !size_map !size_rpegE => ->.
-    by rewrite /= -addSn leq_add // ltnS size_map -c2'Epp3 IHc2.
+      rewrite !size_cat /= !size_map !size_rpegE => ->.
+      by rewrite size_ppeg prednK // expn_gt0.
+    rewrite /= -addSn leq_add // size_map -[_ ^ _]prednK ?expn_gt0 // ltnS.
+    have := IHc2; rewrite c2'Epp3 size_rpegE rpeg_ppeg ?opegDr // size_ppeg.
+    by move=>->.
   apply/leqifP; case: eqP => [/(congr1 size)|_].
-    by rewrite !size_cat /= !size_map !size_rpegE => ->.
-  rewrite -addnS leq_add //= ?ltnS -p2Ep.
+    rewrite !size_cat /= !size_map !size_rpegE.
+    by rewrite size_ppeg prednK ?expn_gt0 // => ->.
+  rewrite -addnS leq_add //= ?ltnS -?p2Ep.
     by rewrite size_map IHc1.
-  by apply: leq_ltn_trans Lcs2; rewrite -c2'Epp3 IHc2.
+  rewrite -[_ ^ _]prednK ?expn_gt0 //.
+  apply: leq_ltn_trans Lcs2.
+  have := IHc2.
+  by rewrite c2'Epp3 size_rpegE rpeg_ppeg ?opegDr // size_ppeg => ->.
 (* The largest disk jumped to an intermediate peg *)
 have p3Ep : p3 = p.
   by apply/eqP; rewrite opeg3E // p1Dp.
 (* cs cannot be optimal *)
 apply/leqifP; case: eqP => [/(congr1 size)|_].
-  by rewrite !size_cat /= !size_map !size_rpegE => ->.
+  rewrite !size_cat /= !size_map !size_rpegE.
+  by rewrite size_ppeg prednK ?expn_gt0 // => ->.
 case: path3SP c2Pcs2 => // [c2' cs2'|cs3 cs4].
   (* this is impossible we need another move of the largest disk *)  
   rewrite !cliftr_ldisk /= => cs2E c2'Pcs2'.
@@ -297,19 +459,19 @@ have Scs4 : size cs4 < m.+1.
 have Scs4' : size cs4' < m.+1.
   by apply: leq_ltn_trans Scs4; rewrite scs4'L.
 rewrite cs2E /= size_cat /= !size_map.
-rewrite size_rpeg_p opegDr // muln1.
 have /IH := c2'cs5Epp5 => /(_ Scs3 c2'Pcs3) IHc1.
 have c2'E : c2' = `c[p3] by rewrite [LHS]cliftrK.
-rewrite c2'E size_rpeg_p eq_sym p5Dp3 muln1 in IHc1.
+rewrite c2'E size_rpegE rpeg_ppeg // in IHc1; last by rewrite eq_sym.
+rewrite size_ppeg in IHc1.
 have p6Dp : p5 != p.
   by apply: contra p5Dp3 => /eqP->; apply/eqP.
 move: lc1csEp; rewrite csE cs2E.
 rewrite last_cat /= last_cat /= => lpp5p4cs4Epp.
-have lpp5cs4'Epp : last (`c[p5]) cs4' = `c[p].
+have lpp5cs4'Epp : last `c[p5] cs4' = `c[p].
   by rewrite lpp5p4cs4'Elpp5p4cs4 lpp5p4cs4Epp perfect_unliftr.
-have /IH : last (`c[p5]) cs4' = `c[p] => 
-       [//| /(_ Scs4' pp5p4Pcs4') IHc2].
-rewrite size_rpeg_p p6Dp muln1 in IHc2.
+have /IH : last `c[p5] cs4' = `c[p] =>  [//| /(_ Scs4' pp5p4Pcs4') IHc2].
+rewrite size_rpegE rpeg_ppeg // size_ppeg in IHc2.
+rewrite -[2 ^ n]prednK ?expn_gt0 //.
 rewrite !addnS !ltnS.
 apply: leq_trans (leq_addl _ _).
 apply: leq_add.
@@ -318,22 +480,18 @@ apply: leq_trans scs4'L.
 by rewrite IHc2.
 Qed.
 
-Lemma gdist_size_rpeg n (c1 : _ _ n) p : 
-  `d[c1, `c[p]]_rmove = size_rpeg c1 p.
+Lemma gdist_size_rpeg n (c1 : _ _ n) p :  `d[c1, `c[p]]_rmove = size_rpeg c1 p.
 Proof.
 apply/eqP; rewrite eqn_leq [size_rpeg _ _]size_rpegE.
-have [H1 H2] := rpeg_correct c1 p.
-rewrite gdist_path_le //.
-have /gpath_connect [p1 p1H] : connect rmove c1 (`c[p]).
+rewrite gdist_path_le; last 2 first.
+- by apply: path_rpeg.
+- by rewrite last_rpeg.
+have /gpath_connect [p1 p1H] : connect rmove c1 `c[p].
   by apply: move_connect_rpeg.
 rewrite -size_rpegE (gpath_dist p1H) /=.
 apply: (rpeg_min (gpath_path p1H)) => //.
 by apply: gpath_last p1H.
 Qed.
-
-Lemma gdist_perfect n p1 p2 :
-   `d[`c[p1] : configuration 3 n, `c[p2]]_rmove = (2^ n).-1 * (p1 != p2).
-Proof. by rewrite gdist_size_rpeg; apply: size_rpeg_p. Qed.
 
 Lemma gdist_perfect_le n (c : configuration 3 n) p :
    `d[c, `c[p]]_rmove <= (2^ n).-1.
@@ -345,8 +503,7 @@ Proof. by rewrite gdist_size_rpeg; apply: size_rpeg_up. Qed.
 
 Definition lpeg n p (c : _ _ n) := rev (belast c (rpeg c p)).
 
-Lemma lpeg_perfect n p : 
-  lpeg p (`c[p])  = [::] :> seq (configuration 3 n).
+Lemma lpeg_perfect n p : lpeg p `c[p, n]  = [::].
 Proof. by rewrite /lpeg rpeg_perfect. Qed.
 
 Lemma lpeg_nil_inv n c p : 
@@ -357,13 +514,19 @@ rewrite /lpeg; case: rpeg => //= a l.
 by rewrite rev_cons; case: rev.
 Qed.
 
-Lemma lpeg_correct n (c : configuration 3 n) p (cs := lpeg p c) :
-  path rmove (`c[p]) cs /\ last c cs = c.
+Lemma path_lpeg n (c : configuration 3 n) p (cs := lpeg p c) :
+  path rmove `c[p] cs.
 Proof.
 have HHs := @rsym 3.
-have [cMrp lcrpEp] := rpeg_correct c p.
-rewrite {}/cs /lpeg -lcrpEp path_move_rev //; split=> //.
-case: rpeg => //= c1 cs.
+rewrite {}/cs /lpeg -(last_rpeg c) path_move_rev //. 
+by apply: path_rpeg.
+Qed.
+
+Lemma last_lpeg n (c : configuration 3 n) p (cs := lpeg p c) :
+  last `c[p] cs = c.
+Proof.
+have HHs := @rsym 3; have := last_rpeg c p.
+rewrite {}/cs /lpeg; case: rpeg => //= c1 cs.
 by rewrite rev_cons last_rcons.
 Qed.
 
@@ -372,15 +535,15 @@ Lemma size_lpegE n (c : _ _ n) p :
 Proof. by rewrite size_rev size_belast size_rpegE. Qed.
 
 Lemma lpeg_min n (c : configuration 3 n) p cs :
-  path rmove (`c[p]) cs -> last (`c[p]) cs = c ->
+  path rmove `c[p] cs -> last `c[p] cs = c ->
   size_rpeg c p <= size cs ?= iff (cs == lpeg p c).
 Proof.
 (* why this is so complicated???? *)
 move=> pPcs lccsEc.
 have HHs := @rsym 3.
-have cPr : path rmove c (rev (belast (`c[p]) cs)).
+have cPr : path rmove c (rev (belast `c[p] cs)).
   by rewrite -{1}lccsEc path_move_rev.
-have lcrEp : last c (rev (belast (`c[p]) cs)) = (`c[p]).
+have lcrEp : last c (rev (belast `c[p] cs)) = `c[p].
   rewrite -lccsEc; case: (cs)=> //= c3 cs1.
   by rewrite rev_cons last_rcons.
 have := rpeg_min cPr lcrEp.
@@ -393,7 +556,7 @@ have -> : (u == v) = (rev (c :: u) == rev (c :: v)).
 rewrite [c :: v]lastI -/v rev_rcons.
 rewrite rev_cons revK -{2}lccsEc -lastI eqseq_cons andbC.
 case: eqP=> //; case: eqP => // pDl Hcs; case: pDl.
-by have [] := rpeg_correct c p.
+by rewrite last_rpeg.
 Qed.
 
 Fixpoint hanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
@@ -411,58 +574,57 @@ Fixpoint hanoi {n : nat} : configuration _ n -> configuration _ n -> _ :=
        let m2 := size_rpeg c1' p2 + 2 ^ n1 + size_rpeg c2' p1
        in if m1 <= m2 then 
             [seq ↑[i]_p1 | i <- rpeg c1' p] ++
-            [seq ↑[i]_p2 | i <- (`c[p]) :: lpeg p c2'] 
+            [seq ↑[i]_p2 | i <- `c[p] :: lpeg p c2'] 
           else
             [seq ↑[i]_p1 | i <- rpeg c1' p2] ++
-            [seq ↑[i]_p | i <- (`c[p2]) :: rpeg (`c[p2]) p1] ++
-            [seq ↑[i]_p2 | i <- (`c[p1]) :: lpeg p1 c2']
+            [seq ↑[i]_p | i <- `c[p2] :: ppeg p2 p1] ++
+            [seq ↑[i]_p2 | i <- `c[p1] :: lpeg p1 c2']
   else fun _ _ => [::].
 
-Lemma hanoi_correct n (c1 c2 : _ _ n) (cs := hanoi c1 c2) :
-  path rmove c1 cs /\ last c1 cs = c2.
+Lemma last_hanoi n (c1 c2 : _ _ n) (cs := hanoi c1 c2) :
+  last c1 cs = c2.
 Proof.
 have HHr := @rirr 3.
 rewrite {}/cs.
-elim: n c1 c2 => /= [c1 c2 |n IH c1 c2].
-  by split=> //; apply/ffunP=> [] [].
+elim: n c1 c2 => /= [c1 c2 |n IH c1 c2]; first by apply/ffunP=> [] [].
 set p1 := _ ldisk; set p2 := _ ldisk.
 set c3 := cliftr _ _; set c4 := cliftr _ _; set c5 := cliftr _ _.
 set p := `p[_, _].
 case: eqP => [p1Ep2|/eqP p1Dp2].
-  have [c1Ph lc1hEc2] := IH (↓[c1]) (↓[c2]).
-  rewrite -{1 3}[c1]cunliftrK.
-  split; first by rewrite path_liftr.
-  by rewrite last_map lc1hEc2 -/p1 p1Ep2 cunliftrK.
-case: leqP => _; rewrite !cat_path !last_cat {IH}/= ?cat_path ?last_cat /=.
-  split; first (apply/and3P; split).
-  - have [c1Pr lc1rEp] := rpeg_correct (↓[c1]) p.
-    by rewrite -{1}[c1]cunliftrK path_liftr.
-  - rewrite -{1}[c1]cunliftrK last_map.
-    have [_ ->] := rpeg_correct (↓[c1]) p.
-    apply/moveP; exists ldisk.
-    split => // [|d dmDd||].
-    - by rewrite !cliftr_ldisk.
-    - rewrite !ffunE; case: tsplitP => [j|j jE]; first by rewrite !ffunE.
-      by case/eqP: dmDd; apply/val_eqP; rewrite /= jE; case: (j) => [] [].
-    - apply/on_topP=> d; rewrite !cliftr_ldisk !ffunE.
-      case: tsplitP => [j _ /eqP|j jE].
-        by rewrite !ffunE -/p1 eq_sym (negPf (opegDl _ _)).
-      by rewrite /= !ffunE jE /= leq_addl. 
-    apply/on_topP=> d; rewrite /= !cliftr_ldisk !ffunE.
-    case: tsplitP => [j _ /eqP|j ->]; last by case: j => [] [].
-    by rewrite !ffunE eq_sym (negPf (opegDr _ _)).  
-  - have [cPl Hlc2lEc2] := lpeg_correct (↓[c2]) p.
-    by rewrite -[c3]cunliftrK !cliftr_ldisk /= path_liftr // cliftrK.
-  have [cPl lc2lEc2] := lpeg_correct (↓[c2]) p.
-  rewrite last_map -/p.
-  case: lpeg lc2lEc2 (@lpeg_nil_inv _ (↓[c2]) p) => /= [|a l -> _].
-    by move=> _ <- //; rewrite cunliftrK.
-  by rewrite cunliftrK.
-split; first (apply/and5P; split).
-- have [c1Pr lc1rEp2] := rpeg_correct (↓[c1]) p2.
+  by rewrite -{1}[c1]cunliftrK last_map IH [c1 _]p1Ep2 cunliftrK.
+case: leqP => _; first by rewrite last_cat /= last_map last_lpeg cunliftrK.
+by rewrite last_cat /= last_cat /= last_map last_lpeg cunliftrK.
+Qed.
+
+Lemma path_hanoi n (c1 c2 : _ _ n) (cs := hanoi c1 c2) :
+  path rmove c1 cs.
+Proof.
+have HHr := @rirr 3.
+rewrite {}/cs.
+elim: n c1 c2 => //= n IH c1 c2.
+set p1 := _ ldisk; set p2 := _ ldisk.
+set c3 := cliftr _ _; set c4 := cliftr _ _; set c5 := cliftr _ _.
+set p := `p[_, _].
+case: eqP => [p1Ep2|/eqP p1Dp2].
   by rewrite -{1}[c1]cunliftrK path_liftr.
-- rewrite -{1}[c1]cunliftrK last_map.
-  have [_ ->]:= rpeg_correct (↓[c1]) p2.
+case: leqP => _; rewrite !cat_path /=; apply/and3P; split.
+- by rewrite -{1}[c1]cunliftrK path_liftr // path_rpeg.
+- rewrite -{1}[c1]cunliftrK last_map last_rpeg.
+  apply/moveP; exists ldisk.
+  split => // [|d dmDd||].
+  - by rewrite !cliftr_ldisk.
+  - rewrite !ffunE; case: tsplitP => [j|j jE]; first by rewrite !ffunE.
+    by case/eqP: dmDd; apply/val_eqP; rewrite /= jE; case: (j) => [] [].
+  - apply/on_topP=> d; rewrite !cliftr_ldisk !ffunE.
+    case: tsplitP => [j _ /eqP|j jE].
+      by rewrite !ffunE -/p1 eq_sym (negPf (opegDl _ _)).
+    by rewrite /= !ffunE jE /= leq_addl. 
+  apply/on_topP=> d; rewrite /= !cliftr_ldisk !ffunE.
+  case: tsplitP => [j _ /eqP|j ->]; last by case: j => [] [].
+  by rewrite !ffunE eq_sym (negPf (opegDr _ _)).  
+- by rewrite -[c3]cunliftrK !cliftr_ldisk /= path_liftr // cliftrK path_lpeg.
+- by rewrite -{1}[c1]cunliftrK path_liftr // path_rpeg.
+- rewrite -{1}[c1]cunliftrK last_map last_rpeg.
   apply/moveP; exists ldisk; split => // [|d2||]; 
          rewrite ?cliftr_ldisk ?ffunE //=.
   - by rewrite /rrel /= eq_sym opegDl.
@@ -476,11 +638,10 @@ split; first (apply/and5P; split).
   rewrite cliftr_ldisk /= !ffunE.
   case: tsplitP => [k _ /eqP | [[]] // j -> //].
   by rewrite !ffunE (negPf (opegDr _ _)).
-- have [c4Pr lc4rEp1] := rpeg_correct (↓[c4]) p1.
-  by rewrite path_liftr //; rewrite cliftrK in c4Pr.
-- rewrite -[c4]cunliftrK !cliftr_ldisk /= last_map 
-          -[perfect _](cliftrK p).
-  have [_ ->]:= rpeg_correct (↓[c4]) p1.
+rewrite cat_path /=; apply/and3P; split => //.
+- rewrite -[c4]cunliftrK cliftr_ldisk -/p path_liftr // cliftrK // path_ppeg //.
+  by rewrite eq_sym.
+- rewrite -[c4]cunliftrK cliftr_ldisk -/p last_map cliftrK // last_ppeg //.
   apply/moveP; exists ldisk; split => // [|d2||]; 
          rewrite ?cliftr_ldisk ?ffunE /=.
   - by rewrite /rrel /= opegDr.
@@ -494,13 +655,7 @@ split; first (apply/and5P; split).
   rewrite cliftr_ldisk /= !ffunE.
   case: tsplitP => [k _ /eqP | [[]] // j -> //].
   by rewrite !ffunE eq_sym (negPf p1Dp2).
-- have [p1Pl lc2lEc2] := lpeg_correct (↓[c2]) p1.
-  by rewrite path_liftr.
-have [cPl lc2lEc2] := lpeg_correct (↓[c2]) p1.
-rewrite last_map.
-case: lpeg lc2lEc2 (@lpeg_nil_inv _ (↓[c2]) p1) => /= [|a l -> _].
-  by move=> _ <- //; rewrite cunliftrK.
-by rewrite cunliftrK.
+by rewrite path_liftr // path_lpeg.
 Qed.
 
 Lemma hanoi_min n (c1 c2 : configuration 3 n) cs :
@@ -524,8 +679,7 @@ suff : minn u v < size cs.
     by apply: leq_trans Lscs.
   apply: leq_ltn_trans _ Lscs.
   rewrite -addnS -addSn !addnA !leq_add //.
-  rewrite -[2 ^ _]prednK ?expn_gt0 // ltnS.
-  by rewrite -size_rpegE; apply: size_rpeg_up.
+  by rewrite -[2 ^ _]prednK ?expn_gt0 // ltnS size_ppeg.
 pose f (c : configuration 3 n.+1) := c ldisk.
 have [m Lcs] := ubnP (size cs); elim: m => // m IH1 in cs Lcs c1Pcs lc1csEc2 *.
 case: path3SP c1Pcs => // [c1' cs' /= csE c1'Pcs' _|
@@ -598,7 +752,7 @@ rewrite -[v]addnA leq_add //.
 apply: leq_add.
   rewrite -[2 ^ _]prednK ?expn_gt0 // ltnS.
   have <-: size_rpeg (↓[c3]) p1 = (2 ^ n).-1.
-    by rewrite cliftrK size_rpeg_p p4Ep2 eq_sym p1Dp2 muln1.
+    by rewrite cliftrK size_rpegE rpeg_ppeg ?opegDl // size_ppeg.
   apply: leq_of_leqif (rpeg_min _ _) => //.
   by rewrite c3'cs3Epp7 p7Ep1.
 have [cs4' [c4'Pcs4' lc4'cs4'Elc4cs4 /leq_of_leqif Lcs4']] := 
@@ -639,7 +793,7 @@ rewrite fun_if.
 rewrite size_cat /= size_cat /= size_cat /= !size_map.
 rewrite -!(size_rpegE, size_lpegE) /=.
 rewrite -/x -/y -/z -/t.
-rewrite size_rpeg_p eq_sym NE muln1 -[_ + t.+1]addSnnS prednK ?expn_gt0 //.
+rewrite size_ppeg -[_ + t.+1]addSnnS prednK ?expn_gt0 //.
 rewrite !addnS.
 rewrite /minn !addnA.
 case: leqP => LL1; case: leqP => LL2 //.
@@ -650,8 +804,9 @@ Qed.
 Lemma gdist_hanoi n (c1 c2 : _ _ n) : `d[c1, c2]_rmove = size_hanoi c1 c2.
 Proof.
 apply/eqP; rewrite eqn_leq.
-have [H1 H2] := hanoi_correct c1 c2.
-rewrite [size_hanoi _ _]size_hanoiE gdist_path_le //.
+rewrite [size_hanoi _ _]size_hanoiE gdist_path_le //=; last 2 first.
+- by apply: path_hanoi.
+- by apply: last_hanoi.
 have /gpath_connect [p1 p1H] : connect rmove c1 c2 by apply:  move_connect.
 rewrite (gpath_dist p1H) hanoi_min //; first apply: gpath_path p1H.
 by apply: gpath_last p1H.
