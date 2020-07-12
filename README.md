@@ -25,4 +25,4 @@ Hanoi towers in Coq
 
 A note about this development is available [here](./Note.pdf).
 
-To buld the library, download the files and type ```make install```.
+To build the library, download the files and type ```make install```.
