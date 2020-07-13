@@ -40,7 +40,7 @@ by case: (peg4E p1) => ->; rewrite ?eqxx //;
         (by apply: Or43) || (by apply: Or44)).
 Qed.
 
-(* Lifting linear hanoi3 to shanoi4 *)
+(* Lifting lhanoi3 to shanoi4 *)
 
 Section lift.
 
@@ -122,7 +122,7 @@ Qed.
 Lemma gdist_clmerge c1 c2 :
   `d[clmerge c1, clmerge c2]_smove <= `d[c1, c2]_(move (@lrel 3)).
 Proof.
-have /gpath_connect[pa1 pa1H] := move_lconnect c1 c2.
+have /gpath_connect[pa1 pa1H] := move_lconnect3 c1 c2.
 rewrite (gpath_dist pa1H) -(size_map clmerge).
 apply: gdist_path_le; first by rewrite path_clmerge // (gpath_path pa1H).
 by rewrite [LHS]last_map (gpath_last pa1H).
@@ -133,11 +133,7 @@ End lift.
 
 (* We first prove the lower bound *)
 
-Lemma bigminMr  f n k :
- \min_(i <= n) (f i * k) =  (\min_(i <= n) f i) * k.
-Proof. by elim: n => //= n ->; rewrite  minn_mull. Qed.
-
-Lemma leq_shanoi p1 p2 n :
+Lemma leq_shanoi4 p1 p2 n :
    p1 != p0 -> p2 != p0 -> p1 != p2 -> 
    `d[`c[p1, n],`c[p2, n]]_smove <= (S_[1] n).*2.
 Proof.
@@ -183,15 +179,15 @@ repeat apply: leq_add; first 2 last.
 rewrite div2K; last first.
   rewrite -subn1 oddB ?expn_gt0 // addbT.
   by rewrite odd_exp orbT.
-have -> : c2 = clmerge p1 p2 p3 _ (perfect ord0).
+have -> : c2 = clmerge p1 p2 p3 _ `c[ord0].
   apply/ffunP=> x; rewrite !ffunE.
   by case: tsplitP => // j; rewrite !ffunE /=.
-have -> : c3 = clmerge p1 p2 p3 _ (perfect (inord 2)).
+have -> : c3 = clmerge p1 p2 p3 _ `c[inord 2].
   apply/ffunP=> x; rewrite !ffunE.
   by case: tsplitP => // j; rewrite !ffunE /= inordK.
 apply: leq_trans (gdist_clmerge _ _ _ _ _ _ _ _ _) _ => //; 
   try by rewrite eq_sym.
-rewrite gdist_lhanoi_p /lrel /= inordK //=.
+rewrite gdist_lhanoi3p /lrel /= inordK //=.
 case: eqP=> [/val_eqP/=|]; first by rewrite inordK.
 by rewrite muln1.
 Qed.
@@ -3831,12 +3827,12 @@ apply: (@main p1 p3 p2) => //.
 by case=> [] [].
 Qed.
 
-Lemma gdist_S1 (n : nat) (p1 p2 : peg 4) : 
+Lemma gdist_shanoi4 (n : nat) (p1 p2 : peg 4) : 
   p1 != p2 -> p1 != p0 -> p2 != p0 -> 
   `d[`c[p1, n], `c[p2, n]]_smove = (S_[1] n).*2.
 Proof.
 move=> p1Dp2 p1Dp0 p2Dp0; apply/eqP; rewrite eqn_leq.
-by rewrite leq_shanoi // main_cor.
+by rewrite leq_shanoi4 // main_cor.
 Qed.
 
 End sHanoi4.

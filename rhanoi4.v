@@ -24,9 +24,9 @@ Lemma gdist_leq (n : nat) (p1 p2 : peg 4) :
 Proof.
 have [/eqP->|p1Dp2] := boolP (p1 == p2); first by rewrite gdist0.
 elim/ltn_ind: n p1 p2 p1Dp2 => [] [|[|n]] IH p1 p2 p1Dp2.
-- rewrite (_ : perfect p1 = perfect p2) ?gdist0 //.
+- rewrite (_ : `c[p1] = `c[p2]) ?gdist0 //.
   by apply/ffunP => [] [].
-- rewrite -[phi 1]/(size [:: (@perfect 4 1 p2)]).
+- rewrite -[phi 1]/(size [:: `c[p2, 1]]).
   apply: gdist_path_le => //=.
   rewrite andbT; apply/moveP; exists ldisk; split => //=.
   - by rewrite !ffunE.
@@ -42,8 +42,8 @@ have k1Lm2S : k1 <= n.+2 by apply: ltnW.
 rewrite -[in X in X <= _](subnK k1Lm2S); set k2 := _ - _.
 rewrite -perfect_liftrn; set c1 := cliftrn _ _ _.
 rewrite -perfect_liftrn; set c4 := cliftrn _ _ _.
-pose c2 : _ _ (k2 + k1) := cliftrn k2 p1 (perfect p3).
-pose c3 : _ _ (k2 + k1) := cliftrn k2 p2 (perfect p3).
+pose c2 : _ _ (k2 + k1) := cliftrn k2 p1 `c[p3].
+pose c3 : _ _ (k2 + k1) := cliftrn k2 p2 `c[p3].
 apply: leq_trans (_ : _ <= gdist rmove c1 c2 + _) _.
   by apply: gdist_triangular.
 rewrite phi_gmin /g -/k -/k1 -addnn -addnA.
@@ -72,7 +72,7 @@ move => p1Dp2.
 have p1'Dp2' : p1' != p2' by apply: contra p1Dp2 => /eqP->.
 rewrite -[X in _ <= X]muln1 {11}(_ : 1 = (p1' != p2')); last first.
   by rewrite (negPf p1'Dp2').
-rewrite -gdist_perfect -/p3 -!crliftn_perfect -!plift_perfect.
+rewrite -gdist_rhanoi3p -/p3 -!crliftn_perfect -!plift_perfect.
 rewrite -(prednK kP).
 apply: gdist_liftln => [|i j|]; first by apply: rirr.
   by (apply/idP/idP; apply: contra => /eqP) => [/lift_inj->|->].
@@ -164,7 +164,7 @@ have [Ez|EnZ] := boolP (E' == set0).
     by rewrite cards1 add1n card_ord => [] [].
   move: (enum_rank_in p0Isp p0) (enum_rank_in p0Isp np2).
   rewrite U => u1 v1 u1Dv1.
-  rewrite gdist_perfect (negPf u1Dv1) muln1 -card_s2f.
+  rewrite gdist_rhanoi3p (negPf u1Dv1) muln1 -card_s2f.
   by apply: psi_exp.
 rewrite -card_gt0 in EnZ.
 case: (eq_bigmax_cond (@nat_of_ord _) EnZ) => /= T TinE' Tmax.
@@ -372,7 +372,7 @@ have [KLT|TLK] := leqP (delta K) T; last first.
     by rewrite cards1 add1n card_ord => [] [].
   move: (enum_rank_in p0Isp p1) (enum_rank_in p0Isp np2).
   rewrite U => u1 v1 u1Dv1.
-  rewrite gdist_perfect (negPf u1Dv1) muln1 /K.
+  rewrite gdist_rhanoi3p (negPf u1Dv1) muln1 /K.
   by rewrite (cardsD1 N) inE NiE TLN.
 pose s := ∇((T + K).+1).
 (* This is 3.7 *)
@@ -968,7 +968,7 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_rmove.
     apply: memE''; first by rewrite gE' !(inE, mem_cat, i3Iz0b, orbT).
     by rewrite !inE /= uEp0.
   apply: leq_trans (gdist_cset2 F1 csV csL path1).
-  have -> : cset2 sd1 p0Isp u1 = perfect (enum_rank_in p0Isp p0).
+  have -> : cset2 sd1 p0Isp u1 = `c[enum_rank_in p0Isp p0].
     apply/ffunP => i ; rewrite !ffunE /=.
     have := enum_valP i; rewrite !inE /=.
     rewrite  (_ : tuc_ord _ _  = oproj (enum_val i)).
@@ -978,7 +978,7 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_rmove.
     - by [].
     - by apply: memE'' => //; rewrite gE' !(mem_cat, inE, eqxx, orbT).
     - by rewrite eq_sym.
-    have -> : cset2 sd1 p0Isp (f z0) = perfect (enum_rank_in p0Isp np1).
+    have -> : cset2 sd1 p0Isp (f z0) = `c[enum_rank_in p0Isp np1].
       apply/ffunP => i ; rewrite !ffunE /=.
       have := enum_valP i; rewrite !inE -val_eqE /= => /and3P[iTEN uEp0 TLiT].
       rewrite -oprojE; case: (Hnz (z0 (oproj (enum_val i)))) => // /eqP.
@@ -1000,7 +1000,7 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_rmove.
     by rewrite (negPf np1Dp0).
   move: (enum_rank_in _ _) (enum_rank_in _ _).
   rewrite card_sd1 card_sp1 => /= cp1 cp2 cp1Dcp2.
-  have := gdist_perfect K.-1 cp1 cp2.
+  have := gdist_rhanoi3p K.-1 cp1 cp2.
   by rewrite eq_sym (negPf cp1Dcp2) muln1 => ->.
 have dz2v_leq : psi (s2f B) <= `d[z2, v]_rmove.
   have cH1 : codom ↓[v] \subset [:: np2; np3] by apply: codom_liftr.

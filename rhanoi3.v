@@ -23,11 +23,10 @@ Local Notation "c1 `-->*_r c2" := (connect rmove c1 c2)
 (******************************************************************************)
 
 Fixpoint ppeg {n : nat} p1 p2 :=
-  if n is n1.+1 return seq (configuration 3 n) then
+  if n isn't n1.+1 return seq (configuration 3 n) then [::] else
     let p3 := `p[p1, p2] in
     [seq ↑[i]_p1 | i <- ppeg p1 p3] ++
-    [seq ↑[i]_p2 | i <- `c[p3] :: ppeg p3 p2]
-  else [::].
+    [seq ↑[i]_p2 | i <- `c[p3] :: ppeg p3 p2].
 
 Lemma size_ppeg n p1 p2 :
    size (ppeg p1 p2 : seq (configuration 3 n)) = (2^ n).-1.
@@ -38,10 +37,10 @@ by rewrite -(prednK (_ : 0 < 2 ^ n)) // expn_gt0.
 Qed.
 
 Lemma last_ppeg n p1 p2 c (cs := ppeg p1 p2 : seq (configuration 3 n)) :
-   last  c cs = `c[p2].
+   last c cs = `c[p2].
 Proof.
 have HH := @rirr 3.
-rewrite /cs; elim: n p1 p2 c {cs} => //= [_ p2 c | n IH p1 p2 p1Dp2].
+rewrite /cs; elim: n p1 p2 c {cs} => //= [_ p2 c | n IH p1 p2 c].
   by apply/ffunP=> [] [].
 by rewrite last_cat /= last_map IH perfect_liftr.
 Qed.
@@ -79,7 +78,7 @@ Proof.
 have irrH := @rirr 3; have symH := @rsym 3.
 (* The first induction is used when the path has duplicates (1 case) *)
 have [m sLm] := ubnP (size cs); elim: m => // m IHm in n p1 p2 cs sLm *.
-elim: n p1 p2 cs sLm => /= [p1 p2 [|] // p1Dp2 |]n IH p1 p2 cs sLm p1Dp2.
+elim: n p1 p2 cs sLm => /= [p1 p2 [|] //|]n IH p1 p2 cs sLm p1Dp2.
 have /= := size_ppeg n.+1 p1 p2.
 (* Is there a move of the last first disk *)
 case:  path3SP => //.
@@ -161,7 +160,7 @@ rewrite (IH _ _ _ Scs3 _ p1p3Pcs3 p1p3cs3Lp3p4) //.
 by rewrite opeg3E // eq_sym opeg3E // eq_sym p1Dp3 p4Dp1 eq_sym opegDl.
 Qed.
 
-Lemma gdist_perfect n p1 p2 :
+Lemma gdist_rhanoi3p n p1 p2 :
   `d[`c[p1, n], `c[p2]]_rmove = (2^ n).-1 * (p1 != p2).
 Proof.
 case: eqP => [<-|/eqP p1Dp2]; first by rewrite muln0 gdist0.
@@ -189,7 +188,7 @@ Fixpoint rpeg {n : nat} :=
     if p1 == p then [seq ↑[i]_p | i <- rpeg ↓[c] p] else
     let p2 := `p[p1, p] in
     [seq ↑[i]_p1 | i <- rpeg ↓[c] p2] ++
-    [seq ↑[i]_p | i <- (`c[p2]) :: ppeg p2 p]
+    [seq ↑[i]_p | i <- `c[p2] :: ppeg p2 p]
   else fun _ _ => [::].
 
 Lemma rpeg_perfect n p : rpeg (`c[p]) p = [::] :> seq (configuration 3 n).
@@ -699,7 +698,7 @@ have [/eqP p3Ep2 | p3Dp2] := boolP (p3 == p2).
   apply: leq_trans (geq_minl _ _) _.
   apply: leq_add.
     apply: leq_of_leqif (rpeg_min _ _ ) => //.
-      by rewrite lc1'cs1Epp4; congr (perfect (`p[_, _])).
+      by rewrite lc1'cs1Epp4; congr `c[`p[_, _]].
   apply: leq_of_leqif (lpeg_min _ _ ); rewrite -p4Ep //.
   by rewrite pp4cs2'E lc3cs2Ec2.
 have p3Ep : p3 = p.

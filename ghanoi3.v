@@ -44,6 +44,18 @@ by case: (peg3E (opeg p1 p2)) => ->;
    rewrite !D /peg1 /peg2 /peg3 /= ?inordK.
 Qed.
 
+Lemma opeg3Kl p p1 p2 : p1 != p2 -> `p[`p[p1, p2], p1] = p2.
+Proof.
+move=> p1Dp2; apply/eqP.
+by rewrite !opeg3E ?(eqxx, p1Dp2) // [in p2 != p1]eq_sym p1Dp2.
+Qed.
+
+Lemma opeg3Kr p p1 p2 : p1 != p2 -> `p[`p[p1, p2], p2] = p1.
+Proof.
+move=> p1Dp2; apply/eqP.
+by rewrite !opeg3E ?(eqxx, p1Dp2) // [in p2 != p1]eq_sym p1Dp2.
+Qed.
+
 Variable hrel : rel (peg 3).
 Hypothesis hirr : irreflexive hrel.
 Hypothesis hsym : symmetric hrel.

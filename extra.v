@@ -655,6 +655,10 @@ elim: n => /= [->//|n IH H].
 by rewrite H // IH // => i iH; rewrite H // (leq_trans iH).
 Qed.
 
+Lemma bigminMr  f n k :
+ \min_(i <= n) (f i * k) =  (\min_(i <= n) f i) * k.
+Proof. by elim: n => //= n ->; rewrite  minn_mull. Qed.
+
 (* Convolution *)
 
 Definition conv (f g : nat -> nat) n :=

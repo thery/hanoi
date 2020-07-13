@@ -93,7 +93,9 @@ Definition perfect p : configuration :=  [ffun d => p].
 
 End Disk.
 
-Local Notation "`c[ p ] " := (perfect p )
+Arguments perfect [n].
+
+Local Notation "`c[ p ] " := (perfect p)
     (format "`c[ p ]", at level 5).
 
 (* The smallest disk *)
@@ -616,12 +618,12 @@ by rewrite last_rm_rep last_map (gpath_last pH).
 Qed.
 
 Definition cliftrn m n p (c : configuration n) : configuration (m + n) :=
-  cmerge (perfect m p) c.
+  cmerge `c[p] c.
 Definition cliftr n : _ -> _ -> configuration n.+1 := @cliftrn 1 n.
 Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
 
 Definition cliftln m n p (c : configuration m) : configuration (m + n) :=
-  cmerge c (perfect n p).
+  cmerge c `c[p].
 
 Definition cliftl n c p : configuration (n + 1) := (@cliftln n 1 c p).
 
@@ -658,7 +660,7 @@ Lemma move_liftr n p (c1 c2 : configuration n) :
   move ↑[c1]_p ↑[c2]_p = move c1 c2.
 Proof. by exact: move_liftrn 1 p c1 c2. Qed.
 
-Lemma perfect_liftr n p : ↑[perfect n p]_p = perfect n.+1 p.
+Lemma perfect_liftr n p : ↑[`c[p]]_p = `c[p] :> configuration n.+1.
 Proof.
 apply/ffunP => i; rewrite !ffunE.
 by case: tsplitP => [j|k]; rewrite !ffunE.
@@ -697,7 +699,7 @@ Lemma eq_map_liftr n p (cs1 cs2 : seq (configuration n)) :
  ([seq ↑[i]_p | i <- cs1] == [seq ↑[i]_p | i <- cs2]) = (cs1 == cs2).
 Proof. by apply/map_eqr/cliftr_inj. Qed.
 
-Lemma perfect_unliftr n p : ↓[perfect n.+1 p] = perfect n p.
+Lemma perfect_unliftr n p : ↓[`c[p]] = `c[p] :> configuration n.
 Proof. by apply/ffunP => i; rewrite !ffunE. Qed.
 
 Lemma s2f_liftr n (c : configuration n.+1) (p : peg) :
@@ -793,7 +795,8 @@ apply/connectP; exists (rm_rep (↓[c1]) ([seq ↓[i] | i <- p])) => //.
 by rewrite last_rm_rep c2E last_map.
 Qed.
 
-Lemma perfect_liftrn m n p : cliftrn m p (perfect n p) = perfect (m + n) p.
+Lemma perfect_liftrn m n p : 
+  cliftrn m p (`c[p]) = `c[p] :> configuration (m + n).
 Proof.
 by apply/ffunP => i; rewrite !ffunE; case: tsplitP => j; rewrite !ffunE.
 Qed.
@@ -1070,18 +1073,23 @@ End Crlift.
 (*  Other peg                                                                 *)
 (******************************************************************************)
 
-Definition opeg n (p1 p2 : peg n.+1) :=
-  odflt ord0 [pick i | (i != p1) && (i != p2)].
+Definition opeg n (p1 p2 : peg n) :=
+  odflt (if p1 <= p2 then p1 else p2) [pick i | (i != p1) && (i != p2)].
 
-Lemma opeg_sym n (p1 p2 : peg n.+1) : opeg p1 p2 = opeg p2 p1.
-Proof. by congr odflt; apply: eq_pick => p; rewrite andbC. Qed.
+Lemma opeg_sym n (p1 p2 : peg n) : opeg p1 p2 = opeg p2 p1.
+Proof.
+rewrite /opeg; case: ltngtP => H;
+  try by congr odflt; apply: eq_pick => p; rewrite andbC.
+suff -> : p1 = p2 by [].
+by apply/val_eqP/eqP.
+Qed.
 
 Lemma opegDl n (p1 p2 : peg n.+3) : opeg p1 p2 != p1.
 Proof.
 rewrite /opeg; case: pickP => [x /andP[]//| HD].
 have D (p3 p4 : peg n.+3) : (p3 == p4) = (val p3 == val p4).
   by apply/eqP/idP => /val_eqP.
-have := HD ldisk; have := HD (inord 1); have := HD (inord 2).
+have := HD sdisk; have := HD (inord 1); have := HD (inord 2).
 rewrite !D /= !inordK //.
 by case: {HD}p1 => [] [|[|[|p1 Hp1]]] /=;
    case: p2 => [] [|[|[|p2 Hp2]]].
@@ -1092,7 +1100,7 @@ Proof.
 rewrite /opeg; case: pickP => [x /andP[]//| HD].
 have D (p3 p4 : peg n.+3) : (p3 == p4) = (val p3 == val p4).
   by apply/eqP/idP => /val_eqP.
-have := HD ldisk; have := HD (inord 1); have := HD (inord 2).
+have := HD sdisk; have := HD (inord 1); have := HD (inord 2).
 rewrite !D /= !inordK //.
 by case: {HD}p1 => [] [|[|[|p1 Hp1]]] /=;
    case: p2 => [] [|[|[|p2 Hp2]]].
