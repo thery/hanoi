@@ -369,9 +369,9 @@ Open Scope nat_scope.
 
 Lemma codom_subC (A : finType) (B : finType) (f : {ffun A -> B}) 
           (p1 p2 : B) : 
-  codom f \subset [:: p1; p2] -> codom f \subset [:: p2; p1].
+  (codom f \subset [:: p1; p2]) = (codom f \subset [:: p2; p1]).
 Proof.
-by move=> /subsetP sB; apply/subsetP => i /sB; rewrite !inE orbC.
+by apply/subsetP/subsetP; move => sB i /sB; rewrite !inE orbC.
 Qed.
 
 Lemma inord_eq0 n k : k = 0 -> inord k = ord0 :> 'I_n.+1.
@@ -409,6 +409,9 @@ Qed.
 
 Lemma Ival_eq n (x y : 'I_n) : (x == y) = (val x == val y).
 Proof. by apply/eqP/val_eqP. Qed.
+
+Lemma oddS n : odd n.+1 = ~~ odd n.
+Proof. by []. Qed.
 
 Lemma even_halfMl k m : 
   ~~ odd m -> (k * m)./2 = k * m./2.
