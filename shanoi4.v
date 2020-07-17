@@ -205,42 +205,42 @@ Notation " D[ l ] " := (distanceL l)
 
 (* Alternating peg : depending on the parity of n it is p1 or p2 *)
 Definition apeg p1 p2 n : peg 4 := if odd n then p2 else p1.
-Notation " z[ p1 , p2 ] " := (apeg p1 p2)
-  (format " z[ p1 ,  p2 ]").
+Notation " a[ p1 , p2 ] " := (apeg p1 p2)
+  (format " a[ p1 ,  p2 ]").
 
-Lemma apeg32E a p1 p2 : z[p1, p2] (3 * a).-2 = z[p1, p2] a.
+Lemma apeg32E a p1 p2 : a[p1, p2] (3 * a).-2 = a[p1, p2] a.
 Proof.
 case: a => // a.
 rewrite /apeg -subn2 oddB; last by rewrite mulnS.
 by rewrite odd_mul /=; case: odd.
 Qed.
 
-Lemma apeg0 p1 p2 : z[p1, p2] 0 = p1.
+Lemma apeg0 p1 p2 : a[p1, p2] 0 = p1.
 Proof. by []. Qed.
 
-Lemma apegS p1 p2 n : z[p1, p2] n.+1 = z[p2, p1] n.
+Lemma apegS p1 p2 n : a[p1, p2] n.+1 = a[p2, p1] n.
 Proof. by rewrite /apeg /=; case: odd. Qed.
 
-Lemma apegO p1 p2 n : z[p1, p2] n = z[p2, p1] (~~ (odd n)).
+Lemma apegO p1 p2 n : a[p1, p2] n = a[p2, p1] (~~ (odd n)).
 Proof. by rewrite /apeg /=; case: odd. Qed.
 
-Lemma apeg_double p1 p2 n : z[p1, p2] (n.*2) = p1.
+Lemma apeg_double p1 p2 n : a[p1, p2] (n.*2) = p1.
 Proof. by rewrite apegO odd_double. Qed.
 
-Lemma apeg_neq p1 p2 p3 n : p1 != p3 -> p2 != p3 -> z[p1, p2] n != p3.
+Lemma apeg_neq p1 p2 p3 n : p1 != p3 -> p2 != p3 -> a[p1, p2] n != p3.
 Proof. by rewrite /apeg /=; case: odd; rewrite // eq_sym. Qed.
 
-Lemma apeg_eqC p1 p2 n : (z[p1, p2] n == z[p2, p1] n) = (p1 == p2).
+Lemma apeg_eqC p1 p2 n : (a[p1, p2] n == a[p2, p1] n) = (p1 == p2).
 Proof. by rewrite /apeg /=; case: odd; rewrite // eq_sym. Qed.
 
-Lemma apegD p1 p2 m n : z[p1, p2] (m + n) = z[ z[p1, p2] n, z[p2, p1] n] m.
+Lemma apegD p1 p2 m n : a[p1, p2] (m + n) = a[ a[p1, p2] n, a[p2, p1] n] m.
 Proof. by rewrite /apeg oddD; do 2 case: odd. Qed.
 
-Lemma apegMr p1 p2 m n : odd m -> z[p1, p2] (m * n) = z[p1, p2] n.
+Lemma apegMr p1 p2 m n : odd m -> a[p1, p2] (m * n) = a[p1, p2] n.
 Proof. by rewrite /apeg; rewrite odd_mul => ->. Qed.
 
 Lemma codom_apeg (A : finType) (f : {ffun A -> _}) p1 p2 n : 
-  (codom f \subset [::  z[p1, p2] n;  z[p2, p1] n]) =
+  (codom f \subset [::  a[p1, p2] n;  a[p2, p1] n]) =
   (codom f \subset [:: p1; p2]). 
 Proof. by rewrite /apeg; case: odd; rewrite // codom_subC. Qed.
 
@@ -468,10 +468,10 @@ Hypothesis IH:
      p2 != p0 ->
      p3 != p0 ->
      (forall k : 'I_l.+1,
-      0 < k < l -> codom (u k) \subset [:: p2; z[p1, p3] k]) ->
+      0 < k < l -> codom (u k) \subset [:: p2; a[p1, p3] k]) ->
      (S_[l] n.+1).*2 <= sd u + 
-                     sp (u ord0) l (z[p1, p3] 0) + 
-                     sp (u ord_max) l (z[p1, p3] l).
+                     sp (u ord0) l (a[p1, p3] 0) + 
+                     sp (u ord_max) l (a[p1, p3] l).
  
 Variable l : nat.
 Variables p1 p2 p3: peg 4.
@@ -483,37 +483,37 @@ Hypothesis p1Dp0 : p1 != p0.
 Hypothesis p2Dp0 : p2 != p0.
 Hypothesis p3Dp0 : p3 != p0.
 Hypothesis cH : forall k : 'I_l.+2,
-     0 < k < l.+1 -> codom (u k) \subset [:: p2; z[p1, p3] k].
+     0 < k < l.+1 -> codom (u k) \subset [:: p2; a[p1, p3] k].
 
 Let u':= ([ffun i => ↓[u i]] : {ffun 'I_l.+2 -> configuration 4 n.+1})
  : {ffun 'I_l.+2 -> configuration 4 n.+1}.
 
 Let H: forall k : 'I_l.+2,
-    0 < k < l.+1 -> codom (u' k) \subset [:: p2; z[p1, p3] k].
+    0 < k < l.+1 -> codom (u' k) \subset [:: p2; a[p1, p3] k].
 Proof. by move=> k kH; rewrite ffunE; apply/codom_liftr/cH. Qed.
 
-Let apeg13D2 a : z[p1, p3] a != p2.
+Let apeg13D2 a : a[p1, p3] a != p2.
 Proof. by rewrite /apeg; case: odd; rewrite // eq_sym. Qed.
 
-Let apeg13D0 a : z[p1, p3] a != p0.
+Let apeg13D0 a : a[p1, p3] a != p0.
 Proof. by rewrite /apeg; case: odd; rewrite // eq_sym. Qed.
 
 Hypothesis KH1 : u ord0 ord_max = p1.
-Hypothesis KH2 : u ord_max ord_max != z[p3, p1] l.
+Hypothesis KH2 : u ord_max ord_max != a[p3, p1] l.
 Hypothesis l_gt0 : l != 0.
 
 Lemma case1 :
   (S_[l.+1] n.+2).*2 <= 
   sd u + sp (u ord0) l.+1 p1 + 
-         sp (u ord_max) l.+1 (z[p3, p1] l).
+         sp (u ord_max) l.+1 (a[p3, p1] l).
 Proof.
 have il1E : inord l.+1 = ord_max :> 'I_l.+2
   by apply/val_eqP; rewrite /= inordK.
-have iE : exists i, u (inord i) ord_max != z[p1, p3] i.
+have iE : exists i, u (inord i) ord_max != a[p1, p3] i.
   by exists l.+1; rewrite apegS il1E.
 case: (@ex_minnP _ iE) => a aH aMin.
-have aMin1 i : i < a -> u (inord i) ord_max = z[p1, p3] i.
-  by case: (u (inord i) ord_max =P z[p1, p3] i) => // /eqP /aMin; case: leqP.
+have aMin1 i : i < a -> u (inord i) ord_max = a[p1, p3] i.
+  by case: (u (inord i) ord_max =P a[p1, p3] i) => // /eqP /aMin; case: leqP.
 have aLld1 : a <= l.+1 by apply: aMin; rewrite apegS il1E.
 have a_gt0 : 0 < a by case: (a) aH; rewrite // apeg0 -KH1 inord_eq0 //= eqxx.
 pose ai : 'I_l.+2 := inord a.
@@ -549,12 +549,12 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     - by rewrite aMin1.
     by rewrite aMin1 // -[a]prednK.
   pose sam1 : configuration 4 n.+1 := 
-     sgdist1 (z[p1, p3] a) (u (inord a.-1)) (u (inord a)).
+     sgdist1 (a[p1, p3] a) (u (inord a.-1)) (u (inord a)).
   pose tam1 : configuration 4 n.+1 := 
-     sgdist2 (z[p1, p3] a) (u (inord a.-1)) (u (inord a)).
+     sgdist2 (a[p1, p3] a) (u (inord a.-1)) (u (inord a)).
   have [sam1C tam1C duam1ua1E] : 
-     [/\ codom sam1 \subset [:: z[p1, p3] a; u (inord a) ldisk ], 
-         codom tam1 \subset [:: u (inord a.-1) ldisk; z[p1, p3] a] & 
+     [/\ codom sam1 \subset [:: a[p1, p3] a; u (inord a) ldisk ], 
+         codom tam1 \subset [:: u (inord a.-1) ldisk; a[p1, p3] a] & 
          `d[u (inord a.-1), u (inord a)]_smove = 
            D[[:: ↓[u (inord a.-1)]; sam1; tam1; ↓[u (inord a)]]].+2].
     apply: sgdistE => //.
@@ -565,7 +565,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     by rewrite uaiLEp2. 
   have {}tam1C : codom tam1 \subset [:: p1; p3].
     move: tam1C; rewrite aMin1; last by rewrite -{2}[a]prednK.
-    rewrite -subn1 apegO oddB //= [z[_, _]a]apegO; case: odd => //=.
+    rewrite -subn1 apegO oddB //= [a[_, _]a]apegO; case: odd => //=.
     by rewrite codom_subC.
   pose u1 := 
     [ffun i =>
@@ -681,7 +681,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
   set x3P1 := sd _ in P1; set xP1 := sd _ in P1.
   rewrite -/xP1.
   have cH2 (k : 'I_(3 * a).-2.+1) : 
-      0 < k < (3 * a).-2 -> codom (u1 k) \subset [:: p2; z[p1, p3] k].
+      0 < k < (3 * a).-2 -> codom (u1 k) \subset [:: p2; a[p1, p3] k].
     move=> /andP[k_gt0 k_lt].
     have kL3a1 : k <= (3 * a.-1).
       by rewrite -ltnS (leq_trans k_lt) // -{1}[a]prednK // mulnS.
@@ -704,7 +704,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
       by rewrite (leq_trans kLa1) // -subn1 leq_subr.
     case: eqP => k3mH.
       apply: codom_liftr.
-      rewrite {2}(divn_eq k 3) k3mH addn0 [in z[_,_] _]mulnC apegMr //.
+      rewrite {2}(divn_eq k 3) k3mH addn0 [in a[_,_] _]mulnC apegMr //.
       have := @cH (inord (k %/3)); rewrite inordK; last first.
         by rewrite (leq_ltn_trans k3La).
       apply.
@@ -714,8 +714,8 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     case: eqP => k3mH1.
       case: (sitiH ((k %/ 3))) => /=.
         by rewrite -[a.-1]prednK // -ltnS prednK.
-      set pp := u _ _; (suff <- : pp = z[p1, p3] k by []); rewrite {}/pp.
-      set i := inord _; have <- : z[p1, p3] i = z[p1, p3] k.
+      set pp := u _ _; (suff <- : pp = a[p1, p3] k by []); rewrite {}/pp.
+      set i := inord _; have <- : a[p1, p3] i = a[p1, p3] k.
         rewrite (divn_eq k 3) k3mH1 addn1 apegS mulnC apegMr //.
         by rewrite /i !inordK ?apegS //= !ltnS (leq_trans k3La).
       have H2 : (k %/ 3).+1 < l.+2 by rewrite !ltnS (leq_trans k3La).
@@ -727,8 +727,8 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     rewrite codom_subC.
     case: (sitiH ((k %/ 3))) => /= [|_].
       by rewrite -[a.-1]prednK // -ltnS prednK.
-    set pp := u _ _; (suff <- : pp = z[p1, p3] k by []); rewrite {}/pp.
-    set i := inord _; have <- : z[p1, p3] i = z[p1, p3] k.
+    set pp := u _ _; (suff <- : pp = a[p1, p3] k by []); rewrite {}/pp.
+    set i := inord _; have <- : a[p1, p3] i = a[p1, p3] k.
       have k3mH2 : k %% 3 = 2.
         have := ltn_mod k 3; move: k3mH k3mH1.
         by case: modn => // [] [|[]].
@@ -746,20 +746,20 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
   rewrite u10E uiME apeg0 in P2.
   have {}P2 := leq_trans P2 (leq_add (leq_add (leqnn _) (leq_sum_beta _ _))
                           (leqnn _)).
-  pose pa := z[p1, p3] a; pose paS := z[p1, p3] a.+1.
+  pose pa := a[p1, p3] a; pose paS := a[p1, p3] a.+1.
   have cH3 (k : 'I_3) : 
-    0 < k < 2 -> codom (u2 k) \subset [:: paS; z[p2, pa] k].
+    0 < k < 2 -> codom (u2 k) \subset [:: paS; a[p2, pa] k].
     case: k => [] [|[|]] //= iH _.
     by rewrite /pa /paS !apegS apeg0 ffunE /= codom_apeg codom_subC.
   rewrite -/x1P1 in P2.
   have {cH3}P3 : 
-    (S_[2] n.+1).*2 <= sd u2 + sp (u2 ord0) 2 (z[p2, pa] 0) +
-                       sp (u2 ord_max) 2 (z[p2, pa] 2).
+    (S_[2] n.+1).*2 <= sd u2 + sp (u2 ord0) 2 (a[p2, pa] 0) +
+                       sp (u2 ord_max) 2 (a[p2, pa] 2).
     apply: IH cH3 => //; try by rewrite /pa /paS // eq_sym.
     by rewrite /pa /paS apegS apeg_eqC eq_sym.
   rewrite !ffunE /= apeg0 -/x2P1 in P3.
   have cH4 (k : 'I_b.+1) :
-      0 < k < b -> codom (u3 k) \subset [:: p2; z[pa, paS] k].
+      0 < k < b -> codom (u3 k) \subset [:: p2; a[pa, paS] k].
       rewrite /b .
     move=> /andP[k_gt0 kLb].
     have kBound : 0 < k + a < l.+1.
@@ -770,12 +770,12 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
     rewrite /pa /paS apegS inordK; first by rewrite -apegD; apply.
     by rewrite ltnW // ltnS; case/andP: kBound.
   have {cH4}P4 : 
-   (S_[b] n.+1).*2 <= sd u3 + sp (u3 ord0) b (z[pa, paS] 0) +
-                      sp (u3 ord_max) b (z[pa, paS] b).
+   (S_[b] n.+1).*2 <= sd u3 + sp (u3 ord0) b (a[pa, paS] 0) +
+                      sp (u3 ord_max) b (a[pa, paS] b).
     apply: IH cH4 => //; try by rewrite /pa /paS // eq_sym.
     by rewrite /pa /paS apegS apeg_eqC.
   have {}P4 := leq_trans P4 (leq_add (leqnn _) (leq_sum_beta _ _)).
-  rewrite apeg0 /= (_ : z[_, _] b = z[p3, p1] l) in P4; last first.
+  rewrite apeg0 /= (_ : a[_, _] b = a[p3, p1] l) in P4; last first.
     by rewrite /pa /paS apegS -apegD subnK ?apegS.
   rewrite !ffunE /= add0n -/ai in P4.
   rewrite -/x3P1 subnK // (_ : inord l.+1 = ord_max) in P4; last first.
@@ -880,7 +880,7 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
     - by rewrite aMin1 1?eq_sym // -[a]prednK.
     - by rewrite aMin1.
     by rewrite aMin1 // -[a]prednK.
-  pose pa := z[p1, p3] a.
+  pose pa := a[p1, p3] a.
   pose sam1 : configuration 4 n.+1 := sgdist1 pa (u (inord a.-1)) (u (inord a)).
   pose tam1 : configuration 4 n.+1 := sgdist2 pa (u (inord a.-1)) (u (inord a)).
   have [sam1C tam1C duam1ua1E] : 
@@ -1007,7 +1007,7 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
   set x1P1 := sd _ in P1; set x2P1 := sd _ in P1.
   set xP1 := sd _ in P1; rewrite -/xP1.
   have cH2 (k : 'I_(3 * a).-2.+1) : 
-      0 < k < (3 * a).-2 -> codom (u1 k) \subset [:: p2; z[p1, p3] k].
+      0 < k < (3 * a).-2 -> codom (u1 k) \subset [:: p2; a[p1, p3] k].
     move=> /andP[k_gt0 k_lt].
     have kL3a1 : k <= (3 * a.-1).
       by rewrite -ltnS (leq_trans k_lt) // -{1}[a]prednK // mulnS.
@@ -1029,7 +1029,7 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
       by rewrite (leq_trans kLa1) // -subn1 leq_subr.
     case: eqP => k3mH.
       apply: codom_liftr.
-      rewrite {2}(divn_eq k 3) k3mH addn0 [in z[_,_] _]mulnC apegMr //.
+      rewrite {2}(divn_eq k 3) k3mH addn0 [in a[_,_] _]mulnC apegMr //.
       have := @cH (inord (k %/3)); rewrite inordK; last first.
         by rewrite (leq_ltn_trans k3La).
       apply.
@@ -1038,8 +1038,8 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
       by case/andP.
     case: eqP => k3mH1.
       case: (sitiH (k %/ 3)); first by rewrite -[a.-1]prednK.
-      set pp := u _ _; (suff <- : pp = z[p1, p3] k by []); rewrite {}/pp.
-      set i := inord _; have <- : z[p1, p3] i = z[p1, p3] k.
+      set pp := u _ _; (suff <- : pp = a[p1, p3] k by []); rewrite {}/pp.
+      set i := inord _; have <- : a[p1, p3] i = a[p1, p3] k.
         rewrite (divn_eq k 3) k3mH1 addn1 apegS mulnC apegMr //.
         by rewrite /i !inordK ?apegS //= !ltnS lEa.  
       have H2 : (k %/ 3).+1 < l.+2 by rewrite !ltnS lEa (leq_trans k3La).
@@ -1049,8 +1049,8 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
       by apply/val_eqP; rewrite /= !inordK.
     rewrite codom_subC.
     case: (sitiH (k %/ 3)) => [|_]; first by rewrite -[a.-1]prednK.
-    set pp := u _ _; (suff <- : pp = z[p1, p3] k by []); rewrite {}/pp.
-    set i := inord _; have <- : z[p1, p3] i = z[p1, p3] k.
+    set pp := u _ _; (suff <- : pp = a[p1, p3] k by []); rewrite {}/pp.
+    set i := inord _; have <- : a[p1, p3] i = a[p1, p3] k.
       have k3mH2 : k %% 3 = 2.
         have := ltn_mod k 3; move: k3mH k3mH1.
         by case: modn => // [] [|[]].
@@ -1069,17 +1069,17 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
   have {}P2 := leq_trans P2 (leq_add (leq_add (leqnn _) (leq_sum_beta _ _))
                           (leqnn _)).
   rewrite -/x1P1 in P2.
-  pose paS := z[p1, p3] a.+1.
+  pose paS := a[p1, p3] a.+1.
   have cH3 (k : 'I_4) :
-    0 < k < 3 -> codom (u2 k) \subset [:: pa; z[p2, paS] k].
+    0 < k < 3 -> codom (u2 k) \subset [:: pa; a[p2, paS] k].
     case: k => [] [|[|[|]]] //= iH _; rewrite ffunE /=.
       by have := tam1C; rewrite /pa /paS !(apegS, apeg0) codom_apeg.
     apply: codom_liftr.
     have /cH : 0 < ai < l.+1 by rewrite aiE a_gt0 // lEa /=.
     by rewrite /pa /paS !(apegS, apeg0) aiE codom_subC.
   have {cH3}P3 : 
-    (S_[3] n.+1).*2 <= sd u2 + sp (u2 ord0) 3 (z[p2, paS] 0) +
-                       sp (u2 ord_max) 3 (z[p2, paS] 3).
+    (S_[3] n.+1).*2 <= sd u2 + sp (u2 ord0) 3 (a[p2, paS] 0) +
+                       sp (u2 ord_max) 3 (a[p2, paS] 3).
     apply: IH cH3 => //; try by rewrite /pa /paS // eq_sym.
     by rewrite /paS apegS apeg_eqC.
   have {}P3 := leq_trans P3 (leq_add (leqnn _) (leq_sum_beta _ _)).
@@ -1185,13 +1185,13 @@ have [/eqP aE1| aD1] := boolP (a == 1).
     set x1P1 := sd _ in P1; set x2P1 := sd _ in P1.
     set xP1 := sd _ in P1; rewrite -/xP1.
     have cH2 (k : 'I_4) :
-      0 < k < 3 -> codom (u1 k) \subset [:: p3; z[p1, p2] k]. 
+      0 < k < 3 -> codom (u1 k) \subset [:: p3; a[p1, p2] k]. 
       case: k => [] [|[|[|]]] //= iH _; rewrite ffunE /= !(apegS, apeg0).
         by have := s0C; rewrite u1C.
       by rewrite codom_subC -KH1.
     have {cH2}P2 : 
-      (S_[3] n.+1).*2 <= sd u1 + sp ↓[u (inord 0)] 3 (z[p1, p2] 0) +
-                         sp ↓[u (inord 1)] 3 (z[p1, p2] 3).
+      (S_[3] n.+1).*2 <= sd u1 + sp ↓[u (inord 0)] 3 (a[p1, p2] 0) +
+                         sp ↓[u (inord 1)] 3 (a[p1, p2] 3).
       apply: leq_trans (IH _ _ _ _ _ _ cH2) _ => //.
         by rewrite eq_sym.
       repeat apply: leq_add => //; rewrite leq_eqVlt;
@@ -1202,7 +1202,7 @@ have [/eqP aE1| aD1] := boolP (a == 1).
                (leq_add (leq_add (leqnn _) (leq_sum_beta _ _)) (leqnn _)).
     rewrite -/x2P1 (inord_eq0) // -[in inord 1]aE1 !(apegS, apeg0) in P2.
     have cH3 (k : 'I_b.+1) :
-      0 < k < b -> codom (u2 k) \subset [:: p2; z[p3, p1] k].
+      0 < k < b -> codom (u2 k) \subset [:: p2; a[p3, p1] k].
       rewrite [X in k < X]bE => /andP[k_gt0 kLb].
       rewrite ffunE addn1; apply: codom_liftr.
       have := @cH (inord k.+1).
@@ -1210,7 +1210,7 @@ have [/eqP aE1| aD1] := boolP (a == 1).
       by rewrite ltnS (leq_trans kLb).
     have {cH3}P3 : 
      (S_[b] n.+1).*2 <= sd u2 + sp ↓[u (inord 1)] b p3 + 
-                        sp ↓[u ord_max] b (z[p3, p1] b).
+                        sp ↓[u ord_max] b (a[p3, p1] b).
       apply: leq_trans (IH _ _ _ _ _ _ cH3) _ => //; try by rewrite eq_sym.
       repeat apply: leq_add => //; rewrite leq_eqVlt; 
          apply/orP; left; apply/eqP; apply: eq_bigr => i _.
@@ -1218,7 +1218,7 @@ have [/eqP aE1| aD1] := boolP (a == 1).
       rewrite !ffunE /= addn1 bE; congr ((u _ _ != _) * _).
       by apply/val_eqP; rewrite /= inordK.
     have {}P3 := leq_trans P3 (leq_add (leqnn _) (leq_sum_beta _ _)).
-    rewrite -/x2P1 (_ : z[p3, p1] b = z[p3, p1] l) in P3; last first.
+    rewrite -/x2P1 (_ : a[p3, p1] b = a[p3, p1] l) in P3; last first.
       by rewrite bE.
     rewrite -[in inord 1]aE1 in P3.
     rewrite !sum_beta_S // KH1 eqxx mul0n addn0 KH2 mul1n.
@@ -1288,7 +1288,7 @@ have [/eqP aE1| aD1] := boolP (a == 1).
     case: (l) u => // [] [] // uu _; rewrite big_ord_recl big_ord0 addn0 /=.
     by congr(`d[uu _, uu _]_smove); apply/val_eqP; rewrite /= !inordK.
   have cH1 (k : 'I_5) : 
-    0 < k < 4 -> codom (u1 k) \subset [:: p3; z[p1, p2] k].
+    0 < k < 4 -> codom (u1 k) \subset [:: p3; a[p1, p2] k].
     case: k => [] [|[|[|[|]]]] //= iH _; rewrite !ffunE !(apegS, apeg0).
     - by have := s0C; rewrite u1LE.
     - by rewrite codom_subC -KH1.
@@ -1307,7 +1307,7 @@ have [/eqP aE1| aD1] := boolP (a == 1).
   set x1P := sd _ in P1; rewrite -/x1P in P2.
   rewrite !ffunE /= (_ : inord 2 = ord_max) in P2; last first.
     by apply: val_inj; rewrite /= inordK // -bE bE1.
-  rewrite {2}(_ : p1 = z[p3, p1] l) in P2; last first.
+  rewrite {2}(_ : p1 = a[p3, p1] l) in P2; last first.
     by rewrite -bE -bE1.
   set x1S := \sum_(_ < _) _ in P2; set x2S := \sum_(_ < _) _ in P2.
   rewrite !sum_beta_S //= KH1 KH2 !eqxx !addn0 mul1n.
@@ -1392,7 +1392,7 @@ have P1 : l.*2 + sd u1 <= sd u.
   have : (3 * i.+1) %% 3 = (3 * l).+1 %% 3 by rewrite eH.
   by rewrite !mod3E.
 have cH1 (k : 'I_(3 * l).+2) : 
-    0 < k < (3 * l).+1 -> codom (u1 k) \subset [:: p2; z[p1, p3] k].
+    0 < k < (3 * l).+1 -> codom (u1 k) \subset [:: p2; a[p1, p3] k].
   rewrite !ffunE.
   case: eqP => [->|/eqP kD3l1]; first by rewrite ltnn andbF.
   case: eqP => [km3E0|/eqP km3D0].
@@ -1418,13 +1418,13 @@ have cH1 (k : 'I_(3 * l).+2) :
 have {cH1}P2 : 
    (S_[(3 * l).+1] n.+1).*2 <= sd u1 + sp (u1 ord0) (3 * l).+1 p1 +
                                sp (u1 ord_max) (3 * l).+1 
-                                               (z[p1, p3] (3 * l).+1).
+                                               (a[p1, p3] (3 * l).+1).
   by apply: IH cH1.
  have {}P2 := leq_trans P2 (leq_add (leq_add (leqnn _) (leq_sum_beta _ _))
                           (leq_sum_beta _ _)).
 set xP := sd _; rewrite -/xP in P1.
 set x1P := sd _ in P1.
-rewrite -/x1P (_ : z[p1, p3] (3 * l).+1 = z[p3, p1] l) in P2; last first.
+rewrite -/x1P (_ : a[p1, p3] (3 * l).+1 = a[p3, p1] l) in P2; last first.
   by rewrite apegS apegMr.
 rewrite !sum_beta_S // KH1 KH2 !eqxx addn0 mul1n.
 rewrite !ffunE /= eqxx inord_eq0 // (_ : ai = ord_max) in P2; last first.
@@ -1461,32 +1461,32 @@ Hypothesis IH:
      p2 != p0 ->
      p3 != p0 ->
      (forall k : 'I_l.+1,
-      0 < k < l -> codom (u k) \subset [:: p2; z[p1, p3] k]) ->
-     (S_[l] n.+1).*2 <= sd u + sp (u ord0) l (z[p1, p3] 0) +
-                            sp (u ord_max) l (z[p1, p3] l).
+      0 < k < l -> codom (u k) \subset [:: p2; a[p1, p3] k]) ->
+     (S_[l] n.+1).*2 <= sd u + sp (u ord0) l (a[p1, p3] 0) +
+                            sp (u ord_max) l (a[p1, p3] l).
 
 Lemma case2 l (u :  {ffun 'I_l.+2 -> configuration 4 n.+2}) 
               (p1 p2 p3: peg 4) :
    p1 != p2 -> p1 != p3 -> p2 != p3 ->
    p1 != p0 -> p2 != p0 -> p3 != p0 ->
   (forall k : 'I_l.+2,
-     0 < k < l.+1 -> codom (u k) \subset [:: p2; z[p1, p3] k]) ->
+     0 < k < l.+1 -> codom (u k) \subset [:: p2; a[p1, p3] k]) ->
   (u ord0 ord_max = p1) ->
-  (u ord_max ord_max = z[p3, p1] l) ->
-  (forall k, u k ldisk = z[p1, p3] k) ->
+  (u ord_max ord_max = a[p3, p1] l) ->
+  (forall k, u k ldisk = a[p1, p3] k) ->
   (S_[l.+1] n.+2).*2 <= sd u + sp (u ord0) l.+1 p1
-                             + sp (u ord_max) l.+1 (z[p3, p1] l).
+                             + sp (u ord_max) l.+1 (a[p3, p1] l).
 Proof.
 move=> p1Dp2 p1Dp3 p2Dp3 p1Dp0 p2Dp0 p3Dp0.
 move=> /= cH KH1 KH2 ukLE.
 pose u':= ([ffun i => ↓[u i]] : {ffun 'I_l.+2 -> configuration 4 n.+1})
  : {ffun 'I_l.+2 -> configuration 4 n.+1}.
 have H: forall k : 'I_l.+2,
-    0 < k < l.+1 -> codom (u' k) \subset [:: p2; z[p1, p3] k].
+    0 < k < l.+1 -> codom (u' k) \subset [:: p2; a[p1, p3] k].
   by move=> k kH; rewrite ffunE; apply/codom_liftr/cH.
-have apegpaD2 a : z[p1, p3] a != p2.
+have apegpaD2 a : a[p1, p3] a != p2.
   by rewrite /apeg; case: odd; rewrite // eq_sym.
-have apegpaD0 a : z[p1, p3] a != p0.
+have apegpaD0 a : a[p1, p3] a != p0.
   by rewrite /apeg; case: odd; rewrite // eq_sym.
 pose si i : configuration 4 n.+1 := 
     sgdist1 p2 (u (inord i)) (u (inord i.+1)).
@@ -1535,7 +1535,7 @@ have P1 : l.+1.*2 + sd u1 = sd u.
   case: (sitiH i) => // _ _.
   by rewrite /= add2n addn0 !addnA add1n.
 have cH1 (k : 'I_(3 * l.+1).+1) : 
-  0 < k < 3 * l.+1 -> codom (u1 k) \subset [:: p2; z[p1, p3] k].
+  0 < k < 3 * l.+1 -> codom (u1 k) \subset [:: p2; a[p1, p3] k].
   rewrite !ffunE.
   case: eqP => [km3E0|/eqP km3D0].
     rewrite {1 2 4}(divn_eq k 3) km3E0 addn0.
@@ -1561,7 +1561,7 @@ have cH1 (k : 'I_(3 * l.+1).+1) :
 have {cH1}P2 : 
     (S_[3 * l.+1] n.+1).*2 <= sd u1 + sp (u1 ord0) (3 * l.+1) p1 
                                     + sp (u1 ord_max) (3 * l.+1)
-                                         (z[p1, p3] (3 * l.+1)).
+                                         (a[p1, p3] (3 * l.+1)).
   by apply: IH cH1.
 have {}P2 := leq_trans P2 (leq_add (leq_add (leqnn _) (leq_sum_beta _ _))
                         (leq_sum_beta _ _)).
@@ -1601,40 +1601,40 @@ Hypothesis IH:
   p2 != p0 ->
   p3 != p0 ->
   (forall k : 'I_l.+1,
-  0 < k < l -> codom (u k) \subset [:: p2; z[p1, p3] k]) ->
-  (S_[l] n.+1).*2 <= sd u + sp (u ord0) l p1 + sp (u ord_max) l (z[p1, p3] l).
+  0 < k < l -> codom (u k) \subset [:: p2; a[p1, p3] k]) ->
+  (S_[l] n.+1).*2 <= sd u + sp (u ord0) l p1 + sp (u ord_max) l (a[p1, p3] l).
 
 Lemma case3 l (u :  {ffun 'I_l.+2 -> configuration 4 n.+2}) 
               (p1 p2 p3: peg 4) :
    p1 != p2 -> p1 != p3 -> p2 != p3 ->
    p1 != p0 -> p2 != p0 -> p3 != p0 ->
   (forall k : 'I_l.+2,
-     0 < k < l.+1 -> codom (u k) \subset [:: p2; z[p1, p3] k]) ->
+     0 < k < l.+1 -> codom (u k) \subset [:: p2; a[p1, p3] k]) ->
   (u ord0 ord_max = p1) ->
-  (u ord_max ord_max = z[p3, p1] l) ->
+  (u ord_max ord_max = a[p3, p1] l) ->
   (S_[l.+1] n.+2).*2 <= sd u + sp (u ord0) l.+1 p1 
-                             + sp (u ord_max) l.+1 (z[p3, p1] l).
+                             + sp (u ord_max) l.+1 (a[p3, p1] l).
 Proof.
 move=> p1Dp2 p1Dp3 p2Dp3 p1Dp0 p2Dp0 p3Dp0.
 move=> cH KH1 KH2.
 pose u':= ([ffun i => ↓[u i]] : {ffun 'I_l.+2 -> configuration 4 n.+1})
  : {ffun 'I_l.+2 -> configuration 4 n.+1}.
 have H: forall k : 'I_l.+2,
-    0 < k < l.+1 -> codom (u' k) \subset [:: p2; z[p1, p3] k].
+    0 < k < l.+1 -> codom (u' k) \subset [:: p2; a[p1, p3] k].
   by move=> k kH; rewrite ffunE; apply/codom_liftr/cH.
-have apegpaD2 a : z[p1, p3] a != p2.
+have apegpaD2 a : a[p1, p3] a != p2.
   by rewrite /apeg; case: odd; rewrite // eq_sym.
-have apegpaD0 a : z[p1, p3] a != p0.
+have apegpaD0 a : a[p1, p3] a != p0.
   by rewrite /apeg; case: odd; rewrite // eq_sym.
-case: (pickP (fun i => u i ldisk != z[p1, p3] i)) => [x xH|pH]; last first.
-  have {pH}ukLE k : u k ldisk = z[p1, p3] k by have := pH k; case: eqP.
+case: (pickP (fun i => u i ldisk != a[p1, p3] i)) => [x xH|pH]; last first.
+  have {pH}ukLE k : u k ldisk = a[p1, p3] k by have := pH k; case: eqP.
   have := case2 _ _ _ _ _ _ _ cH KH1 KH2 ukLE.
   by apply.
-have exH : exists x, u (inord x) ldisk != z[p1, p3] x.
+have exH : exists x, u (inord x) ldisk != a[p1, p3] x.
   exists x; rewrite (_ : inord x = x) //.
   by apply/val_eqP; rewrite /= inordK.
 case: (@ex_minnP _ exH) => a aH {exH}aMin.
-have exL : exists x, (x <= l) && (u (inord x) ord_max != z[p1, p3] x).
+have exL : exists x, (x <= l) && (u (inord x) ord_max != a[p1, p3] x).
   exists x; apply/andP; split => //.
     have := ltn_ord x.
      rewrite ltnS leq_eqVlt => /orP[] // /eqP xEl1.
@@ -1642,13 +1642,13 @@ have exL : exists x, (x <= l) && (u (inord x) ord_max != z[p1, p3] x).
     rewrite (_ : x = ord_max); last by apply/val_eqP/eqP.
     by apply/eqP/val_eqP; rewrite /= apegS.
   by rewrite (_ : inord x = x) //; apply/val_eqP; rewrite /= inordK.
-have exL1 y : (y <= l) && (u (inord y) ord_max != z[p1, p3] y) -> y <= l.
+have exL1 y : (y <= l) && (u (inord y) ord_max != a[p1, p3] y) -> y <= l.
   by case/andP.
 pose a1 := ex_maxn exL exL1.
-have a1H: u (inord a1) ldisk != z[p1, p3] a1.
+have a1H: u (inord a1) ldisk != a[p1, p3] a1.
   by rewrite /a1; case: ex_maxnP => i /andP[].
 have a1Ll : a1 <= l by rewrite /a1; case: ex_maxnP => i /andP[].
-have a1Max i : a1 < i < l.+2 -> u (inord i) ord_max = z[p1, p3] i.
+have a1Max i : a1 < i < l.+2 -> u (inord i) ord_max = a[p1, p3] i.
   case/andP=> a1Li; rewrite ltnS leq_eqVlt => /orP[/eqP iEl1|iLl].
     rewrite iEl1 apegS (_ : inord l.+1 = ldisk) //.
     by apply/val_eqP; rewrite /= inordK.
@@ -1685,12 +1685,12 @@ wlog aLl1Ba1 : u p1 p3 p1Dp3 p2Dp3 p3Dp0 apegpaD2 apegpaD0 p1Dp2 p1Dp0
     congr (`d[u _,u _]_smove).
       by apply/val_eqP; rewrite /= !inordK ?subSn.
     by apply/val_eqP; rewrite /= !inordK // ?subSS ltnS // ltnW.
-  pose p1' := z[p1, p3] l; pose p3' := z[p3, p1] l.
-  have -> : sp (u ord0) l.+1 p1 = sp (u1 ord_max) l.+1 (z[p1', p3'] l). 
+  pose p1' := a[p1, p3] l; pose p3' := a[p3, p1] l.
+  have -> : sp (u ord0) l.+1 p1 = sp (u1 ord_max) l.+1 (a[p1', p3'] l). 
     apply: eq_bigr => i _; congr (_ * _).
     rewrite -apegD addnn apegO odd_double /= apegS apeg0.
     by rewrite ffunE subnn inord_eq0.
-  have -> : sp (u ord_max) l.+1 (z[p3, p1] l) = sp (u1 ord0) l.+1 p3'.
+  have -> : sp (u ord_max) l.+1 (a[p3, p1] l) = sp (u1 ord0) l.+1 p3'.
     apply: eq_bigr => i _; congr (_ * _).
     rewrite ffunE subn0.
     suff -> : inord l.+1 = ord_max :> 'I_l.+2 by []. 
@@ -1711,7 +1711,7 @@ wlog aLl1Ba1 : u p1 p3 p1Dp3 p2Dp3 p3Dp0 apegpaD2 apegpaD0 p1Dp2 p1Dp0
     have F1 : k <= l.+1 by apply: ltnW.
     have F2 : l.+1 - k < l.+2.
       by rewrite ltn_subLR // addnS ltnS leq_addl.
-    have -> :  z[p3', p1'] k = z[p1, p3] (inord (l.+1 - k) : 'I_l.+2) .
+    have -> :  a[p3', p1'] k = a[p1, p3] (inord (l.+1 - k) : 'I_l.+2) .
       rewrite inordK // -apegD -apegS -addnS.
       by rewrite [LHS]apegO [RHS]apegO oddD oddB //= addbC.
     apply: cH; rewrite inordK // subn_gt0 // ltn_subLR // kH2 //=.
@@ -1737,16 +1737,16 @@ wlog aLl1Ba1 : u p1 p3 p1Dp3 p2Dp3 p3Dp0 apegpaD2 apegpaD0 p1Dp2 p1Dp0
   - by rewrite -[a]prednK // subSS leq_subr.
   move=> k /andP[l1BaLk kLl2]; rewrite ffunE.
   rewrite inordK //; apply/eqP; case: eqP => // /eqP.
-  suff -> : z[p3', p1'] k = z[p1, p3] (l.+1 - k).
+  suff -> : a[p3', p1'] k = a[p1, p3] (l.+1 - k).
     by move=> /aMin; rewrite leqNgt ltn_subLR // addnC -ltn_subLR // l1BaLk.
   by rewrite [RHS]apegO oddB // -oddD -apegO addSn apegS addnC apegD.
 pose u':= ([ffun i => ↓[u i]] : {ffun 'I_l.+2 -> configuration 4 n.+1})
  : {ffun 'I_l.+2 -> configuration 4 n.+1}.
 have H: forall k : 'I_l.+2,
-    0 < k < l.+1 -> codom (u' k) \subset [:: p2; z[p1, p3] k].
+    0 < k < l.+1 -> codom (u' k) \subset [:: p2; a[p1, p3] k].
   by move=> k kH; rewrite ffunE; apply/codom_liftr/cH.
-have aMin1 i : i < a -> u (inord i) ord_max = z[p1, p3] i.
-  by case: (u (inord i) ord_max =P z[p1, p3] i) => // /eqP /aMin; case: leqP.
+have aMin1 i : i < a -> u (inord i) ord_max = a[p1, p3] i.
+  by case: (u (inord i) ord_max =P a[p1, p3] i) => // /eqP /aMin; case: leqP.
 have a_gt0 : 0 < a.
   have : 0 <= a by [].
   rewrite leq_eqVlt => /orP[/eqP aE0|] //.
@@ -1786,7 +1786,7 @@ have sitiH i : i < a.-1 ->
   apply: sgdistE; rewrite ?aMin1 // -1?[a]prednK //.
     by rewrite apegS apeg_eqC.
   by rewrite eq_sym.
-pose pa := z[p1, p3] a.
+pose pa := a[p1, p3] a.
 pose sam1 : configuration 4 n.+1 := sgdist1 pa (u (inord a.-1)) (u (inord a)).
 pose tam1 : configuration 4 n.+1 := sgdist2 pa (u (inord a.-1)) (u (inord a)).
 have [sam1C tam1C duam1ua1E] : 
@@ -1859,12 +1859,12 @@ have sitiHb i : a1 < i < l.+1 ->
     by rewrite apegS apeg_eqC.
   by rewrite eq_sym.
 pose sa1 : configuration 4 n.+1 := 
-  sgdist1 (z[p1, p3] a1) (u (inord a1)) (u (inord a1.+1)).
+  sgdist1 (a[p1, p3] a1) (u (inord a1)) (u (inord a1.+1)).
 pose ta1 : configuration 4 n.+1 := 
-  sgdist2 (z[p1, p3] a1) (u (inord a1)) (u (inord a1.+1)).
+  sgdist2 (a[p1, p3] a1) (u (inord a1)) (u (inord a1.+1)).
 have [sa1C ta1C dua1uad1E] : 
-   [/\ codom sa1 \subset [:: z[p1, p3] a1; u (inord a1.+1) ldisk ], 
-       codom ta1 \subset [:: u (inord a1) ldisk; z[p1, p3] a1] & 
+   [/\ codom sa1 \subset [:: a[p1, p3] a1; u (inord a1.+1) ldisk ], 
+       codom ta1 \subset [:: u (inord a1) ldisk; a[p1, p3] a1] & 
        `d[u (inord a1), u (inord a1.+1)]_smove = 
          D[[:: ↓[u (inord a1)]; sa1 ; ta1; ↓[u (inord a1.+1)]]].+2].
   apply: sgdistE; rewrite ?ua1LEp2 ?a1Max ?leqnn // 1?eq_sym //.
@@ -1947,7 +1947,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
   have a3_gt1 : 1 < (3 * a).-2 by rewrite -(subnK a_gt1) addn2 !mulnS.
   have c3_gt1 : 1 < (3 * c).-2 by rewrite -(subnK c_gt1) addn2 !mulnS.
   have cH1 (k : 'I_(3 * a).-2.+1) : 
-    0 < k < (3 * a).-2 -> codom (u1l k) \subset [:: p2; z[p1, p3] k].
+    0 < k < (3 * a).-2 -> codom (u1l k) \subset [:: p2; a[p1, p3] k].
     move=> /andP[k_gt0 k3L3a].
     have k3La1 : k %/ 3 <= a.-1.
       have kL3a : k <= 3 * (a.-1).
@@ -2018,10 +2018,10 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
   set x1S := \sum_(_ < _.+1) _ in P4; set x2S := \sum_(_ < _.+1) _ in P4.
   rewrite -/x1S.
   pose u2r := [ffun i : 'I_(3 * c).-2.+1 => u2 (inord i.+2)].
-  pose pa1 := z[p1, p3] a1.
-  pose pa1S := z[p1, p3] a1.+1.
+  pose pa1 := a[p1, p3] a1.
+  pose pa1S := a[p1, p3] a1.+1.
   have cH1 (k : 'I_(3 * c).-2.+1) : 
-    0 < k < (3 * c).-2 -> codom (u2r k) \subset [:: p2; z[pa1, pa1S] k].
+    0 < k < (3 * c).-2 -> codom (u2r k) \subset [:: p2; a[pa1, pa1S] k].
     move=> /andP[k_gt0 k3L3a].
     have k2L3c : k.+2 < (3 * c).
       by have := k3L3a; rewrite -{2}subn2 ltn_subRL add2n.    
@@ -2035,7 +2035,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
         rewrite {1}(divn_eq k.+2 3) km3E0 addn0 mulnC ltn_mul2l /= => k2L3c.
         rewrite -(subnK (_ : a1 <= l.+1)) ?(leq_trans a1Ll) //.
         by rewrite addnC ltn_add2r -/c.
-      rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + k.+2 %/ 3)) ; last first.
+      rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2 %/ 3)) ; last first.
         rewrite /pa1 /pa1S apegS -apegD -2!apegS -!addSn addnC.
         rewrite {1}(divn_eq k.+2 3) km3E0 addn0 apegO.
         by rewrite oddD odd_mul andbT -oddD -apegO.
@@ -2052,9 +2052,9 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
         rewrite {1}(divn_eq k.+2 3) km3E1 addn1 mulnC ltn_mul2l /=.
         rewrite -(subnK (_ : a1 <= l.+1)) ?(leq_trans a1Ll) //.
         by rewrite addnC ltn_add2r -/c.
-      rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + k.+2)) ; last first.
+      rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
         by rewrite /pa1S apegS -apegD !addnS addnC !apegS.
-      rewrite (_ : z[_, _ ] _ = z[p3, p1] (a1 + (k.+2) %/ 3)) ; last first.
+      rewrite (_ : a[_, _ ] _ = a[p3, p1] (a1 + (k.+2) %/ 3)) ; last first.
         rewrite apegO oddD {1}(divn_eq k.+2 3) oddD km3E1 addbT odd_mul andbT.
         by rewrite addbN -oddD -oddS -apegO apegS.
       case: (sitiHb (a1 + k.+2 %/ 3)) => // [| siH _ _].
@@ -2073,9 +2073,9 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
       rewrite mulnC ltn_mul2l /=.
       rewrite -(subnK (_ : a1 <= l.+1)) ?(leq_trans a1Ll) //.
       by rewrite addnC ltn_add2r -/c.
-    rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + k.+2)) ; last first.
+    rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
       by rewrite /pa1 /pa1S apegS -apegD addnC !addnS !apegS.
-    rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
+    rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
       rewrite apegO /= oddD {1}(divn_eq k.+2 3) !oddD odd_mul andbT.
       by rewrite km3E2 addbF -oddD -apegO.
     rewrite codom_subC.
@@ -2084,7 +2084,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
   have P5 :
     (S_[(3 * c).-2] n.+1).*2 <=       
     \sum_(i < (3 * c).-2) `d[u2 (inord i.+2), u2 (inord i.+3)]_smove +
-    sp ta1 (3 * c).-2  pa1 + sp ↓[u ord_max] (3 * c).-2 (z[p3, p1] l).
+    sp ta1 (3 * c).-2  pa1 + sp ↓[u ord_max] (3 * c).-2 (a[p3, p1] l).
     apply: leq_trans (IH _ _ _ _ _ _ cH1) _; rewrite /pa1 /pa1S {cH1}//.
     - by rewrite apegS apeg_eqC.
     - by rewrite eq_sym.
@@ -2116,7 +2116,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
                  if i == 0 :> nat then sam1 
                  else if i == 1 :> nat then tam1 else ↓[u (inord a)]].
     have cH6 (k : 'I_3) : 
-      0 < k < 2 -> codom (u3 k) \subset [:: p1; z[p2, p3] k].
+      0 < k < 2 -> codom (u3 k) \subset [:: p1; a[p2, p3] k].
       move=> /andP[k_gt0 k_lt2].
       rewrite !ffunE.
       by have ->/= : k = 1 :> nat by case: (k : nat) k_gt0 k_lt2 => // [] [|].
@@ -2136,9 +2136,9 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
       by apply: sum_alpha_diffE; by rewrite /pa.
     rewrite (maxn_idPl _) // in x2Sx3SE.
     pose u4 := [ffun i : 'I_b.+1 => ↓[u (inord (a + i))]].
-    pose paS := z[p1, p3] a.+1.
+    pose paS := a[p1, p3] a.+1.
     have cH7 (k : 'I_b.+1) : 
-      0 < k < b -> codom (u4 k) \subset [:: p2; z[pa, paS] k].
+      0 < k < b -> codom (u4 k) \subset [:: p2; a[pa, paS] k].
       move=> /andP[k_gt0 k_ltb].
       have akLl : a + k < l.+1.
         rewrite  ltnS (leq_trans _ a1Ll) //.
@@ -2152,7 +2152,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
     have P7 : 
       (S_[b] n.+1).*2 <= 
       \sum_(i < b) `d[↓[u (inord (a + i))], ↓[u (inord (a + i).+1)]]_smove +
-      sp ↓[u (inord a)] b pa + sp ↓[u (inord a1)] b (z[p1, p3] a1).
+      sp ↓[u (inord a)] b pa + sp ↓[u (inord a1)] b (a[p1, p3] a1).
       apply: leq_trans (IH _ _ _ _ _ _ cH7) (leq_add (leq_add _ _) _);
         rewrite /pa /paS // 1?eq_sym //.
       - by rewrite apegS apeg_eqC eq_sym.
@@ -2173,7 +2173,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
                      if i == 0 :> nat then ↓[u (inord a1)]
                  else if i == 1 :> nat then sa1 else ta1].
     have cH8 (k : 'I_3) : 
-      0 < k < 2 -> codom (u5 k) \subset [:: p1; z[p2, p3] k].
+      0 < k < 2 -> codom (u5 k) \subset [:: p1; a[p2, p3] k].
       move=> /andP[k_gt0 k_lt2].
       rewrite !ffunE.
       by have ->/= : k = 1 :> nat by case: (k : nat) k_gt0 k_lt2 => // [] [|].
@@ -2354,7 +2354,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
                  else if i == 2 :> nat then ↓[u (inord a)]
                  else ↓[u (inord a.+1)]].
     have cH6 (k : 'I_4) : 
-      0 < k < 3 -> codom (u3 k) \subset [:: pa1S; z[p2, pa1] k].
+      0 < k < 3 -> codom (u3 k) \subset [:: pa1S; a[p2, pa1] k].
       move=> /andP[k_gt0 k_lt3].
       rewrite !ffunE eqn_leq leqNgt k_gt0 /=.
       case: eqP => [->/=|/eqP kD1].
@@ -2370,7 +2370,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
       (S_[3] n.+1).*2 <=
       (`d[sam1, tam1]_smove + `d[tam1, ↓[u (inord a)]]_smove + 
           `d[↓[u (inord a)], ↓[u (inord a.+1)]]_smove) +
-      sp sam1 3 p2 + sp ↓[u (inord a.+1)] 3 (z[p1, p3] a1).
+      sp sam1 3 p2 + sp ↓[u (inord a.+1)] 3 (a[p1, p3] a1).
       apply: (leq_trans (IH _ _ _ _ _ _ cH6)); rewrite /pa1S /pa1 //.
       - by rewrite eq_sym.
       - by rewrite eq_sym.
@@ -2388,7 +2388,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
                      if i == 0 :> nat then ↓[u (inord a1)]
                  else if i == 1 :> nat then sa1 else ta1].
     have cH8 (k : 'I_3) : 
-      0 < k < 2 -> codom (u5 k) \subset [:: p1; z[p2, p3] k].
+      0 < k < 2 -> codom (u5 k) \subset [:: p1; a[p2, p3] k].
       move=> /andP[k_gt0 k_lt2].
       rewrite !ffunE.
       by have ->/= : k = 1 :> nat by case: (k : nat) k_gt0 k_lt2 => // [] [|].
@@ -2563,7 +2563,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
                  else if i == 3 :> nat then sa1 
                  else ta1].
   have cH6 (k : 'I_5) : 
-    0 < k < 4 -> codom (u3 k) \subset [:: pa1; z[p2, pa1S] k].
+    0 < k < 4 -> codom (u3 k) \subset [:: pa1; a[p2, pa1S] k].
     move=> /andP[k_gt0 k_lt3].
     rewrite !ffunE eqn_leq leqNgt k_gt0 /=.
     case: eqP => [->/=|/eqP kD1].
@@ -2770,9 +2770,9 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
       rewrite -{1}[a]add0n big_addn  -/b big_mkord.
       apply: eq_bigr => i _.
       by rewrite !ffunE addnC !inordK ?(addnS, ltnS) // ltnW.
-    pose paS := z[p1, p3] a.+1.
+    pose paS := a[p1, p3] a.+1.
     have cH3 (k : 'I_b.+1) : 
-      0 < k < b -> codom (u3 k) \subset [:: p2; z[pa, paS] k].
+      0 < k < b -> codom (u3 k) \subset [:: p2; a[pa, paS] k].
       move=> /andP[k_gt0 k_ltb].
       have akLl : a + k < l.+1.
         rewrite  ltnS (leq_trans _ a1Ll) //.
@@ -2783,7 +2783,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
         by rewrite ltnS ltnW.
       rewrite ffunE inordK //; last by rewrite ltnS ltnW.
       by rewrite /paS apegS -apegD [k + _]addnC.
-    pose pa1 := z[p1, p3] a1.
+    pose pa1 := a[p1, p3] a1.
     have P3 : 
       (S_[b] n.+1).*2 <=
       \sum_(i < b) `d[↓[u (inord (a + i))], ↓[u (inord (a + i).+1)]]_smove +
@@ -2803,7 +2803,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
       by apply: eq_bigr => i; rewrite !ffunE !inordK ?addnS // ltnS // ltnW.
     set y0S := \sum_(_ < _) _ ; set y5S := \sum_(_ < _) _.
     have cH1 (k : 'I_(3 * a).+1) : 
-      0 < k < 3 * a -> codom (u1 k) \subset [:: p3; z[p1, p2] k].
+      0 < k < 3 * a -> codom (u1 k) \subset [:: p3; a[p1, p2] k].
       move=> /andP[k_gt0 k_ltb].
       rewrite {2}aE1 muln1 in k_ltb.
       rewrite ffunE !modn_small // !divn_small // inord_eq0 //.
@@ -2829,7 +2829,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
       by rewrite /pa aE1 inordK.
     have cH2 (k : 'I_(3 * c).+1) : 
       0 < k < 3 * c -> 
-      codom (u2 k) \subset [:: z[p1, p3] a1; z[p2, z[p1, p3] a1.+1] k].
+      codom (u2 k) \subset [:: a[p1, p3] a1; a[p2, a[p1, p3] a1.+1] k].
       move=> /andP[k_gt0 k_ltb].
       rewrite {2}cE1 muln1 in k_ltb.
       rewrite ffunE !modn_small // !divn_small // addn0.
@@ -2838,7 +2838,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
       by rewrite !(apegS, apeg0) codom_subC.
     have P2 : 
       (S_[3 * c] n.+1).*2 <= x2S + sp ↓[u (inord a1)] 3 p2 +
-                             sp ↓[u ord_max] 3 (z[p3, p1] l).
+                             sp ↓[u ord_max] 3 (a[p3, p1] l).
       apply: leq_trans (IH _ _ _ _ _ _ cH2) (leq_add (leq_add _ _) _);
           rewrite // 1?eq_sym //.
       - by rewrite apegS apeg_eqC eq_sym.
@@ -2915,7 +2915,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
         by apply/val_eqP; rewrite /= inordK aE1.
       by rewrite -[in inord 1]aE1 duam1ua1E /= addnA addn0.
     have cH1 (k : 'I_5) : 
-      0 < k < 4 -> codom (u1l k) \subset [:: p3; z[p1, p2] k].
+      0 < k < 4 -> codom (u1l k) \subset [:: p3; a[p1, p2] k].
       case: k => [] [|[|[|[|]]]] //= iH _; rewrite !ffunE !(apegS, apeg0).
       - by have := sam1C; rewrite /pa aE1.
       - by rewrite codom_subC.
@@ -2936,7 +2936,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
     set y1S := \sum_(_ < _) _ in P4; set y2S := sp _ _ _ in P4.
     have cH2 (k : 'I_(3 * c).+1) : 
       0 < k < 3 * c -> 
-      codom (u2 k) \subset [:: z[p1, p3] a1; z[p2, z[p1, p3] a1.+1] k].
+      codom (u2 k) \subset [:: a[p1, p3] a1; a[p2, a[p1, p3] a1.+1] k].
       move=> /andP[k_gt0 k_ltb].
       rewrite {2}cE1 muln1 in k_ltb.
       rewrite ffunE !modn_small // !divn_small // addn0.
@@ -2945,7 +2945,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
       by rewrite codom_subC.
     have P5 : 
       (S_[3 * c] n.+1).*2 <= sd u2 + sp ↓[u (inord a1)] 3 p2 +
-                                     sp ↓[u ord_max] 3 (z[p3, p1] l).
+                                     sp ↓[u ord_max] 3 (a[p3, p1] l).
       apply: leq_trans (IH _ _ _ _ _ _ cH2) (leq_add (leq_add _ _) _);
           rewrite // 1?eq_sym //.
       - by rewrite a1E2 eq_sym.
@@ -3012,9 +3012,9 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
   have bE0 : b = 0 by case: (b) b_lt1 => //.
   have lE1 : l = 1 by have := l1E; rewrite aE1 bE0 cE1 => [] [].
   have a1E1 : a1 = 1 by rewrite a1El.
-  rewrite (_ : z[p3, p1] l = z[p2, p1] l); last by rewrite lE1.
+  rewrite (_ : a[p3, p1] l = a[p2, p1] l); last by rewrite lE1.
   apply: (@case2 _ IH)  => //.
-  - by rewrite (_ : z[p1, p3] _ = z[p1, p3] 1).
+  - by rewrite (_ : a[p1, p3] _ = a[p1, p3] 1).
   - move=> k hK; rewrite {3}lE1 in hK.
     have -> : k = inord 1.
       apply/val_eqP; rewrite /= inordK //.
@@ -3038,10 +3038,10 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
   by rewrite KH2 lE1 /= inordK.
 (* This is 4.2.3 a = 1, c >= 2 *)
 pose u2r := [ffun i : 'I_(3 * c).-2.+1 => u2 (inord i.+2)].
-pose pa1 := z[p1, p3] a1.
-pose pa1S := z[p1, p3] a1.+1.
+pose pa1 := a[p1, p3] a1.
+pose pa1S := a[p1, p3] a1.+1.
 have cH8 (k : 'I_(3 * c).-2.+1) : 
-  0 < k < (3 * c).-2 -> codom (u2r k) \subset [:: p2; z[pa1, pa1S] k].
+  0 < k < (3 * c).-2 -> codom (u2r k) \subset [:: p2; a[pa1, pa1S] k].
   move=> /andP[k_gt0 k3L3a].
   have k2L3c : k.+2 < (3 * c).
     by have := k3L3a; rewrite -{2}subn2 ltn_subRL add2n.    
@@ -3055,9 +3055,9 @@ have cH8 (k : 'I_(3 * c).-2.+1) :
       rewrite {1}(divn_eq k.+2 3) km3E0 addn0 mulnC ltn_mul2l /= => k2L3c.
       rewrite -(subnK (_ : a1 <= l.+1)) ?(leq_trans a1Ll) //.
       by rewrite addnC ltn_add2r -/c.
-    rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + k.+2)) ; last first.
+    rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
       by rewrite /pa1S !addnS !apegS -apegD addnC.
-    rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
+    rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
       rewrite apegO oddD {1}(divn_eq k.+2 3) !oddD odd_mul andbT -oddD.
       by rewrite km3E0 addn0 -oddD -apegO.
     have /H : 0 < (inord (a1 + k.+2 %/ 3) : 'I_l.+2) < l.+1.
@@ -3073,9 +3073,9 @@ have cH8 (k : 'I_(3 * c).-2.+1) :
       rewrite {1}(divn_eq k.+2 3) km3E1 addn1 mulnC ltn_mul2l /=.
       rewrite -(subnK (_ : a1 <= l.+1)) ?(leq_trans a1Ll) //.
       by rewrite addnC ltn_add2r -/c.
-    rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + k.+2)) ; last first.
+    rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
       by rewrite /pa1S !addnS !apegS -apegD addnC.
-    rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + (k.+2) %/ 3).+1) ; last first.
+    rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3).+1) ; last first.
       rewrite apegS apegO {1}(divn_eq k.+2 3) !oddD odd_mul andbT.
       by rewrite km3E1 addbT addbN -oddD -oddS -apegO apegS.
     case: (sitiHb (a1 + k.+2 %/ 3)) => // [| siH _ _]; first by rewrite a1La1k.
@@ -3093,9 +3093,9 @@ have cH8 (k : 'I_(3 * c).-2.+1) :
     rewrite mulnC ltn_mul2l /=.
     rewrite -(subnK (_ : a1 <= l.+1)) ?(leq_trans a1Ll) //.
     by rewrite addnC ltn_add2r -/c.
-  rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + k.+2)) ; last first.
+  rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
     by rewrite !addnS /pa1S !apegS -apegD addnC.
-  rewrite (_ : z[_, _ ] _ = z[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
+  rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
     rewrite apegO {1}(divn_eq k.+2 3) !oddD odd_mul andbT.
     by rewrite km3E2 addbF -oddD -apegO.
   rewrite codom_subC.
@@ -3105,7 +3105,7 @@ have c_gt0 : 0 < c by rewrite ltnW.
 have P8 :
   (S_[(3 * c).-2] n.+1).*2 <=
   \sum_(i < (3 * c).-2) `d[u2 (inord i.+2), u2 (inord i.+3)]_smove +
-  sp ta1 (3 * c).-2 pa1 + sp ↓[u ord_max] (3 * c).-2 (z[p3, p1] l).
+  sp ta1 (3 * c).-2 pa1 + sp ↓[u ord_max] (3 * c).-2 (a[p3, p1] l).
   apply: leq_trans (IH _ _ _ _ _ _ cH8) _; rewrite /pa1 /pa1S {cH8}//.
   - by rewrite apegS apeg_eqC.
   - by rewrite eq_sym.
@@ -3173,7 +3173,7 @@ set x3S := \sum_(_ < _) _ in P8; rewrite -/x3S.
 have [|b_gt0] := leqP b 0; last first.
 (* subcase 1 <= b *)
   have cH1 (k : 'I_(3 * a).+1) : 
-    0 < k < 3 * a -> codom (u1 k) \subset [:: p3; z[p1, p2] k].
+    0 < k < 3 * a -> codom (u1 k) \subset [:: p3; a[p1, p2] k].
     move=> /andP[k_gt0 k_ltb].
     rewrite {2}aE1 muln1 in k_ltb.
     rewrite ffunE !modn_small // !divn_small // inord_eq0 //.
@@ -3196,9 +3196,9 @@ have [|b_gt0] := leqP b 0; last first.
   have [b_gt1|b_le2] := leqP 2 b.
 (*  subcase b >= 2 *)  
     pose u3 := [ffun i => ↓[u (inord ((i : 'I_b.+1) + a))]].
-    pose paS := z[p1, p3] a.+1.
+    pose paS := a[p1, p3] a.+1.
     have cH6 (k : 'I_b.+1) :
-        0 < k < b -> codom (u3 k) \subset [:: p2; z[pa, paS] k].
+        0 < k < b -> codom (u3 k) \subset [:: p2; a[pa, paS] k].
       move=> /andP[k_gt0 kLb].
       have kBound : 0 < k + a < l.+1.
         rewrite (leq_trans a_gt0) ?leq_addl //=.
@@ -3211,7 +3211,7 @@ have [|b_gt0] := leqP b 0; last first.
       by apply.
     have {cH6}P6 : 
     (S_[b] n.+1).*2 <= sd u3 + sp (u3 ord0) b pa + 
-                               sp (u3 ord_max) b (z[pa, paS] b).
+                               sp (u3 ord_max) b (a[pa, paS] b).
       apply: IH cH6 => //; try by rewrite /pa /paS // eq_sym.
       by rewrite /paS apegS apeg_eqC.
     set x1S := \sum_(_ <= _ < _) _.
@@ -3230,7 +3230,7 @@ have [|b_gt0] := leqP b 0; last first.
                      if i == 0 :> nat then ↓[u (inord a1)]
                      else if i == 1 :> nat then sa1 else ta1].
     have cH7 (k : 'I_3) : 
-      0 < k < 2 -> codom (u5 k) \subset [:: p1; z[p2, p3] k].
+      0 < k < 2 -> codom (u5 k) \subset [:: p1; a[p2, p3] k].
       move=> /andP[k_gt0 k_lt2].
       rewrite !ffunE.
       by have ->/= : k = 1 :> nat by case: (k : nat) k_gt0 k_lt2 => // [] [|].
@@ -3368,7 +3368,7 @@ have [|b_gt0] := leqP b 0; last first.
     have l_gt2 : 2 < l by rewrite -ltnS l1E aE1 bE1 !add1n.
   set x6S := \sum_(_ < 3) _.
   have cH6 (k : 'I_4) : 
-    0 < k < 3 -> codom (u3 k) \subset [:: pa1; z[pa1S, p2] k].
+    0 < k < 3 -> codom (u3 k) \subset [:: pa1; a[pa1S, p2] k].
     move=> /andP[k_gt0 k_lt3].
     rewrite !ffunE eqn_leq leqNgt k_gt0 /=.
     case: eqP => [->/=|/eqP kD1].
@@ -3468,7 +3468,7 @@ have -> : x0S + d1 = sd u3.
           /= ?inordK //= !ffunE ?inordK ?a1Ea ?aE1 //=.
   by rewrite add0n !addnA inord_eq0.
 have cH4 (k : 'I_6) : 
-    0 < k < 5 -> codom (u3 k) \subset [:: p3; z[p1, p2] k].
+    0 < k < 5 -> codom (u3 k) \subset [:: p3; a[p1, p2] k].
     case: k => [] [|[|[|[|[]]]]] //= iH _; rewrite !ffunE !(apegS, apeg0).
   - by have := sam1C; rewrite /pa aE1.
   - by rewrite codom_subC.
@@ -3599,10 +3599,10 @@ Lemma main p1 p2 p3 n l (u : {ffun 'I_l.+1 -> configuration 4 n}) :
    p1 != p2 -> p1 != p3 -> p2 != p3 -> 
    p1 != p0 -> p2 != p0 -> p3 != p0 ->
   (forall k : 'I_l.+1, 0 < k < l -> 
-                       codom (u k) \subset [:: p2; z[p1, p3] k]) ->
+                       codom (u k) \subset [:: p2; a[p1, p3] k]) ->
   (S_[l] n).*2 <=  \sum_(i < l) `d[u (inord i), u (inord i.+1)]_smove + 
                     \sum_(k < n) (u ord0 k != p1) * β_[n, l] k +  
-                    \sum_(k < n) (u ord_max k != z[p1, p3] l) * β_[n, l] k.
+                    \sum_(k < n) (u ord_max k != a[p1, p3] l) * β_[n, l] k.
 Proof.
 elim: n l p1 p2 p3 u => [|[|n] IH] l p1 p2 p3 
                 u p1Dp2 p1Dp3 p2Dp3 p1Dp0 p2Dp0 p3Dp0 cH.
@@ -3698,10 +3698,10 @@ rewrite apegS.
 pose u' : {ffun 'I_l.+2 -> configuration 4 n.+1} :=
      [ffun i : 'I_l.+2 => ↓[u i]].
 have H (k : 'I_l.+2) : 
-  0 < k < l.+1 -> codom (u' k) \subset [:: p2; z[p1, p3] k].
+  0 < k < l.+1 -> codom (u' k) \subset [:: p2; a[p1, p3] k].
   by move=> k1; rewrite ffunE; apply/codom_liftr/cH. 
 pose K := (u ord0 ord_max != p1) + 
-          (u ord_max ord_max != z[p3, p1] l).
+          (u ord_max ord_max != a[p3, p1] l).
 have [HK|] := boolP ((K == 2) || ((K == 1) && (l == 0))).
   rewrite dsum_alphaL_S doubleD.
   have IH' := IH _ p1 p2 p3 u'
@@ -3760,28 +3760,28 @@ case: ltngtP => //= KE _ _ l_gt0; last first.
     congr (`d[u _,u _]_smove).
       by apply/val_eqP; rewrite /= !inordK ?subSn.
     by apply/val_eqP; rewrite /= !inordK // ?subSS ltnS // ltnW.
-  pose p1' := z[p3, p1] l.
-  pose p3' := z[p1, p3] l.
+  pose p1' := a[p3, p1] l.
+  pose p3' := a[p1, p3] l.
   have -> : \sum_(k < n.+2) (u ord0 k != p1) * β_[n.+2, l.+1] k =
-            \sum_(k < n.+2) (u1 ord_max k != z[p1', p3'] l.+1) * 
+            \sum_(k < n.+2) (u1 ord_max k != a[p1', p3'] l.+1) * 
                             β_[n.+2, l.+1] k.
     apply: eq_bigr => i _; congr (_ * _).
     rewrite ffunE subnn.
     by rewrite inord_eq0 // -apegD addSn addnn apegS apeg_double.
   have -> : \sum_(k < n.+2) 
-              (u ord_max k != z[p3, p1] l) * β_[n.+2, l.+1] k =
+              (u ord_max k != a[p3, p1] l) * β_[n.+2, l.+1] k =
             \sum_(k < n.+2) (u1 ord0 k != p1') * β_[n.+2, l.+1] k.
     apply: eq_bigr => i _; congr (_ * _).
     rewrite ffunE subn0.
     suff -> : inord l.+1 = ord_max :> 'I_l.+2 by []. 
     by apply/val_eqP; rewrite /= inordK.
   have cH1 (k : 'I_l.+2) : 
-     0 < k < l.+1 -> codom (u1 k) \subset [:: p2; z[p1', p3'] k].
+     0 < k < l.+1 -> codom (u1 k) \subset [:: p2; a[p1', p3'] k].
     move=> /andP[kH1 kH2]; rewrite ffunE.
     have F1 : k <= l.+1 by apply: ltnW.
     have F2 : l.+1 - k < l.+2.
       by rewrite ltn_subLR // addnS ltnS leq_addl.
-    have -> :  z[p1', p3'] k = z[p1, p3] (inord (l.+1 - k) : 'I_l.+2).
+    have -> :  a[p1', p3'] k = a[p1, p3] (inord (l.+1 - k) : 'I_l.+2).
       rewrite -apegD inordK // [RHS]apegO oddB //.
       by rewrite -oddD -apegO addSn apegS addnC.
     apply: cH; rewrite inordK // subn_gt0 // ltn_subLR // kH2 //=.
