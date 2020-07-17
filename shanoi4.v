@@ -207,7 +207,7 @@ Notation " D[ l ] " := (distanceL l)
 Definition apeg p1 p2 n : peg 4 := if odd n then p2 else p1.
 Notation " a[ p1 , p2 ] " := (apeg p1 p2)
   (format " a[ p1 ,  p2 ]").
-
+ 
 Lemma apeg32E a p1 p2 : a[p1, p2] (3 * a).-2 = a[p1, p2] a.
 Proof.
 case: a => // a.
