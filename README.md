@@ -9,7 +9,7 @@ Hanoi tower in Coq
 | File                              |  Content                                 | 
 | --------------------------------- | -----------------------------------------| 
 | [extra](./extra.v)                | Extra theorems from the standard library |
-[ gdist](./gdist.v)                 | Distance in a graph                      |
+| [gdist](./gdist.v)                | Distance in a graph                      |
 | [ghanoi](./ghanoi.v)              | General Hanoi framework                  |
 | [ghanoi3](./ghanoi3.v)            | General Hanoi framework with 3 pegs      |
 | [lhanoi3](./lhanoi3.v)            | Linear Hanoi tower with 3 pegs           |
