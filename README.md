@@ -23,6 +23,11 @@ Hanoi tower in Coq
 | [shanoi](./shanoi.v)              | Hanoi tower in star                      |
 | [shanoi4](./shanoi4.v)            | Hanoi tower with 4 pegs in star          |
 
-A note about this development is available [here](./Note.pdf).
+A note about this development is available 
+[here](https://hal.inria.fr/hal-02903548).
+
+An interactive version of the library is available 
+[here](https://thery.github.io/hanoi/index.html).
+
 
 To build the library, download the files and type ```make install```.
