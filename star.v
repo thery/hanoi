@@ -352,7 +352,7 @@ case: (leqP (a * alpha j) (b ^ k)) => [|bLaa].
 - rewrite leq_eqVlt => /orP[/eqP aaEb |aaLb].
   have : a %| b ^ k by rewrite -aaEb dvdn_mulr.
   move/gcdn_idPl.
-  have /eqP->:= @coprime_expr k _ _ aCb.
+  have /eqP-> := coprimeXr k aCb.
   by case: a aL1 => // [] [].
 - rewrite big_ltn; last by rewrite addnS leq_addr.
   rewrite [X in _ <= X + _]big_ltn; last by rewrite addnS leq_addr.
@@ -449,7 +449,7 @@ have lkEla1 : lk =i la1.
   rewrite andbC => /andP[/mapP[v Hv ->] Ha].
   have [[[|x1] y1] Hx1y1] : isAB (alpha v) by apply: isAB_alpha.
     move: Ha; rewrite Hx1y1 mul1n /= => /gcdn_idPl.
-    have /eqP-> : coprime a (b ^ y1) by rewrite coprime_expr.
+    have /eqP-> : coprime a (b ^ y1) by rewrite coprimeXr.
     by move=> H; move: aL1; rewrite H ltnn.
   case: (alpha_surjective x1 y1) => j1 Hj1.
   suff H1j1 : j1 < k.+1.
@@ -473,7 +473,7 @@ have lbEla2 : lb =i la2.
   move=> /mapP[u1 _ ->].
   rewrite mem_filter; apply/andP; split.
     apply/negP=> /gcdn_idPl.
-    have /eqP-> : coprime a (b ^ u1) by rewrite coprime_expr.
+    have /eqP-> : coprime a (b ^ u1) by rewrite coprimeXr.
     by move=> H; move: aL1; rewrite H ltnn.
    case: (alpha_surjective 0 u1) => j1; rewrite mul1n => Hj1.
   suff j1Ln : j1 < n.+2.
@@ -568,7 +568,7 @@ Lemma S1_leq n i : i <= n -> S1 n <= (S1 (n - i)).*2 + (3 ^ i).-1./2.
 Proof.
 move=> iLn.
 rewrite -leq_double doubleD div2K; last first.
-  by rewrite -subn1 oddB ?expn_gt0 //= odd_exp orbT.
+  by rewrite -subn1 oddB ?expn_gt0 //= oddX orbT.
 rewrite -!mul2n predn_exp.
 rewrite -mulnDr leq_mul2l /=.
 by apply: sum_alpha_leq.
@@ -614,7 +614,7 @@ Proof.
 case: n => // n _.
 apply: double_inj.
 rewrite doubleD div2K; last first.
-  by rewrite -subn1 oddB ?expn_gt0 //= odd_exp orbT.
+  by rewrite -subn1 oddB ?expn_gt0 //= oddX orbT.
 rewrite -!mul2n predn_exp -mulnDr; congr (2 * _).
 have iLn : 3 ^ (log3 (α n)) <= α n < 3 ^ (log3 (α n)).+1.
   rewrite gtn_log3  leq_log3 //.
@@ -706,7 +706,7 @@ Qed.
 Lemma delta_3l l i : delta (fun i : nat => l * ((3 ^ i).-1)./2) i = l * 3 ^ i.
 Proof.
 rewrite /delta -mulnBr -even_halfB //;
-  try by rewrite -subn1 oddB ?expn_gt0 //= odd_exp orbT.
+  try by rewrite -subn1 oddB ?expn_gt0 //= oddX orbT.
 rewrite -predn_sub -subnS prednK ?expn_gt0 //.
 by rewrite expnS -[X in _ * ((_ - X))./2]mul1n -mulnBl mul2n doubleK.
 Qed.
@@ -970,7 +970,7 @@ Qed.
 
 Lemma even_expn3_pred n : ~~ odd (3 ^ n).-1.
 Proof.
-by rewrite -subn1 oddB ?expn_gt0 // odd_exp orbT.
+by rewrite -subn1 oddB ?expn_gt0 // oddX orbT.
 Qed.
 
 (* This is 3.4 *)
@@ -1018,7 +1018,7 @@ rewrite /dsum_alphaL /conv -bigmin_constD.
 apply: bigmin_ext => i iH; rewrite -addnA; congr (_ + _).
 rewrite -mulnAC -{3}[l]mul1n -mulnDl mulnC; congr (_ * _).
 rewrite -even_halfMl ?even_expn3_pred // -{4}[1]/(2./2).
-rewrite -even_halfD ?odd_mul ?even_expn3_pred //; congr (_./2).
+rewrite -even_halfD ?oddM ?even_expn3_pred //; congr (_./2).
 rewrite subSn // expnS -!subn1 mulnBr muln1 addn2 -!subSn ?subSS //.
   by rewrite ltnS -expnS (ltn_exp2l 0).
 by rewrite -expnS (leq_exp2l 1).

@@ -178,7 +178,7 @@ repeat apply: leq_add; first 2 last.
   by rewrite -S1E; apply: IH => //; rewrite eq_sym.
 rewrite div2K; last first.
   rewrite -subn1 oddB ?expn_gt0 // addbT.
-  by rewrite odd_exp orbT.
+  by rewrite oddX orbT.
 have -> : c2 = clmerge p1 p2 p3 _ `c[ord0].
   apply/ffunP=> x; rewrite !ffunE.
   by case: tsplitP => // j; rewrite !ffunE /=.
@@ -212,7 +212,7 @@ Lemma apeg32E a p1 p2 : a[p1, p2] (3 * a).-2 = a[p1, p2] a.
 Proof.
 case: a => // a.
 rewrite /apeg -subn2 oddB; last by rewrite mulnS.
-by rewrite odd_mul /=; case: odd.
+by rewrite oddM /=; case: odd.
 Qed.
 
 Lemma apeg0 p1 p2 : a[p1, p2] 0 = p1.
@@ -237,7 +237,7 @@ Lemma apegD p1 p2 m n : a[p1, p2] (m + n) = a[ a[p1, p2] n, a[p2, p1] n] m.
 Proof. by rewrite /apeg oddD; do 2 case: odd. Qed.
 
 Lemma apegMr p1 p2 m n : odd m -> a[p1, p2] (m * n) = a[p1, p2] n.
-Proof. by rewrite /apeg; rewrite odd_mul => ->. Qed.
+Proof. by rewrite /apeg; rewrite oddM => ->. Qed.
 
 Lemma codom_apeg (A : finType) (f : {ffun A -> _}) p1 p2 n : 
   (codom f \subset [::  a[p1, p2] n;  a[p2, p1] n]) =
@@ -2038,7 +2038,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
       rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2 %/ 3)) ; last first.
         rewrite /pa1 /pa1S apegS -apegD -2!apegS -!addSn addnC.
         rewrite {1}(divn_eq k.+2 3) km3E0 addn0 apegO.
-        by rewrite oddD odd_mul andbT -oddD -apegO.
+        by rewrite oddD oddM andbT -oddD -apegO.
       have /H : 0 < (inord (a1 + k.+2 %/ 3) : 'I_l.+2) < l.+1.
         rewrite inordK; first by rewrite addn_gt0 a1_gt0.
         by rewrite ltnS ltnW.
@@ -2055,7 +2055,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
       rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
         by rewrite /pa1S apegS -apegD !addnS addnC !apegS.
       rewrite (_ : a[_, _ ] _ = a[p3, p1] (a1 + (k.+2) %/ 3)) ; last first.
-        rewrite apegO oddD {1}(divn_eq k.+2 3) oddD km3E1 addbT odd_mul andbT.
+        rewrite apegO oddD {1}(divn_eq k.+2 3) oddD km3E1 addbT oddM andbT.
         by rewrite addbN -oddD -oddS -apegO apegS.
       case: (sitiHb (a1 + k.+2 %/ 3)) => // [| siH _ _].
         by rewrite a1La1k.
@@ -2076,7 +2076,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
     rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
       by rewrite /pa1 /pa1S apegS -apegD addnC !addnS !apegS.
     rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
-      rewrite apegO /= oddD {1}(divn_eq k.+2 3) !oddD odd_mul andbT.
+      rewrite apegO /= oddD {1}(divn_eq k.+2 3) !oddD oddM andbT.
       by rewrite km3E2 addbF -oddD -apegO.
     rewrite codom_subC.
     case: (sitiHb (a1 + k.+2 %/ 3)) => // [| _ tiH _]; first by rewrite a1La1k.
@@ -2103,7 +2103,7 @@ have [/andP[a_gt1 c_gt1]|] := boolP ((1 < a) && (1 < c)).
       by rewrite ffunE; congr (u _ _ ); apply/val_eqP; rewrite /= inordK.
     rewrite -[RHS]apegS -(subnK (_ : a1 <= l.+1)) // -/c.
       rewrite apegS -apegD apegO oddD -subn2 oddB.
-        by rewrite addbF odd_mul /= -oddD -apegO.
+        by rewrite addbF oddM /= -oddD -apegO.
       by rewrite (leq_trans (_ : _ < 3 * 1)) // leq_mul2l //.
     by rewrite ltnW.
   rewrite {cH1}//.
@@ -3058,7 +3058,7 @@ have cH8 (k : 'I_(3 * c).-2.+1) :
     rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
       by rewrite /pa1S !addnS !apegS -apegD addnC.
     rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
-      rewrite apegO oddD {1}(divn_eq k.+2 3) !oddD odd_mul andbT -oddD.
+      rewrite apegO oddD {1}(divn_eq k.+2 3) !oddD oddM andbT -oddD.
       by rewrite km3E0 addn0 -oddD -apegO.
     have /H : 0 < (inord (a1 + k.+2 %/ 3) : 'I_l.+2) < l.+1.
       rewrite inordK; first by rewrite addn_gt0 a1_gt0.
@@ -3076,7 +3076,7 @@ have cH8 (k : 'I_(3 * c).-2.+1) :
     rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
       by rewrite /pa1S !addnS !apegS -apegD addnC.
     rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3).+1) ; last first.
-      rewrite apegS apegO {1}(divn_eq k.+2 3) !oddD odd_mul andbT.
+      rewrite apegS apegO {1}(divn_eq k.+2 3) !oddD oddM andbT.
       by rewrite km3E1 addbT addbN -oddD -oddS -apegO apegS.
     case: (sitiHb (a1 + k.+2 %/ 3)) => // [| siH _ _]; first by rewrite a1La1k.
     by move: siH; rewrite a1Max // ltnS ltnW.
@@ -3096,7 +3096,7 @@ have cH8 (k : 'I_(3 * c).-2.+1) :
   rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + k.+2)) ; last first.
     by rewrite !addnS /pa1S !apegS -apegD addnC.
   rewrite (_ : a[_, _ ] _ = a[p1, p3] (a1 + (k.+2) %/ 3)) ; last first.
-    rewrite apegO {1}(divn_eq k.+2 3) !oddD odd_mul andbT.
+    rewrite apegO {1}(divn_eq k.+2 3) !oddD oddM andbT.
     by rewrite km3E2 addbF -oddD -apegO.
   rewrite codom_subC.
   case: (sitiHb (a1 + k.+2 %/ 3)) => // [| _ tiH _]; first by rewrite a1La1k.
@@ -3124,7 +3124,7 @@ have P8 :
     by rewrite ffunE; congr (u _ _ ); apply/val_eqP; rewrite /= inordK.
   rewrite /pa1 /pa1S -[RHS]apegS -(subnK (_ : a1 <= l.+1)) // -/c.
     rewrite apegS -apegD apegO -subn2 oddD oddB //.
-      by rewrite odd_mul /= addbF -oddD -apegO.
+      by rewrite oddM /= addbF -oddD -apegO.
     by rewrite (leq_trans (_ : _ < 3 * 1)) // leq_mul2l //.
   by rewrite ltnW.
 rewrite {cH8}//.

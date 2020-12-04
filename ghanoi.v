@@ -939,7 +939,7 @@ Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
 Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
 Notation "`c[ p ] " := (perfect p) (format "`c[ p ]", at level 5).
 Notation "`c[ p , n ] " := ((perfect p) : configuration _ n) 
-  (format "`c[ p  ,  n ]", only parsing, at level 5).
+  (format "`c[ p  ,  n ]", at level 5).
 
 Lemma on_top1 k (d : disk 1) (c : configuration k 1) : on_top d c.
 Proof. by apply/on_topP=> [] [] [] //=; case: d => [] []. Qed.

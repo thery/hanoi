@@ -93,7 +93,7 @@ Qed.
 Lemma phi_odd n : odd (phi n) = (0 < n).
 Proof.
 case: n => // [] [|n] //.
-rewrite phi_modSE oddD odd_mul odd_exp orbF.
+rewrite phi_modSE oddD oddM oddX orbF.
 case: troot (troot_gt0 (isT : 0 < n.+1)) => // k.
 by rewrite andbF.
 Qed.

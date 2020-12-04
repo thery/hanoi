@@ -62,7 +62,7 @@ Compute zip (iota 1 20) (map delta (iota 1 20)).
 Lemma deltaS n : delta n.+1 = delta n + n.+1.
 Proof.
 rewrite /delta -addn2 mulnDl mulnC halfD.
-rewrite !odd_mul andbF add0n mul2n.
+rewrite !oddM andbF add0n mul2n.
 by rewrite -{4}(half_bit_double n.+1 false).
 Qed.
 

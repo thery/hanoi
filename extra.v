@@ -660,7 +660,7 @@ Qed.
 
 Lemma bigminMr  f n k :
  \min_(i <= n) (f i * k) =  (\min_(i <= n) f i) * k.
-Proof. by elim: n => //= n ->; rewrite  minn_mull. Qed.
+Proof. by elim: n => //= n ->; rewrite  minnMl. Qed.
 
 (* Convolution *)
 
