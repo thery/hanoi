@@ -32,4 +32,4 @@ An interactive version of the library is available
 
 To build the library, download the files and type ```make``` and 
 then ```make install``` (the dependencies are listed in 
-[opam](https://thery.github.io/hanoi/opam)).
+[opam](./opam)).
