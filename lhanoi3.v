@@ -78,7 +78,7 @@ Local Notation "c1 `-->*_r c2" := (connect lmove c1 c2)
 Fixpoint lhanoi3 {n : nat} : configuration 3 n -> configuration _ n -> _ :=
   match n with
   | 0 => fun _ _ => [::] : seq (configuration _ 0)
-  | n1.+1 =>
+  | _.+1 =>
       fun c1 c2 =>
        let p1 := c1 ldisk in
        let p2 := c2 ldisk in
