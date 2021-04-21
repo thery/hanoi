@@ -1,9 +1,9 @@
 opam-version: "1.2"
-name: "robbins"
+name: "hanoi"
 maintainer: "Laurent.Thery@inria.fr"
 homepage: "https://github.com/thery/hanoi"
 bug-reports: "https://github.com/thery/hanoi/issues"
-dev-repo: "git+https:https://github.com/thery/hanoi"
+dev-repo: "git@github.com:thery/hanoi"
 license: "CeCILL-B"
 authors: ["Laurent Théry"]
 build: [
