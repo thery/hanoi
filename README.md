@@ -30,7 +30,4 @@ An interactive version of the library is available
 [here](https://thery.github.io/hanoi/index.html).
 
 
-To build the library, download the files and type ```opam install .``` or manually type  
-```make``` and 
-then ```make install``` (the dependencies are listed in 
-[opam](./hanoi.opam)).
+To build the library, download the files and type ```opam install .``` or manually type  ```make``` and then ```make install``` (the dependencies are listed in [opam](./hanoi.opam)).
