@@ -4,6 +4,9 @@ maintainer: "Laurent.Thery@inria.fr"
 homepage: "https://github.com/thery/hanoi"
 bug-reports: "https://github.com/thery/hanoi/issues"
 dev-repo: "git@github.com:thery/hanoi"
+synopsis: "Hanoi for Coq"
+description: "Some Proofs about the Tower of Hanoi"
+
 license: "CeCILL-B"
 authors: ["Laurent Théry"]
 build: [
