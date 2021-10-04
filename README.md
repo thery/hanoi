@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/thery/hanoi.svg?branch=master)](https://travis-ci.org/thery/hanoi)
+[![Build Status](https://travis-ci.com/thery/hanoi.svg?branch=master)](https://travis-ci.com/thery/hanoi)
 
 ## Hanoi
 
