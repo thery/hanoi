@@ -51,7 +51,7 @@ Proof.
 have tG : #|T| > 0 by rewrite (cardD1 t1).
 rewrite /gdist.
 case: #|_| tG => // n _.
-rewrite (iota_add _ 1) /= inE [t2 == _]eq_sym.
+rewrite (iotaD _ 1) /= inE [t2 == _]eq_sym.
 by case: (t1 =P t2).
 Qed.
 
