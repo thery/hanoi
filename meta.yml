@@ -1,0 +1,89 @@
+---
+fullname: hanoi
+shortname: hanoi
+organization: thery
+community: false
+dune: false
+action: true
+
+synopsis: Hanoi tower in Coq
+
+description: |-
+  Hanoi tower in Coq
+
+
+  | File                              |  Content                                 | 
+  | --------------------------------- | -----------------------------------------| 
+  | [extra](./extra.v)                | Extra theorems from the standard library |
+  | [gdist](./gdist.v)                | Distance in a graph                      |
+  | [ghanoi](./ghanoi.v)              | General Hanoi framework                  |
+  | [ghanoi3](./ghanoi3.v)            | General Hanoi framework with 3 pegs      |
+  | [lhanoi3](./lhanoi3.v)            | Linear Hanoi tower with 3 pegs           |
+  | [rhanoi3](./rhanoi3.v)            | Regular Hanoi tower with 3 pegs          |
+  | [triangular](./triangular.v)      | Theorems about triangular numbers        |
+  | [phi](./phi.v)                    | Theorems about the Φ function            |
+  | [psi](./psi.v)                    | Theorems about the Ψ function            |
+  | [ghanoi4](./ghanoi4.v)            | General Hanoi framework with 4 pegs      |
+  | [rhanoi4](./rhanoi4.v)            | Regular Hanoi tower with 4 pegs          |
+  | [star](./star.v)                  | Some maths for the shanoi                |
+  | [shanoi](./shanoi.v)              | Hanoi tower in star                      |
+  | [shanoi4](./shanoi4.v)            | Hanoi tower with 4 pegs in star          |
+
+  A note about this development is available 
+  [here](https://hal.inria.fr/hal-02903548).
+  
+  An interactive version of the library is available 
+  [here](https://thery.github.io/hanoi/index.html).
+
+
+authors:
+- name: Laurent Théry
+
+maintainers:
+- name: Laurent Théry
+  nickname: thery
+
+opam-file-maintainer: thery@sophia.inria.fr
+
+license:
+  fullname: MIT License
+  identifier: MIT
+
+supported_coq_versions:
+  text: '8.15 or later'
+  opam: '{(>= "8.15")}'
+
+dependencies:
+- opam:
+    name: coq-mathcomp-ssreflect
+    version: '{(>= "1.14.0")}'
+  description: |-
+    [MathComp ssreflect 1.14 or later](https://math-comp.github.io)
+- opam:
+    name: coq-mathcomp-algebra
+    version: '{(>= "1.14.0")}'
+  description: |-
+    [MathComp algebra 1.14 or later](https://math-comp.github.io)
+- opam:
+    name: coq-mathcomp-finmap
+    version: '{(>= "1.5.1")}'
+  description: |-
+    [MathComp finmap 1.5.1 or later](https://github.com/math-comp/finmap)
+- opam:
+    name: coq-mathcomp-bigenough
+    version: '{(>= "1.0.1")}'
+  description: |-
+    [MathComp finmap 1.0.1 or later](https://github.com/math-comp/finmap)
+
+
+tested_coq_opam_versions:
+- version: '1.14.0-coq-8.15'
+  repo: 'mathcomp/mathcomp'
+
+namespace: hanoi
+
+keywords:
+- name: hanoi tower
+
+
+---
