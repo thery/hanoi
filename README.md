@@ -47,7 +47,7 @@ An interactive version of the library is available
 - Additional dependencies:
   - [MathComp ssreflect 1.15 or later](https://math-comp.github.io)
   - [MathComp algebra 1.15 or later](https://math-comp.github.io)
-  - [MathComp finmap 1.5.1 or later](https://github.com/math-comp/finmap)
+  - [MathComp finmap 1.5.2 or later](https://github.com/math-comp/finmap)
   - [MathComp finmap 1.0.1 or later](https://github.com/math-comp/finmap)
 - Coq namespace: `hanoi`
 - Related publication(s): none
