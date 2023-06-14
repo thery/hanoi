@@ -874,7 +874,7 @@ have Hm1 : move ↑[last c1 cs1]_p1 ↑[last c1 cs1]_p2.
 apply: pathS_spec_move (p1Dp2) _ _ _ (Hm1) _ => //.
 -  have := @move_diskr _ ldisk _ _ Hm1.
    by rewrite !cliftr_ldisk; apply.
-- by rewrite csE lc1E lcs1E.
+- by rewrite csE lc1E -lcs1E.
 - rewrite path_unlift_eq => //.
   by move: Hp; rewrite -[cs](cat_take_drop n1) cat_path => /andP[].
 rewrite -lc1E.
