@@ -43,12 +43,12 @@ An interactive version of the library is available
 - Author(s):
   - Laurent Théry
 - License: [MIT License](LICENSE)
-- Compatible Coq versions: 8.17 or later
+- Compatible Coq versions: 8.18 or later
 - Additional dependencies:
-  - [MathComp ssreflect 1.15 or later](https://math-comp.github.io)
-  - [MathComp algebra 1.17 or later](https://math-comp.github.io)
-  - [MathComp finmap 1.5.2 or later](https://github.com/math-comp/finmap)
-  - [MathComp finmap 1.0.1 or later](https://github.com/math-comp/finmap)
+  - [MathComp ssreflect 2.1 or later](https://math-comp.github.io)
+  - [MathComp algebra 2.1 or later](https://math-comp.github.io)
+  - [MathComp finmap 2.0 or later](https://github.com/math-comp/finmap)
+  - [MathComp bigenough 1.0.1 or later](https://github.com/math-comp/finmap)
 - Coq namespace: `hanoi`
 - Related publication(s): none
 

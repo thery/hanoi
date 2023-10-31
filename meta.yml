@@ -50,34 +50,34 @@ license:
   identifier: MIT
 
 supported_coq_versions:
-  text: '8.17 or later'
-  opam: '{(>= "8.17")}'
+  text: '8.18 or later'
+  opam: '{(>= "8.18")}'
 
 dependencies:
 - opam:
     name: coq-mathcomp-ssreflect
-    version: '{(>= "1.17.0")}'
+    version: '{(>= "2.1.0")}'
   description: |-
-    [MathComp ssreflect 1.15 or later](https://math-comp.github.io)
+    [MathComp ssreflect 2.1 or later](https://math-comp.github.io)
 - opam:
     name: coq-mathcomp-algebra
-    version: '{(>= "1.17.0")}'
+    version: '{(>= "2.1.0")}'
   description: |-
-    [MathComp algebra 1.17 or later](https://math-comp.github.io)
+    [MathComp algebra 2.1 or later](https://math-comp.github.io)
 - opam:
     name: coq-mathcomp-finmap
-    version: '{(>= "1.5.2")}'
+    version: '{(>= "2.0.0")}'
   description: |-
-    [MathComp finmap 1.5.2 or later](https://github.com/math-comp/finmap)
+    [MathComp finmap 2.0 or later](https://github.com/math-comp/finmap)
 - opam:
     name: coq-mathcomp-bigenough
     version: '{(>= "1.0.1")}'
   description: |-
-    [MathComp finmap 1.0.1 or later](https://github.com/math-comp/finmap)
+    [MathComp bigenough 1.0.1 or later](https://github.com/math-comp/finmap)
 
 
 tested_coq_opam_versions:
-- version: '1.17.0-coq-8.17'
+- version: '2.1.0-coq-8.18'
   repo: 'mathcomp/mathcomp'
 
 namespace: hanoi

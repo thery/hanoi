@@ -459,7 +459,7 @@ Definition sd n l (u : {ffun 'I_l.+1 -> configuration 4 n}) :=
 
 Variable n : nat.
 Hypothesis IH: 
-     forall (l : nat) (p1 p2 p3 : ordinal_eqType 4)
+     forall (l : nat) (p1 p2 p3 : (Equality.clone _ 'I_4))
        (u : {ffun 'I_l.+1 -> configuration 4 n.+1}),
      p1 != p2 ->
      p1 != p3 ->
@@ -488,14 +488,14 @@ Hypothesis cH : forall k : 'I_l.+2,
 Let u':= ([ffun i => ↓[u i]] : {ffun 'I_l.+2 -> configuration 4 n.+1})
  : {ffun 'I_l.+2 -> configuration 4 n.+1}.
 
-Let H: forall k : 'I_l.+2,
+Lemma Hcodom : forall k : 'I_l.+2,
     0 < k < l.+1 -> codom (u' k) \subset [:: p2; a[p1, p3] k].
 Proof. by move=> k kH; rewrite ffunE; apply/codom_liftr/cH. Qed.
 
-Let apeg13D2 a : a[p1, p3] a != p2.
+Lemma apeg13D2 a : a[p1, p3] a != p2.
 Proof. by rewrite /apeg; case: odd; rewrite // eq_sym. Qed.
 
-Let apeg13D0 a : a[p1, p3] a != p0.
+Lemma apeg13D0 a : a[p1, p3] a != p0.
 Proof. by rewrite /apeg; case: odd; rewrite // eq_sym. Qed.
 
 Hypothesis KH1 : u ord0 ord_max = p1.
@@ -507,6 +507,7 @@ Lemma case1 :
   sd u + sp (u ord0) l.+1 p1 + 
          sp (u ord_max) l.+1 (a[p3, p1] l).
 Proof.
+have apeg13D0 := apeg13D0; have apeg13D2 := apeg13D2.
 have il1E : inord l.+1 = ord_max :> 'I_l.+2
   by apply/val_eqP; rewrite /= inordK.
 have iE : exists i, u (inord i) ord_max != a[p1, p3] i.
@@ -689,7 +690,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
       by rewrite -(mulKn a.-1 (isT : 0 < 3)) leq_div2r.
     rewrite ffunE; case: eqP => [kH|/eqP kH].
       rewrite kH apegMr //.
-      have := @H (inord a.-1); rewrite inordK //.
+      have := @Hcodom(inord a.-1); rewrite inordK //.
         rewrite ffunE; apply.
         by rewrite -ltnS prednK // a_gt1.
       by rewrite prednK // (leq_trans aLld1).
@@ -793,7 +794,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
   set x2S := sp _ _ _ in P3; set y2S := sp _ _ _ in P4.
   have x2y2SE : x2S + y2S <= (S_[1] n).*2 + α_[maxn 2 b] n.
     apply: sum_alpha_diffE => //; first by rewrite /pa eq_sym.
-    have /H : 0 < (inord a : 'I_l.+2) < l.+1 by rewrite inordK // a_gt0.
+    have /Hcodom : 0 < (inord a : 'I_l.+2) < l.+1 by rewrite inordK // a_gt0.
     by rewrite ffunE inordK.
   rewrite -addnn {1}dsum_alphaL_S in P2.
   rewrite -addnn {1}dsum_alphaL_S in P3.
@@ -1015,7 +1016,7 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
       by rewrite -(mulKn a.-1 (isT : 0 < 3)) leq_div2r.
     rewrite ffunE; case: eqP => [kH|/eqP kH].
       rewrite kH apegMr //.
-      have := @H (inord a.-1); rewrite inordK //.
+      have := @Hcodom (inord a.-1); rewrite inordK //.
         rewrite ffunE; apply.
         by rewrite -ltnS prednK // a_gt1.
       by rewrite prednK // (leq_trans aLld1).
@@ -1399,7 +1400,7 @@ have cH1 (k : 'I_(3 * l).+2) :
     rewrite {1 2 4}(divn_eq k 3) km3E0 addn0.
     rewrite ltnS mulnC muln_gt0 leq_mul2l /= => /andP[k3_gt0 k3Ll].
     rewrite apegMr //.
-    have:= @H (inord (k %/ 3)); rewrite ffunE inordK //; last first.
+    have:= @Hcodom (inord (k %/ 3)); rewrite ffunE inordK //; last first.
       by apply: leq_trans k3Ll _.
     by apply; rewrite k3_gt0.
   case: eqP => [km3E1|/eqP km3D1].
@@ -1452,7 +1453,7 @@ Section Case2.
 Variable n : nat.
 
 Hypothesis IH:
-     forall (l : nat) (p1 p2 p3 : ordinal_eqType 4)
+     forall (l : nat) (p1 p2 p3 : (Equality.clone _ 'I_4))
        (u : {ffun 'I_l.+1 -> configuration 4 n.+1}),
      p1 != p2 ->
      p1 != p3 ->
@@ -1592,7 +1593,7 @@ Section Case3.
 Variable n : nat.
 
 Hypothesis IH:
-  forall (l : nat) (p1 p2 p3 : ordinal_eqType 4)
+  forall (l : nat) (p1 p2 p3 : (Equality.clone _ 'I_4))
     (u : {ffun 'I_l.+1 -> configuration 4 n.+1}),
   p1 != p2 ->
   p1 != p3 ->

@@ -243,7 +243,6 @@ Lemma psi_ler l e :
       <= ((psi e)%:R : int))%R.
 Proof.
 have [/psi_aux_psib/le_trans->//|lLp] := leqP (psi_auxb e) l.
-  by rewrite (ler_nat _ 0).
 rewrite [X in (_ <= X%:R)%R](bigD1 (Ordinal lLp)) //=.
 apply: le_trans (ler_rnz _) _.
 rewrite -natz ler_nat.
@@ -322,7 +321,7 @@ have [->|[x]] := fset_0Vmem e; first by rewrite psi_set0 !eqxx.
 have [->|_] := e =P fset0; first by rewrite inE.
 move=> xIe.
 suff : psi e > 0 by case: psi.
-rewrite -(ltr_nat int_numDomainType).
+rewrite -(ltr_nat (Num.NumDomain.clone _ int)).
 apply: lt_le_trans (psi_max _ 0).
 by rewrite /psi_aux add0n subr0 ltr_nat (big_fsetD1 x).
 Qed.
@@ -452,7 +451,7 @@ Qed.
 Lemma psi_sint_phi n : (psi `[n]).*2 = (phi n.+1).-1.
 Proof.
 have [|nP] := leqP n 0; first by case: (n)=> //; rewrite psi_sint0.
-apply/eqP; rewrite -(eqr_nat int_numDomainType).
+apply/eqP; rewrite -(eqr_nat (Num.NumDomain.clone _ int)).
 rewrite -muln2 natrM mulr_natr.
 rewrite psi_aux_sint // psi_auxE_lt.
 rewrite (_ : [fset _ in _ | _] = [fset i in `[n] | delta (troot n) <= i]);
@@ -553,7 +552,7 @@ Qed.
 (* This is 2.4.1 *)
 Lemma psi_sint_min n : n <= psi `[n].
 Proof.
-rewrite -(ler_nat int_numDomainType).
+rewrite -(ler_nat (Num.NumDomain.clone _ int)).
 rewrite natz -[X in (X <= _)%R]psi_aux0_sint.
 by apply: psi_max.
 Qed.
@@ -626,7 +625,7 @@ Qed.
 (* This is 2.4.3 *)
 Lemma psi_exp e : psi e <= (2 ^ #|`e|).-1.
 Proof.
-rewrite -(ler_nat int_numDomainType).
+rewrite -(ler_nat (Num.NumDomain.clone _ int)).
 have [l ->] := psiE e.
 apply: le_trans (_ : ((2 ^ l).-1 + \sum_(i <- e) 2 ^ l)%:R - 
                       (l * 2 ^ l)%:R <= _)%R.
@@ -652,7 +651,7 @@ Qed.
 (* This is 2.5 *)
 Lemma psi_diff e1 e2 : psi e1 - psi e2 <= \sum_(i <- e1 `\` e2) 2 ^ troot i.
 Proof.
-rewrite leq_subLR -(ler_nat int_numDomainType) natrD addrC -lerBlDr.
+rewrite leq_subLR -(ler_nat (Num.NumDomain.clone _ int)) natrD addrC -lerBlDr.
 have [l ->] := psiE e1.
 apply: le_trans (lerB (lexx _) (psi_max _ l)) _.
 rewrite /psi_aux opprB addrA subrK addnC !natrD opprD addrA addrK.
@@ -678,7 +677,7 @@ Lemma psi_delta e s a :
   #|` e `\` `[delta s]| <= s -> a \in e -> psi e - psi (e `\  a) <= 2 ^ s.-1.
 Proof.
 move=> CLs aIe.
-rewrite leq_subLR -(ler_nat int_numDomainType) natrD addrC -lerBlDr.
+rewrite leq_subLR -(ler_nat (Num.NumDomain.clone _ int)) natrD addrC -lerBlDr.
 have [l Hl] := psiE e.
 have F l1 : s <= l1.+1 -> (psi_aux l1.+1 e <= psi_aux l1 e)%R. 
   move=> sLl1.
@@ -786,7 +785,7 @@ Qed.
 (* This is 2.8 *)
 Lemma psi_cap_ge e1 e2 : phi (#|` e1 `|` e2|.+3) <= (psi e1 + psi e2).*2.*2 + 5.
 Proof.
-rewrite -(ler_nat int_numDomainType) natrD.
+rewrite -(ler_nat (Num.NumDomain.clone _ int)) natrD.
 rewrite -!muln2 !natrM !mulr_natr -mulrnA natrD.
 set n := #|`_|.
 pose m := troot (n.+3).

@@ -12,7 +12,7 @@ Hypothesis aL1 : 1 < a.
 Hypothesis aLb : a < b.
 Hypothesis aCb : coprime a b.
 
-Let bL1 : 1 < b.
+Lemma bL1 : 1 < b.
 Proof. by apply: ltn_trans aLb. Qed.
 
 Fixpoint alphal (n : nat) :=
@@ -41,6 +41,7 @@ Qed.
 
 Lemma gt0_alphal n i : i \in alphal n -> 0 < i.
 Proof.
+have bL1 := bL1.
 elim: n i => /= [i|n].
   by rewrite !inE => /or3P[] /eqP-> //; rewrite ltnW // (ltn_trans aL1).
 case: (alphal n) => [/= _ i|/= a1 l IH i]; rewrite !inE.
@@ -82,6 +83,7 @@ Qed.
 
 Lemma alpha_ltn n : alpha n < alpha n.+1.
 Proof.
+have bL1 := bL1.
 rewrite /alpha /=.
 set h := head _ _.
 have hP : 0 < h.
@@ -238,6 +240,7 @@ Qed.
 
 Lemma alpha_surjective m n : {k | alpha k = a ^ m * b ^ n}.
 Proof.
+have bL1 := bL1.
 pose P p := has (fun i => i %| a ^ m * b ^ n) (alphal p).
 have F1 : exists n, P n.
   by exists 0; apply/hasP; exists 1.
@@ -304,6 +307,7 @@ Lemma sum_alpha_leq n i :
   i <= n ->
  \sum_(j < n) alpha j <= (a * \sum_(j < (n - i)) alpha j) + \sum_(j < i) b ^ j.
 Proof.
+have bL1 := bL1.
 move=> iLn.
 rewrite -!(big_mkord xpredT) big_distrr /=.
 suff aux : forall u v w n n0 n1 : nat,
@@ -392,6 +396,7 @@ Qed.
 
 Lemma b_exp_leq k n : b ^ k <= alpha n -> k <= n.
 Proof.
+have bL1 := bL1.
 elim: n k => [k|n IH [|k Hk]//].
   by rewrite -[alpha 0]/(b ^ 0) leq_exp2l.
 apply/IH/(isAB_geq_alphaSn (isAB_bexp _)).
@@ -410,6 +415,7 @@ Qed.
 Lemma alpha_b_eq n i : 
    b ^ i < alpha n.+1 < b ^ i.+1 -> alpha n.+1 = a * alpha (n - i).
 Proof.
+have bL1 := bL1.
 move=> /andP[beLa aLbe].
 have iLm : i <= n.
   apply/b_exp_leq/isAB_geq_alphaSn => //.
@@ -517,6 +523,7 @@ Lemma sum_alpha_eq n i :
  \sum_(i0 < n.+1) alpha i0 =
   (a * \sum_(i0 < (n - i)) alpha i0) + \sum_(i0 < i.+1) b ^ i0.
 Proof.
+have bL1 := bL1.
 elim: n i => [i|n IH i].
   case: i => [_|i]; last by rewrite leqNgt alpha0 (ltn_exp2l 0).
   by rewrite !big_ord_recr !big_ord0 muln0.
