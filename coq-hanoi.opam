@@ -41,10 +41,10 @@ An interactive version of the library is available
 build: [make "-j%{jobs}%"]
 install: [make "install"]
 depends: [
-  "coq" {(>= "8.18")}
-  "coq-mathcomp-ssreflect" {(>= "2.1.0")}
-  "coq-mathcomp-algebra" {(>= "2.1.0")}
-  "coq-mathcomp-finmap" {(>= "2.0.0")}
+  "coq" {(>= "8.19")}
+  "coq-mathcomp-ssreflect" {(>= "2.3.0")}
+  "coq-mathcomp-algebra" {(>= "2.3.0")}
+  "coq-mathcomp-finmap" {(>= "2.1.0")}
   "coq-mathcomp-bigenough" {(>= "1.0.1")}
 ]
 

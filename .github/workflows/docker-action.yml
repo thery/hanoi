@@ -17,10 +17,10 @@ jobs:
     strategy:
       matrix:
         image:
-          - 'mathcomp/mathcomp:2.1.0-coq-8.18'
+          - 'mathcomp/mathcomp:2.3.0-coq-8.19'
       fail-fast: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: coq-community/docker-coq-action@v1
         with:
           opam_file: 'coq-hanoi.opam'

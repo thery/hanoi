@@ -984,10 +984,10 @@ have duz2_leq : psi (s2f E `&` `[T]) + psi (s2f A) + 2 ^ K.-1 < `d[u,z2]_rmove.
       rewrite -oprojE; case: (Hnz (z0 (oproj (enum_val i)))) => // /eqP.
       - rewrite -[_ == z0s N]negbK; case/negP.
         apply: (move_on_toplDr z0Mz0s) => //=.
-        by rewrite -{8}[n](subnK TLN) leq_add2r subnS ltnW.
+        by rewrite -[X in _ <= X](subnK TLN) leq_add2r subnS ltnW.
       - rewrite -[_ == p0]negbK; case/negP; rewrite -z0N0.
         apply: (move_on_toplDl z0Mz0s) => //=.
-        by rewrite -{8}[n](subnK TLN) ltn_add2r subnS.
+        by rewrite -[X in _ < X](subnK TLN) ltn_add2r subnS.
       rewrite -[_ == np3]negbK; case/negP.
       apply: memE''.
         have := mem_last u z0sb; rewrite -/z0 gE' !inE !mem_cat.

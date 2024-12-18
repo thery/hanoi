@@ -116,7 +116,7 @@ Lemma gminE n : n = gmin n + troot n.
 Proof.
 case: n => //= n.
 rewrite {1}[n.+1]tmodE /gmin.
-case: troot (troot_gt0 (isT : 0 < n.+1)) => //= t _.
+case: troot (troot_gt0 (isT : 0 < n.+1)) => // t _.
 by rewrite deltaS addnAC.
 Qed.
 
@@ -139,7 +139,7 @@ have mLt : tmod n < troot n by rewrite ltn_neqAle mDt tmod_le.
 rewrite subn1.
 apply/eqP; rewrite /gmin trootE.
 case: n {mDt}mLt => // [] [|] // n mLt.
-case: troot mLt => //= t mLt.
+case: troot mLt => // t mLt.
 by rewrite leq_addr deltaS ltn_add2l.
 Qed.
 
@@ -224,7 +224,7 @@ rewrite (leq_trans (_ : _ <= gmin n.+1 + troot m)) //.
 rewrite -ltnS -addnS.
 rewrite /gmin {3}[n.+1]tmodE addnAC leq_add2r.
 have : 0 < troot n.+1 by apply troot_gt0.
-case E : troot => [|t] _ //=.
+case E : troot => [|t] _ //; rewrite [X in X <= _]/=.
 rewrite deltaS -E leq_add2l.
 by apply: gmin_root_lt.
 Qed.

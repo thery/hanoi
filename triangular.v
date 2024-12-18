@@ -72,7 +72,7 @@ Proof. by case: n => // n _; rewrite deltaS addnS ltnS leq_addr. Qed.
 Lemma deltaE n : delta n = \sum_(i < n.+1) i.
 Proof.
 elim: n => [|n IH]; first by rewrite big_ord_recl big_ord0.
-by rewrite big_ord_recr /= -IH deltaS.
+by rewrite big_ord_recr -IH deltaS.
 Qed.
 
 Compute zip (iota 0 11) (map delta (iota 0 11)).
@@ -303,7 +303,7 @@ case: p => a b.
 rewrite /tpair /pairt /= /tmod.
 have ->: ∇(Δ(a + b) + b)  = a + b.
   apply/eqP.
-  rewrite trootE leq_addr /= deltaS.
+  rewrite trootE leq_addr deltaS.
   by rewrite addnS ltnS addnCA leq_addl.
 by rewrite [delta _ + _]addnC !addnK.
 Qed.

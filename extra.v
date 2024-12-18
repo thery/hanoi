@@ -1,13 +1,14 @@
-From mathcomp Require Import all_ssreflect finmap.
-
-Set Implicit Arguments.
-Unset Strict Implicit.
-
 (******************************************************************************)
 (*                                                                            *)
 (*   Extra theorems and definitions                                           *)
 (*                                                                            *)
 (******************************************************************************)
+
+From mathcomp Require Import all_ssreflect finmap.
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+
 
 (******************************************************************************)
 (*                                                                            *)
@@ -250,9 +251,8 @@ Lemma s2f_setT n : s2f (setT : {set 'I_n}) = sint 0 n.
 Proof.
 apply/fsetP => i; rewrite mem_sint /=.
 apply/imfsetP/idP => /= [[j _ -> //]| iLn].
-by exists (Ordinal iLn).
+by exists (Ordinal iLn); rewrite //= inE.
 Qed.
-
 
 Lemma s2fD n (s1 s2 : {set 'I_n}) : s2f (s1 :\: s2)  = s2f s1 `\` s2f s2.
 Proof.
