@@ -4,6 +4,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
+From Stdlib Require Import ArithRing.
 From mathcomp Require Import all_ssreflect finmap.
 
 Set Implicit Arguments.
@@ -1018,44 +1019,55 @@ end.
 
 Ltac test t1 t2 := let xx := delta_lterm1 t1 t2 in pose kk := xx.
 
+
+Ltac ring_preprocess := rewrite -?mul2n -?[addn]/Nat.add -?[muln]/Nat.mul.
+Ltac ring_postprocess := 
+  rewrite ?[nat_of_bin _]/= -?[Nat.add]/addn -?[Nat.mul]/muln ?add1n ?add2n.
+Ltac hyp_ring_preprocess H := rewrite -?mul2n -?[addn]/Nat.add -?[muln]/Nat.mul in H |- *.
+Ltac hyp_ring_postprocess H := 
+  rewrite ?[nat_of_bin _]/= -?[Nat.add]/addn -?[Nat.mul]/muln ?add1n ?add2n in H |-*.
+  
+Ltac nat_ring := ring_preprocess; ring.
+
 Ltac applyr H :=
-  rewrite -?mul2n in H |- *;
+  hyp_ring_preprocess H;
   match goal with 
   H: is_true (leq _ ?X) |- is_true (leq _ ?Y) =>
     ring_simplify X Y in H;
     ring_simplify X Y; rewrite ?[nat_of_bin _]/= in H |- *
   end;
+  hyp_ring_postprocess H;
   let Z := fresh "Z" in
   match goal with 
   H: is_true (leq _ ?X1) |- is_true (leq _ ?Y1) =>
     let v := delta_lterm1 Y1 X1 in
     (try (rewrite [Z in _ <= Z](_ : _ = v + X1))); 
     [ apply: leq_trans (leq_add (leqnn _) H); rewrite {H}// ?(add0n,addn0) 
-     | ring]
+     | nat_ring]
   end.
   
 Ltac applyl H :=
-  rewrite -?mul2n in H |- *;
+  hyp_ring_preprocess H;
   match goal with 
   H: is_true (leq ?X _) |- is_true (leq ?Y _) =>
-    ring_simplify X Y; ring_simplify X Y in H;
-    rewrite ?[nat_of_bin _]/= in H |- *
+    ring_simplify X Y; ring_simplify X Y in H
   end;
+  hyp_ring_postprocess H;
   let Z := fresh "Z" in
   match goal with 
   H: is_true (leq ?X1 _) |- is_true (leq ?Y1 _) =>
     let v := delta_lterm1 Y1 X1 in
     (try rewrite [Z in Z <= _](_ : Y1 = v + X1));
     [apply: leq_trans (leq_add (leqnn _) H) _;
-     rewrite {H}// ?(add0n,addn0) | ring]
+     rewrite {H}// ?(add0n,addn0) | nat_ring]
   end.
 
 Ltac gsimpl :=
-  rewrite -?mul2n in |- *;
+  ring_preprocess;
   match goal with 
-  |- is_true (leq ?X ?Y) =>
-    ring_simplify X Y; rewrite ?[nat_of_bin _]/=
+  |- is_true (leq ?X ?Y) => ring_simplify X Y 
   end;
+  ring_postprocess;
   let Z := fresh "Z" in
   match goal with 
     |- is_true (leq ?X1 ?Y1) =>
@@ -1065,22 +1077,21 @@ Ltac gsimpl :=
     let v := delta_lterm1 X1 Y1 in
     let v1 := delta_lterm1 X1 v in
     let v2 := delta_lterm1 Y1 v1 in
-    (try (rewrite [Z in _ <= Z](_ : Y1 = v2 + v1); last by ring));
-    (try (rewrite [Z in Z <= _](_ : X1 = v + v1); last by ring));
+    (try (rewrite [Z in _ <= Z](_ : Y1 = v2 + v1); last by nat_ring));
+    (try (rewrite [Z in Z <= _](_ : X1 = v + v1); last by nat_ring));
     rewrite ?leq_add2r
     | _ => 
     let v1 := delta_lterm1 Y1 v in
     let v2 := delta_lterm1 X1 v1 in
-    (try (rewrite [Z in _ <= Z](_ : Y1 = v + v1); last by ring));
-    (try (rewrite [Z in Z <= _](_ : X1 = v2 + v1); last by ring));
+    (try (rewrite [Z in _ <= Z](_ : Y1 = v + v1); last by nat_ring));
+    (try (rewrite [Z in Z <= _](_ : X1 = v2 + v1); last by nat_ring));
     rewrite ?leq_add2r
   end
   end.
-  
-Ltac sring := rewrite -!mul2n; ring.
+
 Ltac changel t :=
   let X := fresh "X" in 
-  rewrite [X in X <= _](_ : _ = t); last by (ring || sring).
+  rewrite [X in X <= _](_ : _ = t); last by (ring || nat_ring).
 Ltac changer t := 
   let X := fresh "X" in 
-  rewrite [X in _ <= X](_ : _ = t); last by (ring || sring).
+  rewrite [X in _ <= X](_ : _ = t); last by (ring || nat_ring).

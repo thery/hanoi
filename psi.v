@@ -897,7 +897,7 @@ Lemma phi_3_5_4_sum n :
 Proof.
 rewrite phiE.
 rewrite -(big_mkord xpredT (fun i => 2 ^ troot i)).
-rewrite (big_cat_nat _ _ _ (_ : 0 <= 1)) //=.
+rewrite (big_cat_nat (_ : 0 <= 1)) //=.
 by rewrite big_nat_recl //= big_mkord big_ord0 addn0 add1n.
 Qed.
 

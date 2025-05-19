@@ -1,3 +1,4 @@
+From Stdlib Require Import ArithRing.
 From mathcomp Require Import all_ssreflect finmap.
 From hanoi Require Import extra star gdist lhanoi3 ghanoi ghanoi4 shanoi.
 
@@ -612,7 +613,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
       have F := big_mkord xpredT 
                     (fun i => `d[u (inord i), u (inord i.+1)]_smove).
       rewrite -{}[sd u]F.
-      rewrite (big_cat_nat _ _ _ (_ : _ <= (a.-1).+1)) //=; last first.
+      rewrite (big_cat_nat (_ : _ <= (a.-1).+1)) //=; last first.
          by rewrite prednK.
       rewrite big_mkord big_ord_recr /= prednK //.
       rewrite -{9}[a]add0n big_addn -/b big_mkord.
@@ -831,7 +832,6 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
   have F9 : α_[1] (n.+2) <= (α_[1] n).*2.+2.
     apply: leq_trans (leqnSn _).
     by apply: alphaL_4_5.
-(* Lia should work now *)
   gsimpl.
   applyr P1.
   rewrite -(leq_add2r x1S); applyr P2.
@@ -846,7 +846,7 @@ have [/andP[a_gt1 aLlm1]|] := boolP (2 <= a <= l.-1).
   gsimpl.
   rewrite -(leq_add2r (S_[1] n.+1)); applyl F6n; gsimpl.
   rewrite F71; gsimpl.
-  rewrite !add1n {}F73; gsimpl.
+  rewrite ?add1n {}F73; gsimpl.
   rewrite -(leq_add2r (S_[1] n.+2 + S_[2] n.+2)).
   applyl  F6n1; gsimpl.
   rewrite {}F72 {}F721 {}F711 {}F71; gsimpl.
@@ -1131,7 +1131,7 @@ have [/andP[a_gt1 /eqP bE1]|] := boolP ((1 < a) && (b == 1)).
   rewrite lEa; applyr F6n.
   rewrite -(leq_add2r (S_[1] n.+2 + S_[3] n.+2)); applyr F6n1.
   rewrite {}F72 {}F711 {}F71; gsimpl.
-  rewrite !add1n -{}F8.
+  rewrite ?add1n -{}F8.
   by applyl F9; gsimpl.
 rewrite negb_and -leqNgt => o1H.
 have [/eqP aE1| aD1] := boolP (a == 1).
@@ -1243,7 +1243,7 @@ have [/eqP aE1| aD1] := boolP (a == 1).
       rewrite !alphaL_3E.
       have F := leq_dsum_alpha_2l_1 n.+1; applyr F.
       rewrite !dsum_alphaL_S; gsimpl.
-      rewrite !add1n.
+      rewrite ?add1n.
       by have F := alphaL_4_5 n; applyl F; gsimpl.
     rewrite (maxn_idPr _) //.
     changer (2 * (S_[3] (n.+1)).+1 +  2 * S_[b] (n.+1)).
@@ -2960,7 +2960,7 @@ move: c_gt0; rewrite leq_eqVlt eq_sym => /orP[/eqP cE1|c_gt1].
     set y3S := sp _ _ _ in P5; set y4S := \sum_(_ < _) _ in P5.
     rewrite /sd -(big_mkord xpredT 
                    (fun i => `d[u (inord i), u (inord i.+1)]_smove)).
-    rewrite (big_cat_nat _ _ _ (_ : 0 <= a1)) //=; last by apply: ltnW.
+    rewrite (big_cat_nat (_ : 0 <= a1)) //=; last by apply: ltnW.
     rewrite big_mkord -!addnA.
     apply: leq_trans (leq_add P1l1  (leqnn _)); rewrite -/x1S.
     rewrite -{P1l1}P2 -/x2S {1}lE2 !sum_beta_S //.
@@ -3331,7 +3331,7 @@ have [|b_gt0] := leqP b 0; last first.
     have F2 := dsum_alphaL_S 3 n; rewrite {1}F2.
     have F3 : S_[5] n.+2 <= S_[4] n.+1 + (α_[1] n.+1).*2.
       by apply: dsum_alphaL_alpha.
-    rewrite -[3 + 2]/5 -[2 + 2]/4; applyl F3.
+    rewrite -[3 + 2]/5; applyl F3.
     have F4 : S_[4] n.+1 <= S_[3] n + (α_[1] n).*2.
       by apply: dsum_alphaL_alpha.
     rewrite -leq_double in F4; applyl F4; gsimpl.
@@ -3569,7 +3569,7 @@ have [c_gt2|c_lt3] := leqP 3 c.
   rewrite -[_ <= _](leq_mul2l 3) mulnA.
   by apply: leq_trans F17 _; gsimpl.
 have cE2 : c = 2 by case: (c) c_gt1 c_lt3 => [|[|[|]]].
-rewrite cE2 (maxn_idPl _) // add1n -[2 * 2]/4 -[(3 * 2).-2]/4 -[2 + 4]/6.
+rewrite cE2 (maxn_idPl _) // -[2 * 2]/4 -[(3 * 2).-2]/4.
 rewrite [in X in _ <= X]mul2n -addnn.
 have F1 := dsum_alphaL_S 5 n; rewrite {1}F1.
 have F2 := dsum_alpha3_S n.+2.
@@ -3591,7 +3591,7 @@ have F9 : 3 * α_[1] n1.+1.+4 <= 4 * α_[1] n1.+4.
   by rewrite alpha_4_3.
 rewrite -[_ <= _]orFb  -(leq_mul2l 4) in F9.
 rewrite -[_ <= _](leq_mul2l 3).
-by rewrite add1n; applyl F9; gsimpl.
+by applyl F9; gsimpl.
 Qed.
 
 End Case3.
