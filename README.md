@@ -12,7 +12,7 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 
 
 
-Hanoi tower in Coq
+Hanoi tower in Rocq
 
 
 | File                              |  Content                                 | 
@@ -43,12 +43,12 @@ An interactive version of the library is available
 - Author(s):
   - Laurent Théry
 - License: [MIT License](LICENSE)
-- Compatible Coq versions: 9.0 or later
+- Compatible Rocq/Coq versions: 9.0 or later
 - Additional dependencies:
   - [MathComp ssreflect 2.4 or later](https://math-comp.github.io)
   - [MathComp algebra 2.4 or later](https://math-comp.github.io)
   - [MathComp finmap 2.2.1 or later](https://github.com/math-comp/finmap)
-- Coq namespace: `hanoi`
+- Rocq/Coq namespace: `hanoi`
 - Related publication(s): none
 
 ## Building and installation instructions

@@ -6,10 +6,10 @@ community: false
 dune: false
 action: true
 
-synopsis: Hanoi tower in Coq
+synopsis: Hanoi tower in Rocq
 
 description: |-
-  Hanoi tower in Coq
+  Hanoi tower in Rocq
 
 
   | File                              |  Content                                 | 

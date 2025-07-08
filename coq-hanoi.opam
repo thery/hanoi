@@ -10,9 +10,9 @@ dev-repo: "git+https://github.com/thery/hanoi.git"
 bug-reports: "https://github.com/thery/hanoi/issues"
 license: "MIT"
 
-synopsis: "Hanoi tower in Coq"
+synopsis: "Hanoi tower in Rocq"
 description: """
-Hanoi tower in Coq
+Hanoi tower in Rocq
 
 
 | File                              |  Content                                 | 
