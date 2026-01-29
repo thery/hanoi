@@ -884,7 +884,7 @@ case: (m) mG2 => // [] [|m1] //= _.
 rewrite addSn subn1 /=.
 rewrite (_ : 5%:R = 1 *+ 4 + 1)%R // addrA -mulrnDl.
 rewrite subrK -addn1 natrD; congr (_ + _)%R.
-rewrite -[in RHS]mulr_natr -!natrM [in RHS]mulnAC mulnC.
+rewrite -[(_ *+ 4)%R]mulr_natr -!natrM [in RHS]mulnAC mulnC.
 congr (_ * _)%:R%R.
 by rewrite mulnC !expnS !mulnA.
 Qed.
