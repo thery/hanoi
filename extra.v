@@ -5,7 +5,7 @@
 (******************************************************************************)
 
 From Stdlib Require Import ArithRing.
-From mathcomp Require Import all_ssreflect finmap.
+From mathcomp Require Import all_boot finmap.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

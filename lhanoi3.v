@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect.
+From mathcomp Require Import all_boot.
 From hanoi Require Import gdist ghanoi ghanoi3.
 
 (******************************************************************************)

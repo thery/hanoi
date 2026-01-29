@@ -50,7 +50,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_ssreflect finmap.
+From mathcomp Require Import all_boot finmap.
 From hanoi Require Import extra gdist.
 
 Set Implicit Arguments.

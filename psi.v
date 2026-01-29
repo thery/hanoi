@@ -7,7 +7,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_ssreflect all_algebra finmap.
+From mathcomp Require Import all_boot all_order all_algebra finmap.
 From hanoi Require Import extra triangular phi.
 
 

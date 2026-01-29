@@ -1,5 +1,5 @@
 From Stdlib Require Import ArithRing.
-From mathcomp Require Import all_ssreflect finmap.
+From mathcomp Require Import all_boot finmap.
 From hanoi Require Import extra star gdist lhanoi3 ghanoi ghanoi4 shanoi.
 
 Open Scope nat_scope.

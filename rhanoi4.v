@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect finmap.
+From mathcomp Require Import all_boot finmap.
 From hanoi Require Import extra gdist ghanoi ghanoi4 triangular phi rhanoi3 psi.
 
 Set Implicit Arguments.

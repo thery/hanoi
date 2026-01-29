@@ -11,7 +11,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_ssreflect.
+From mathcomp Require Import all_boot.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
