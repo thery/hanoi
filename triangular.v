@@ -11,7 +11,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -30,7 +30,7 @@ have [aLb|bLa] := leqP b a; last first.
   by apply/eqP; rewrite subn_eq0 ltnW.
 have [cLb|bLc] := leqP c b; last first.
   by rewrite subnBA ?subnK // ltnW.
-rewrite (_ : c - _ = 0); last by apply/eqP; rewrite subn_eq0.
+rewrite (_ : c - _ = 0); first by apply/eqP; rewrite subn_eq0.
 by rewrite subn0 leq_sub2l.
 Qed.
 
@@ -122,8 +122,8 @@ set l := iota _ _; set f := (fun _ => _).
 case E : _.-1 => [|n] //.
 have  /(before_find 0) : 
    (find f l).-1 < find f l by rewrite prednK // E.
-rewrite E  nth_iota // /f => [->//|].
-rewrite -[m.+2](size_iota 0) -E prednK; first by apply: find_size.
+rewrite E  nth_iota // /f => [|->//].
+rewrite -[m.+2](size_iota 0) -E prednK; last by apply: find_size.
 by case: find E.
 Qed.
 
@@ -140,8 +140,8 @@ case E : _.-1 => [|n] //.
   case: find E => // [] [|n] //.
   by rewrite nth_iota //=; case: (m).
 rewrite nth_iota.
-  by rewrite -E prednK // ltnNge ltnS.
-by rewrite -(size_iota 0 m.+2) -has_find.
+  by rewrite -(size_iota 0 m.+2) -has_find.
+by rewrite -E prednK // ltnNge ltnS.
 Qed.
 
 (* Galois connection *)
@@ -220,7 +220,7 @@ rewrite leq_eqVlt => /orP[/eqP He|He].
   by rewrite /tmod -He subSn ?eqxx // {2}[m]tmodE leq_addr.
 rewrite orbC.
 have: troot m.+1 == (troot m).+1.
-  rewrite trootE (leq_trans (delta_le He)) //; last first.
+  rewrite trootE (leq_trans (delta_le He)) //.
     by rewrite {2}[m.+1]tmodE leq_addr.
   rewrite !deltaS {1}[m]tmodE -addnS -addnS -addnA.
   by rewrite leq_add2l (leq_trans _ (leq_addl _ _)) // !ltnS tmod_le.
@@ -237,7 +237,7 @@ by rewrite !eqxx.
 Qed.
 
 Lemma troot_mod_le m n : 
-   m <= n = 
+   (m <= n) = 
    ((troot m < troot n) || ((troot m == troot n) && (tmod m <= tmod n))).
 Proof.
 case: leqP => [|dmGdn] /= ; last first.
@@ -259,7 +259,7 @@ by apply: delta_le.
 Qed.
 
 Lemma troot_mod_lt m n : 
-   m < n = 
+   (m < n) = 
    ((troot m < troot n) || ((troot m == troot n) && (tmod m < tmod n))).
 Proof.
 case: (leqP (troot n) (troot m))  => [|dmGdn] /= ; last first.

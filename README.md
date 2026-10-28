@@ -43,21 +43,25 @@ An interactive version of the library is available
 - Author(s):
   - Laurent Théry
 - License: [MIT License](LICENSE)
-- Compatible Rocq/Coq versions: 9.1 or later
+- Compatible Rocq/Coq versions: 9.2 or later
 - Additional dependencies:
-  - [MathComp ssreflect 2.5 or later](https://math-comp.github.io)
-  - [MathComp algebra 2.5 or later](https://math-comp.github.io)
-  - [MathComp finmap 2.2.2 or later](https://github.com/math-comp/finmap)
+  - [MathComp ssreflect 2.6 or later](https://math-comp.github.io)
+  - [MathComp algebra 2.6 or later](https://math-comp.github.io)
+  - [MathComp finmap 2.2.4 or later](https://github.com/math-comp/finmap)
 - Rocq/Coq namespace: `hanoi`
 - Related publication(s): none
 
 ## Building and installation instructions
 
-To build and install manually, do:
+To build and install manually, you need to make sure that all the
+libraries this development depends on are installed.  The easiest way to do that
+is still to rely on opam:
 
 ``` shell
 git clone https://github.com/thery/hanoi.git
 cd hanoi
+opam repo add rocq-released https://rocq-prover.org/opam/released
+opam install --deps-only .
 make   # or make -j <number-of-cores-on-your-machine> 
 make install
 ```

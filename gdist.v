@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 
 (******************************************************************************)
 (*             Definition of a distance on graph                              *)
@@ -174,7 +174,7 @@ move=> i iH; rewrite ltnS => iLj nE.
 pose p1 := take i.+1 p ++ drop j.+1 p.
 have [] := boolP (`d[t1, t2] <= size p1) => [|/negP[]].
   rewrite leqNgt => /negP[].
-  rewrite size_cat size_take size_drop ifT //; last first.
+  rewrite size_cat size_take size_drop ifT //.
     by rewrite -ltnS in iLj; apply: leq_trans iLj _.
   rewrite dt1t2E -{2}[size p](subnK (_ : j < size _)) //.
   by rewrite addnC ltn_add2l.
@@ -182,16 +182,16 @@ apply: gdist_path_le.
   move: t1Pp; rewrite -[p](cat_take_drop i.+1).
   rewrite -[drop _ _](cat_take_drop (j - i)) !cat_path.
   case/and3P => [-> _] /=.
-  rewrite !(last_take t1) /=; last first.
+  rewrite !(last_take t1).
   - rewrite size_drop -subSS.
     by apply: leq_sub2r.
   - by apply: leq_trans iLj _; rewrite ltnW //.
-  rewrite drop_drop addnS subnK; last by rewrite ltnW.
+  rewrite drop_drop addnS subnK; first by rewrite ltnW.
   congr path.
   move: (nE) => /= ->.
   rewrite -[j - i]prednK //.
+    by rewrite subn_gt0.
   by rewrite /= nth_drop -subnS addnC subnK //.
-  by rewrite subn_gt0.
 rewrite last_cat (last_take t1) // nE.
 by rewrite -t1pLt2 -{3}[p](cat_take_drop j.+1) last_cat (last_take t1).
 Qed.

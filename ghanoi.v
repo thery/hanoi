@@ -50,7 +50,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_boot finmap.
+From mathcomp Require Import boot finmap.
 From hanoi Require Import extra gdist.
 
 Set Implicit Arguments.
@@ -96,7 +96,7 @@ End Disk.
 Arguments perfect [n].
 
 Local Notation "`c[ p ] " := (perfect p)
-    (format "`c[ p ]", at level 5).
+    (format "`c[ p ]", at level 0).
 
 (* The smallest disk *)
 Definition sdisk {n} : disk n.+1 := ord0.
@@ -163,7 +163,7 @@ Lemma move_on_topl n d (c1 c2 : configuration n) :
   move c1 c2 -> c1 d != c2 d -> on_top d c1.
 Proof.
 case/moveP => d1 [H1 H2 H3 H4 H5].
-rewrite (_ : d = d1); first by apply: H3.
+rewrite (_ : d = d1); last by apply: H3.
 apply/eqP; case: eqP => /eqP H //.
 by case/eqP: H5; apply: H2; rewrite eq_sym.
 Qed.
@@ -172,7 +172,7 @@ Lemma move_on_topr n d (c1 c2 : configuration n) :
   move c1 c2 -> c1 d != c2 d -> on_top d c2.
 Proof.
 case/moveP => d1 [H1 H2 H3 H4 H5].
-rewrite (_ : d = d1); first by apply: H4.
+rewrite (_ : d = d1); last by apply: H4.
 apply/eqP; case: eqP => /eqP H //.
 by case/eqP: H5; apply: H2; rewrite eq_sym.
 Qed.
@@ -213,7 +213,7 @@ Lemma move_on_toplDr n (d d1 : disk n) (c1 c2 : configuration n) :
   move c1 c2 -> c1 d != c2 d -> d1 <= d -> c1 d1 != c2 d.
 Proof.
 move=> c1Mc2 c1Dc2; rewrite leq_eqVlt => /orP[/val_eqP->//|dLd1].
-move: (dLd1); rewrite eq_sym ltnNge (move_disk1 c1Mc2 c1Dc2) //; last first.
+move: (dLd1); rewrite eq_sym ltnNge (move_disk1 c1Mc2 c1Dc2) //.
   by rewrite neq_ltn dLd1 orbT.
 apply: contra => /eqP.
 by have /on_topP := move_on_topr c1Mc2 c1Dc2; apply.
@@ -231,7 +231,7 @@ Lemma move_on_toprDl n (d d1 : disk n) (c1 c2 : configuration n) :
 Proof.
 move=> c1Mc2 c1Dc2; rewrite leq_eqVlt => /orP[/val_eqP->//|dLd1].
   by rewrite eq_sym.
-move: (dLd1); rewrite ltnNge -(move_disk1 c1Mc2 c1Dc2) eq_sym //; last first.
+move: (dLd1); rewrite ltnNge -(move_disk1 c1Mc2 c1Dc2) eq_sym //.
   by rewrite neq_ltn dLd1.
 apply: contra => /eqP.
 have /on_topP := move_on_topl c1Mc2 c1Dc2; apply.
@@ -559,21 +559,21 @@ Lemma path_shift  m n (c : configuration (m + n)) cs :
 Proof.
 elim: cs c => //= c1 cs IH c /andP[/moveP[d [d2H d2H1 d2H2 d2H3]] c1Pcs].
 case: (tsplitP d) => [j dE | k dE].
-  rewrite ifT; last first.
+  rewrite ifT.
     apply/eqP/ffunP=> i; rewrite !ffunE.
     apply: d2H1; apply/eqP => /val_eqP /=.
     by rewrite dE eqn_leq andbC leqNgt (leq_trans (ltn_ord _)) ?leq_addl.
-  rewrite ifN /=; last first.
+  rewrite ifN /=.
     apply/eqP => /ffunP /(_ j); rewrite !ffunE => cE.
     move: d2H; rewrite (_ : c d = c1 d) ?(irH) //.
     by rewrite (_ : d = (trshift m j)) //=; apply/val_eqP/eqP.
   rewrite addnS; congr _.+1.
   by apply: IH.
-rewrite ifN /=; last first.
+rewrite ifN /=.
   apply/eqP => /ffunP /(_ k); rewrite !ffunE => cE.
   move: d2H; rewrite (_ : c d = c1 d) ?(irH) //.
   by rewrite (_ : d = (tlshift n k)) //=; apply/val_eqP/eqP.
-rewrite ifT; last first.
+rewrite ifT.
   apply/eqP/ffunP=> i; rewrite !ffunE.
   apply: d2H1; apply/eqP => /val_eqP /=.
   by rewrite dE eqn_leq leqNgt (leq_trans (ltn_ord _)) ?leq_addl.
@@ -669,7 +669,7 @@ Qed.
 Definition cunliftr {n} (c : configuration n.+1) : configuration n :=
   @crshift 1 n c.
 
-Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
+Notation " ↓[ c ]" := (cunliftr c) (at level 0, format "↓[ c ]").
 
 Lemma cliftrK n p : cancel (cliftr p) (cunliftr : _ -> configuration n).
 Proof. by move=> c; apply/ffunP => i; rewrite !ffunE tsplit_trshift. Qed.
@@ -768,8 +768,8 @@ rewrite cunliftrK -map_comp.
 congr path.
 elim: cs H => //= a cs IH H.
 rewrite -{1}(H a).
-  by rewrite cunliftrK IH // => v Hv; apply: H; rewrite inE orbC Hv.
-by rewrite inE eqxx.
+  by rewrite inE eqxx.
+by rewrite cunliftrK IH // => v Hv; apply: H; rewrite inE orbC Hv.
 Qed.
 
 Lemma path_unlift n (c : configuration n.+1) (cs : seq (configuration _)) :
@@ -936,10 +936,10 @@ Arguments perfect {q n}.
 Arguments cunliftr {q n}.
 
 Notation " ↑[ c ]_ p" := (cliftr p c) (at level 5, format "↑[ c ]_ p").
-Notation " ↓[ c ]" := (cunliftr c) (at level 5, format "↓[ c ]").
-Notation "`c[ p ] " := (perfect p) (format "`c[ p ]", at level 5).
-Notation "`c[ p , n ] " := ((perfect p) : configuration _ n) 
-  (format "`c[ p  ,  n ]", at level 5).
+Notation " ↓[ c ]" := (cunliftr c) (at level 0, format "↓[ c ]").
+Notation "`c[ p , n ] " := ((perfect p) : configuration _ n)
+  (format "`c[ p , n ]", at level 0).
+Notation "`c[ p ] " := (perfect p) (format "`c[ p ]", at level 0).
 
 Lemma on_top1 k (d : disk 1) (c : configuration k 1) : on_top d c.
 Proof. by apply/on_topP=> [] [] [] //=; case: d => [] []. Qed.
@@ -947,7 +947,7 @@ Proof. by apply/on_topP=> [] [] [] //=; case: d => [] []. Qed.
 Lemma perfect_eqE n k (p1 p2 : peg k) : (`c[p1, n.+1] == `c[p2]) = (p1 == p2).
 Proof.
 apply/eqP/eqP => [|<-] // cp1Ecp2.
-rewrite -(_ : `c[p1, n.+1] sdisk = p1); last by rewrite ffunE.
+rewrite -(_ : `c[p1, n.+1] sdisk = p1); first by rewrite ffunE.
 by rewrite cp1Ecp2 ffunE.
 Qed.
 
@@ -1107,7 +1107,7 @@ by case: {HD}p1 => [] [|[|[|p1 Hp1]]] /=;
 Qed.
 
 Notation "`p[ p1 , p2 ] " := (opeg p1 p2)
-    (format "`p[ p1 ,  p2 ]", at level 5).
+    (format "`p[ p1 ,  p2 ]", at level 0).
 
 Lemma move_liftr_perfect q n (hrel : rel (peg q)) p1 p2 p3 :
   hrel p1 p2 -> p1 != p3 -> p2 != p3 -> move hrel ↑[`c[p3, n]]_p1 ↑[`c[p3]]_p2.
@@ -1254,7 +1254,7 @@ apply: leq_add.
   by apply: IH.
 apply: leq_trans.
   apply: (@gdist_triangular _ _ _ _ (cliftr p2 `c[p3])).
-rewrite gdist_liftr_perfect ?ltnS //; last 3 first.
+rewrite gdist_liftr_perfect ?ltnS //.
 - by apply: rirr.
 - by rewrite eq_sym opegDl.
 - by rewrite eq_sym opegDr.
@@ -1317,13 +1317,13 @@ Qed.
 
 (* To be reworked ! *)
 Lemma sorted_enum_val (m : nat) (s : {set 'I_m}) (i j : 'I_#|s|) :
-   (enum_val i) < (enum_val j) = (i < j).
+   (enum_val i < enum_val j) = (i < j).
 Proof.
 case: m s i j => [s|m s i j].
   rewrite (_ : s = set0).
-    case=> m H j; apply: False_ind.
-    by rewrite cards0 in H.
-  by apply/setP=> [] []. 
+    by apply/setP=> [] []. 
+  case=> m H j; apply: False_ind.
+  by rewrite cards0 in H.
 have := ltn_ord i; have := ltn_ord j; rewrite {2 4}cardE.
 rewrite /enum_val /= /(enum _) -enumT enum_ord_inord => iL jL.
 have <-// := @nth_map ('I_m.+1) (enum_default i) nat 0 (@nat_of_ord m.+1).
@@ -1333,10 +1333,10 @@ have F k1 k2 :  k1 + k2 <= m.+1 ->
   (filter (fun i0 => mem s (inord i0))  (iota k1 k2)).
   elim: k2 k1 => //= k2 IH k1 k1k2Lm.
   case: (_ \in _) => //=.
-  rewrite inordK //.
-  rewrite IH //.
-  by rewrite addSnnS.
-  by apply: leq_trans k1k2Lm; rewrite -addSnnS leq_addr.
+    rewrite inordK //.
+      by apply: leq_trans k1k2Lm; rewrite -addSnnS leq_addr.
+    rewrite IH //.
+    by rewrite addSnnS.
   apply: IH.
   by rewrite addSnnS.
 rewrite F //.
@@ -1369,7 +1369,7 @@ Proof.
 move=> /= /on_topP dO.
 apply/on_topP => /= d1 H.
 rewrite leq_eqVlt; case: eqP => //= /eqP dDd1.
-rewrite -[d1](enum_valK_in dIsd) -sorted_enum_val !enum_rankK_in //; last first.
+rewrite -[d1](enum_valK_in dIsd) -sorted_enum_val !enum_rankK_in //.
   by apply: enum_valP.
 rewrite ltn_neqAle.
 case: eqP => [/eqP /val_eqP dEd1 | /eqP dDd1' /=].
@@ -1619,18 +1619,18 @@ elim: cs c => //= c1 cs IH c /andP[/moveP[d [dH1 dH2 dH3 dH4]] c1Pcs].
 have cdDc1d : c d != c1 d.
   by have /idP/negP := irH (c d); apply: contra => /eqP {2}->.
 have [tLd|dLt] := leqP t d; last first.
-  rewrite ifN /= ?addSn; last first.
+  rewrite ifN /= ?addSn.
     apply/eqP => /ffunP /(_ (Ordinal dLt)).
     by rewrite !ffunE ordinalK => /eqP; rewrite (negPf cdDc1d).
-  rewrite ifT; last first.
+  rewrite ifT.
     apply/eqP/ffunP=> i; rewrite !ffunE dH2 //=.
     apply/eqP => /val_eqP.
     by rewrite /= eqn_leq [_ <= d]leqNgt (leq_trans dLt) ?andbF // leq_addl.
   by congr (_.+1); apply: IH.
-rewrite ifT; last first.
+rewrite ifT.
   apply/eqP/ffunP=> i; rewrite !ffunE dH2 //.
   by apply/eqP => /val_eqP; rewrite /= eqn_leq leqNgt (leq_trans (ltn_ord _)).
-rewrite ifN /= ?addSn; last first.
+rewrite ifN /= ?addSn.
   apply/eqP => /ffunP /(_ (otuc tLd)) /eqP.
   by rewrite !ffunE otucK (negPf cdDc1d).
 by rewrite addnS; congr (_.+1); apply: IH.
@@ -1707,7 +1707,7 @@ Proof.
 move=> /= /cvalidP cV /on_topP dO.
 apply/on_topP => /= d1 H.
 rewrite leq_eqVlt; case: eqP => //= /eqP dDd1.
-rewrite -[d1](enum_valK_in dIsd) -sorted_enum_val !enum_rankK_in //; last first.
+rewrite -[d1](enum_valK_in dIsd) -sorted_enum_val !enum_rankK_in //.
   by apply: enum_valP.
 rewrite ltn_neqAle.
 case: eqP => [/eqP /val_eqP dEd1 | /eqP dDd1' /=].
@@ -1755,8 +1755,8 @@ Lemma path_cset2 (c : configuration _ _) cs :
 Proof.
 elim: cs c => //= c1 cs IH c => /and3P[c1V c2V c3V] /andP[cMc1 c1Pcs].
 case: eqP => [->|/eqP cDc1 /=]; first by apply: IH; rewrite ?c2V.
-rewrite move_cset2 => //=; first by apply: IH; rewrite ?c2V.
-by rewrite c1V c2V.
+rewrite move_cset2 => //=; first by rewrite c1V c2V.
+by apply: IH; rewrite ?c2V.
 Qed.
 
 Lemma gdist_cset2 c1 c2 cs : 
@@ -1824,22 +1824,22 @@ elim: cs c => //= c1 cs IH c /and3P[c1V1 c2V1 c3V1]
 have cdDc1d : c d != c1 d.
   by have /idP/negP := irH (c d); apply: contra => /eqP {2}->.
 have [dIsd|dNIsd] := boolP (d \in sd).
-  rewrite ifN /= ?addSn; last first.
+  rewrite ifN /= ?addSn.
     apply/eqP => /ffunP /(_ (enum_rank_in dIsd d)).
     rewrite !ffunE enum_rankK_in // => /enum_rank_in_inj => H.
     case/eqP : cdDc1d; apply: H; first by have /cvalidP := c1V1; apply.
     by have /cvalidP := c2V1; apply.
-  rewrite ifT; last first.
+  rewrite ifT.
     apply/eqP/ffunP=> i; rewrite !ffunE dH2 //.
     have := enum_valP i; rewrite inE.
     by apply: contra => /eqP<-.
   by congr (_.+1); apply: IH; rewrite ?c2V1 ?c2V2.
-rewrite ifT; last first.
+rewrite ifT.
   apply/eqP/ffunP=> i; rewrite !ffunE dH2 //.
   apply: contra dNIsd => /eqP->.
   by have := enum_valP i.
 have dd : d \in ~: sd by rewrite inE.
-rewrite ifN /= ?addSn; last first.
+rewrite ifN /= ?addSn.
   apply/eqP => /ffunP /(_ (enum_rank_in dd d)).
   rewrite !ffunE enum_rankK_in // => /enum_rank_in_inj => H.
   case/eqP : cdDc1d; apply: H.

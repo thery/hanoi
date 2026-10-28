@@ -7,7 +7,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_boot all_order all_algebra finmap.
+From mathcomp Require Import boot order algebra finmap.
 From hanoi Require Import extra triangular phi.
 
 
@@ -40,7 +40,7 @@ rewrite cardfs_gt0 => /diff_fset0_elem[i iH].
 have [|H] := leqP #|`(e `\ i)| 0.
   rewrite leqn0 cardfs_eq0 => /eqP eZ.
   exists i; split => //.
-  rewrite (big_fsetD1 i) //= eZ big1_fset => [|j]; last by rewrite inE.
+  rewrite (big_fsetD1 i) //= eZ big1_fset => [j|]; first by rewrite inE.
   by apply/maxn_idPl.
 case: (IH (e `\ i)) => // [|j [jIe jH]].
   by move: cI; rewrite (cardfsD1 i) iH.
@@ -64,9 +64,9 @@ move=> aA aP; rewrite (big_fsetIDcond _ (mem [fset a])).
 congr (op _ _); last first.
   by apply: eq_fbigl_cond => i; rewrite !inE /= [_ && (_ != _)]andbC.
 rewrite (_ : [fset _ | _ in _ & _] = [fset a]).
-  rewrite big_seq_fsetE /= /index_enum /= -enumT enum_fset1 /=.
-  by rewrite unlock /= aP Monoid.Theory.mulm1.
-by apply/fsetP=> i; rewrite !inE /= andbC; case: eqP => //->.
+  by apply/fsetP=> i; rewrite !inE /= andbC; case: eqP => //->.
+rewrite big_seq_fsetE /= /index_enum /= -enumT enum_fset1 /=.
+by rewrite unlock /= aP Monoid.Theory.mulm1.
 Qed.
 
 End BigFSetAux.
@@ -114,7 +114,7 @@ Open Scope fset_scope.
 Definition psi_aux l e : int :=
   ((2 ^ l).-1 + (\sum_(i <- e) 2 ^ (minn (troot i) l)))%:R - (l * 2 ^ l)%:R.
 
-Notation "'ψ'' n" := (psi_aux n) (format "'ψ'' n", at level 0).
+Abbreviation ψa := psi_aux.
 
 Lemma psi_aux_0_ge0 e :  (0 <= psi_aux 0 e)%R.
 Proof. by rewrite /psi_aux add0n mul0n subr0 (ler_nat _ 0). Qed.
@@ -140,10 +140,10 @@ Proof.
 rewrite /psi_aux.
 congr (_%:R - _%:R)%R.
 rewrite (big_fsetID _ [pred i | l <= ∇i]) /=.
-rewrite (@eq_fbigr _ _ _ _ _ _ _ (fun i => 2 ^ l)) /=; last first.
+rewrite (@eq_fbigr _ _ _ _ _ _ _ (fun i => 2 ^ l)) /=.
   by move=> i; rewrite !inE => /andP[_ /minn_idPr->].
 rewrite fsum_nat_const.
-rewrite (@eq_fbigr _ _ _ _ _ _ _  (fun i => 2 ^ (troot i))) /=; last first.
+rewrite (@eq_fbigr _ _ _ _ _ _ _  (fun i => 2 ^ (troot i))) /=.
   move=> i; rewrite !inE => /andP[_ H] _.
   suff /minn_idPl-> : troot i <= l by [].
   by rewrite ltnW // ltnNge.
@@ -161,10 +161,10 @@ Proof.
 rewrite /psi_aux.
 congr (_%:R - _%:R)%R.
 rewrite (big_fsetID _ [pred i | l < troot i]) /=.
-rewrite (@eq_fbigr _ _ _ _ _ _ _ (fun => 2 ^ l)) /=; last first.
+rewrite (@eq_fbigr _ _ _ _ _ _ _ (fun => 2 ^ l)) /=.
   by move=> i; rewrite !inE => /andP[_ /ltnW/minn_idPr ->].
 rewrite fsum_nat_const.
-rewrite (@eq_fbigr _ _ _ _ _ _ _ (fun i => 2 ^ troot i)) /=; last first.
+rewrite (@eq_fbigr _ _ _ _ _ _ _ (fun i => 2 ^ troot i)) /=.
   move=> i; rewrite !inE /= => /andP[_ H] _.
   suff /minn_idPl-> : troot i <= l by [].
   by rewrite leqNgt.
@@ -176,7 +176,7 @@ Qed.
 
 Definition psi_auxb e := (maxn #|`e| (\max_(i <- e) troot i)).+1.
 
-Notation "'ψ_b' n" := (psi_auxb n) (format "'ψ_b' n", at level 0).
+Abbreviation ψ_b := psi_auxb.
 
 Lemma psi_aux_psib l e : psi_auxb e <= l -> (psi_aux l e <= 0)%R.
 Proof.
@@ -214,7 +214,7 @@ Qed.
 
 Definition psi e := \max_(l < psi_auxb e) rnz (psi_aux l e).
 
-Notation "'ψ' n" := (psi n) (format "'ψ' n", at level 0).
+Abbreviation ψ := psi.
 
 Lemma psiE_leq e n :
   psi_auxb e <= n -> psi e = \max_(l < n) rnz (psi_aux l e).
@@ -301,7 +301,7 @@ Lemma psi_aux_sintE n l :
 Proof.
 congr ((_ + _)%:R - _%:R)%R.
 elim: n => [|n IH]; first by rewrite sint0_set0 /= big_nil.
-rewrite (big_fsetD1 n) /=; last by rewrite mem_sint andTb.
+rewrite (big_fsetD1 n) /=; first by rewrite mem_sint andTb.
 by rewrite sintSr IH !big_mkord big_ord_recr /= addnC.
 Qed.
 
@@ -336,7 +336,7 @@ rewrite -(big_mkord xpredT (fun l => rnz (psi_aux l _))).
 pose f l := 
     rnz (((2 ^ l).-1 + \sum_(0 <= i <  1) 2 ^ minn (∇i) l)%:R -
          (l * 2 ^ l)%:R).
-rewrite (eq_bigr f) => [|i _]; last by rewrite psi_aux_sintE.
+rewrite (eq_bigr f) => [i _|]; first by rewrite psi_aux_sintE.
 by rewrite /f /= unlock.
 Qed.
 
@@ -347,7 +347,7 @@ rewrite -(big_mkord xpredT (fun l => rnz (psi_aux l _))).
 pose f l := 
     rnz (((2 ^ l).-1 + \sum_(0 <= i <  2) 2 ^ minn (∇i) l)%:R -
          (l * 2 ^ l)%:R).
-rewrite (eq_bigr f) => [|i _]; last by rewrite psi_aux_sintE.
+rewrite (eq_bigr f) => [i _|]; first by rewrite psi_aux_sintE.
 by rewrite /f /= unlock.
 Qed.
 
@@ -358,7 +358,7 @@ rewrite -(big_mkord xpredT (fun l => rnz (psi_aux l _))).
 pose f l := 
     rnz (((2 ^ l).-1 + \sum_(0 <= i <  3) 2 ^ minn (∇i) l)%:R -
          (l * 2 ^ l)%:R).
-rewrite (eq_bigr f) => [|i _]; last by rewrite psi_aux_sintE.
+rewrite (eq_bigr f) => [i _|]; first by rewrite psi_aux_sintE.
 by rewrite /f /= unlock.
 Qed.
 
@@ -385,7 +385,7 @@ rewrite [((_ + _ * _)%:R)%R]natrD opprD addrA lerB //.
 rewrite lerBrDr [((_ + x)%:R)%R]natrD lerD //.
 rewrite ler_nat.
 rewrite mulnC leq_mul2l.
-rewrite -subSn; last first.
+rewrite -subSn.
   apply: leq_trans (_ : delta l.+2 <= _); first by by apply: delta_le.
   by apply: leq_trans dlLn _.
 by rewrite ltn_subRL -addnS -deltaS (leq_trans dlLn) ?orbT.
@@ -454,15 +454,14 @@ have [|nP] := leqP n 0; first by case: (n)=> //; rewrite psi_sint0.
 apply/eqP; rewrite -(eqr_nat (Num.NumDomain.clone _ int)).
 rewrite -muln2 natrM mulr_natr.
 rewrite psi_aux_sint // psi_auxE_lt.
-rewrite (_ : [fset _ in _ | _] = [fset i in `[n] | delta (troot n) <= i]);
-   last first.
+rewrite (_ : [fset _ in _ | _] = [fset i in `[n] | delta (troot n) <= i]).
   apply/fsetP=> i; rewrite !inE; congr (_ && _).
   by rewrite prednK ?troot_gt0 // root_delta_le.
 rewrite sint_sub ?delta_gt0 ?troot_gt0 // card_sint //.
-rewrite (_ : \sum_(i <- _ | _) _  = phi (delta (troot n))); last first.
+rewrite (_ : \sum_(i <- _ | _) _  = phi (delta (troot n))).
   rewrite phiE.
   rewrite [RHS](eq_bigl 
-        (fun i : 'I_ _ => (i : nat) \in (enum_fset `[n]))); last first.
+        (fun i : 'I_ _ => (i : nat) \in (enum_fset `[n]))).
     move=> i.
     by rewrite mem_sint leq0n (leq_trans (ltn_ord _)) // delta_root_le.
   elim: enum_fset (fset_uniq `[n]) => /= [_|a l IH /andP[aNIl lU]].
@@ -484,7 +483,7 @@ rewrite phi_deltaE.
 (* taking care of  m * 2 ^ m - 2 ^ m *)
 rewrite -{2}[m]prednK ?troot_gt0 //.
 rewrite mulSn addnCA [(2 ^ _ + _)%nat]addnC addnK add1n.
-rewrite addnS -addSn prednK; last first.
+rewrite addnS -addSn prednK.
   by rewrite muln_gt0 expn_gt0. 
 (* taking care of m.-1 * 2 ^ m - m.-1 * 2 ^ m.-1 *)
 rewrite -{3}[m]prednK ?troot_gt0 //.
@@ -544,9 +543,9 @@ Lemma psi_aux0_sint n : psi_aux 0 `[n] = n.
 Proof.
 rewrite /psi_aux add0n subr0.
 apply/eqP; rewrite -natz eqr_nat; apply/eqP.
-rewrite (eq_bigr (fun => 1)) => [|i _].
-  by rewrite fsum_nat_const card_sint // subn0 muln1.
-by rewrite minn0.
+rewrite (eq_bigr (fun => 1)) => [i _|].
+  by rewrite minn0.
+by rewrite fsum_nat_const card_sint // subn0 muln1.
 Qed.
 
 (* This is 2.4.1 *)
@@ -561,10 +560,10 @@ Lemma sum_sint (F : nat -> nat) n :
   \sum_(i <- `[n]) F i  = \sum_(i < n) F i.
 Proof.
 rewrite big_seq_cond.
-rewrite [LHS](eq_bigl (fun i => (i < n))); last first.
+rewrite [LHS](eq_bigl (fun i => (i < n))).
   by move=> i; rewrite mem_sint andbT.
 rewrite [RHS](eq_bigl 
-        (fun i : 'I_ _ => ((i : nat) \in (enum_fset `[n])))); last first.
+        (fun i : 'I_ _ => ((i : nat) \in (enum_fset `[n])))).
   by move=> i; rewrite mem_sint ltn_ord.
 elim: enum_fset (fset_uniq `[n]) => /= [_|a l IH /andP[aNIl lU]].
   by rewrite big_nil big1.
@@ -611,7 +610,7 @@ apply: leq_add; last by apply: IH; rewrite -eC eE.
 rewrite leq_exp2l // leq_min geq_minr andbT.
 apply: leq_trans (geq_minl _ _) _.
 apply: troot_le.
-rewrite -{2}iM -ltnS -eE -[#|`_|]prednK; last by rewrite eC.
+rewrite -{2}iM -ltnS -eE -[#|`_|]prednK; first by rewrite eC.
 by apply: max_set_nat.
 Qed.
 
@@ -741,7 +740,7 @@ have Ce3 : #|` e3| <= s.
   by move: Ce2; rewrite (cardfsD1 x) xIe2 ltnS.
 apply: leq_trans (leq_sub_add (psi (e1 `|` e3)) _ _) _.
 rewrite addnS psi_sintS.
-rewrite [X in _ <= X - _]addnC -addnBA; last first.
+rewrite [X in _ <= X - _]addnC -addnBA.
   by apply: psi_sint_leq; rewrite leq_addr.
 apply: leq_add; last by apply: IH.
 have [xIe1|xNIe1] := boolP (x \in e1).
@@ -775,7 +774,7 @@ apply: leq_trans (_ : t + #|` sint (delta g) n| <= _).
   by rewrite mem_sint.
 rewrite card_sint. 
 have [|E] := leqP n (delta g); last first.
-  rewrite addnBA; last by apply: ltnW.
+  rewrite addnBA; first by apply: ltnW.
   rewrite leq_subLR addnC.
   by rewrite -ltnS -!addnS -deltaS addnS -root_delta_lt.
 move/eqP->; rewrite addn0.
@@ -829,7 +828,7 @@ have pE : phi (n.+3) = ((m + p - 1) * 2 ^ m).+1.
   rewrite [(_ + p)%N]addSn mulSn [(2 ^ _ + _)%nat]addnC addnA addnK.
   by rewrite -subn1 -[(_ + _).+1]addn1 addnK.
 have pdE : ((phi (delta l))%:R = 1 + (l%:R - 1) * (2 ^ l)%:R :> int)%R.
-  rewrite phi_deltaE natrB; last first.
+  rewrite phi_deltaE natrB.
     by case: (l) => // l1; rewrite mulSn addnCA leq_addr.
   by rewrite natrD /= mulrBl mul1r addrA -natrM.
 rewrite le_eqVlt; apply/orP; left; apply/eqP.
@@ -842,13 +841,13 @@ have -> : [fset i in `[n] | l <= troot i] = [fset i in `[n] | delta l <= i].
 have /(sint_sub n)-> : 0 <= delta l.
   by apply: (@delta_le 0).
 rewrite card_sint //.
-rewrite (_ : \sum_(_ <- _ | _) _  = phi (delta l)); last first.
+rewrite (_ : \sum_(_ <- _ | _) _  = phi (delta l)).
   rewrite phiE.
-  rewrite [LHS](eq_bigl (fun i => (i < n) && (∇i < l))); last first.
+  rewrite [LHS](eq_bigl (fun i => (i < n) && (∇i < l))).
     move=> i; case: leqP; rewrite ?(andbT, andbF) // root_delta_lt.
     by move/(leq_trans)->.
   rewrite [RHS](eq_bigl 
-        (fun i : 'I_ _ => ((i : nat) \in (enum_fset `[n])))); last first.
+        (fun i : 'I_ _ => ((i : nat) \in (enum_fset `[n])))).
     by move=> i; rewrite mem_sint (leq_trans (ltn_ord _)).
   elim: enum_fset (fset_uniq `[n]) => /= [_|a l1 IH /andP[aNIl lU]].
     by rewrite big_nil big1.
@@ -859,7 +858,7 @@ rewrite (_ : \sum_(_ <- _ | _) _  = phi (delta l)); last first.
     apply: eq_bigl => i; move: (ltn_ord i); rewrite inE; case: eqP => [->| //].
     by rewrite -root_delta_lt ltnNge aLl.
   rewrite root_delta_lt in aLl.
-  rewrite [RHS](bigD1 (Ordinal aLl)); apply/eqP; last by rewrite inE eqxx.
+  rewrite [RHS](bigD1 (Ordinal aLl)); apply/eqP; first by rewrite inE eqxx.
   rewrite /= eqn_add2l; apply/eqP.
   apply: eq_bigl => i; rewrite !inE /= -val_eqE /=.
   by case: eqP (ltn_ord i) => [->|]; rewrite?(andbT, negPf aNIl).

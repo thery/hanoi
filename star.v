@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot finmap.
+From mathcomp Require Import boot finmap.
 From hanoi Require Import extra.
 
 Set Implicit Arguments.
@@ -105,9 +105,9 @@ suff hLi1 : (i \in behead (alphal n)) -> h < i => [|H].
   by rewrite -orbA => /or3P[/eqP->|/eqP->|//]; rewrite ltn_Pmull.
 have hsSa : subseq [:: h; i] (alphal n).
   rewrite (_ : alphal n =  h :: behead (alphal n)).
-    rewrite (@cat_subseq _ [::h] _ [::h]) //.
-    by rewrite sub1seq.
-  by rewrite /h; case: (alphal n) (alphal_neq_nil n).
+    by rewrite /h; case: (alphal n) (alphal_neq_nil n).
+  rewrite (@cat_subseq _ [::h] _ [::h]) //.
+  by rewrite sub1seq.
 rewrite ltn_neqAle.
 have /= := subseq_sorted leq_trans hsSa (sorted_alphal n).
 rewrite andbT => ->.
@@ -325,8 +325,8 @@ suff aux : forall u v w n n0 n1 : nat,
 elim => {i iLn}[[] [] // i j k _ _| 
                      u IH [|v] [|w] // i j k uvw aM1 aM2].
 - by rewrite !addn0 big_geq.
-- rewrite big_ltn; last by rewrite addnS leq_addr.
-  rewrite [X in _ <= _ + X]big_ltn; last by rewrite addnS leq_addr.
+- rewrite big_ltn; first by rewrite addnS leq_addr.
+  rewrite [X in _ <= _ + X]big_ltn; first by rewrite addnS leq_addr.
   rewrite addnCA.
   apply: leq_add; first by rewrite mul1n in aM2.
   rewrite -!addSnnS.
@@ -336,8 +336,8 @@ elim => {i iLn}[[] [] // i j k _ _|
   suff /leq_trans-> : alpha i.+1 <= a * alpha i => //.
     by rewrite expnS; apply: leq_mul => //; apply: ltnW.
   by apply: alpha_leq_double.
-- rewrite big_ltn; last by rewrite addnS leq_addr.
-  rewrite [X in _ <= X + _]big_ltn; last by rewrite addnS leq_addr.
+- rewrite big_ltn; first by rewrite addnS leq_addr.
+  rewrite [X in _ <= X + _]big_ltn; first by rewrite addnS leq_addr.
   rewrite -addnA.
   apply: leq_add; first by rewrite mul1n in aM1.
   rewrite -!addSnnS.
@@ -358,8 +358,8 @@ case: (leqP (a * alpha j) (b ^ k)) => [|bLaa].
   move/gcdn_idPl.
   have /eqP-> := coprimeXr k aCb.
   by case: a aL1 => // [] [].
-- rewrite big_ltn; last by rewrite addnS leq_addr.
-  rewrite [X in _ <= X + _]big_ltn; last by rewrite addnS leq_addr.
+- rewrite big_ltn; first by rewrite addnS leq_addr.
+  rewrite [X in _ <= X + _]big_ltn; first by rewrite addnS leq_addr.
   rewrite -addnA.
   apply: leq_add; first by rewrite mul1n in aM1.
   rewrite -2!addSnnS.
@@ -369,8 +369,8 @@ case: (leqP (a * alpha j) (b ^ k)) => [|bLaa].
   rewrite !mul1n in aM1, aM2 |- *.
   apply: isAB_leq_alphaSn (isAB_bexp _) _.
   by apply: leq_ltn_trans aaLb.
-rewrite big_ltn; last by rewrite addnS leq_addr.
-rewrite [X in _ <= _ + X]big_ltn; last by rewrite addnS leq_addr.
+rewrite big_ltn; first by rewrite addnS leq_addr.
+rewrite [X in _ <= _ + X]big_ltn; first by rewrite addnS leq_addr.
 rewrite addnCA.
 apply: leq_add; first by rewrite mul1n in aM2.
 rewrite -addSnnS -(addSnnS k).
@@ -429,7 +429,7 @@ pose la := [seq alpha (j : 'I_n.+2) | j <- enum 'I_n.+2].
 pose lb := [seq b ^ (j : 'I_ i.+1) | j <- enum 'I_i.+1].
 pose lc := [seq a * alpha (j : 'I_(n - i)) | j <- enum 'I_(n- i)].
 have Ula : uniq la.
-  rewrite map_inj_uniq; first by apply: enum_uniq.
+  rewrite map_inj_uniq; last by apply: enum_uniq.
   move=> k1 k2 H.
   case: (leqP k1 k2)=> [|/alpha_mono]; last by rewrite H ltnn.
   by rewrite leq_eqVlt => /orP[/val_eqP//|/alpha_mono]; rewrite H ltnn.
@@ -489,16 +489,16 @@ have lbEla2 : lb =i la2.
   by rewrite Hj1 leq_exp2l // -ltnS.
 rewrite Hxy expnS -mulnA -Hk.
 congr (_ * alpha _).
-rewrite -subSS -subSS -Sla (_ : size la = size la1 + size la2); last first.
+rewrite -subSS -subSS -Sla (_ : size la = size la1 + size la2).
   by rewrite !size_filter count_predC.
 have : uniq la1.
   apply: filter_uniq.
-  rewrite map_inj_uniq; first by apply: enum_uniq.
+  rewrite map_inj_uniq; last by apply: enum_uniq.
   move=> k1 k2 H.
   case: (leqP k1 k2)=> [|/alpha_mono]; last by rewrite H ltnn.
   by rewrite leq_eqVlt => /orP[/val_eqP//|/alpha_mono]; rewrite H ltnn.
-rewrite (uniq_size_uniq _ lkEla1) => [/eqP->|]; last first.
-  rewrite map_inj_uniq; first by apply: enum_uniq.
+rewrite (uniq_size_uniq _ lkEla1) => [|/eqP->].
+  rewrite map_inj_uniq; last by apply: enum_uniq.
   move=> k1 k2 H.
   case: (leqP k1 k2)=> [|/alpha_mono]; last first.
     by rewrite -(ltn_pmul2l (ltnW aL1)) H ltnn.
@@ -507,12 +507,12 @@ rewrite (uniq_size_uniq _ lkEla1) => [/eqP->|]; last first.
 rewrite Slk.
 have : uniq la2.
   apply: filter_uniq.
-  rewrite map_inj_uniq; first by apply: enum_uniq.
+  rewrite map_inj_uniq; last by apply: enum_uniq.
   move=> k1 k2 H.
   case: (leqP k1 k2)=> [|/alpha_mono]; last by rewrite H ltnn.
   by rewrite leq_eqVlt => /orP[/val_eqP//|/alpha_mono]; rewrite H ltnn.
-rewrite (uniq_size_uniq _ lbEla2) => [/eqP->|]; last first.
-  rewrite map_inj_uniq; first by apply: enum_uniq.
+rewrite (uniq_size_uniq _ lbEla2) => [|/eqP->].
+  rewrite map_inj_uniq; last by apply: enum_uniq.
   by move=> k1 k2 /eqP; rewrite eqn_exp2l => // /val_eqP.
 rewrite size_map size_enum_ord.
 by rewrite subSS addnK.
@@ -538,7 +538,7 @@ rewrite leq_eqVlt => /andP[/orP[/eqP Ha Hb| Ha Hb]].
   rewrite Ha alpha_ltn andbT.
   apply: isAB_geq_alphaSn (isAB_bexp _) _.
   by rewrite -Ha ltn_exp2l.
-rewrite subSn; last exact: b_exp_ltn Ha.
+rewrite subSn; first by exact: b_exp_ltn Ha.
 rewrite big_ord_recr [X in _ = _  * X + _]big_ord_recr.
 rewrite mulnDr addnAC.
 congr (_ + _); last first.
@@ -553,14 +553,14 @@ End Main.
 
 Section S23.
 
-Local Notation α := (alpha 2 3).
+Abbreviation α := (alpha 2 3).
 
 (* First 60 element of the list *)
 Compute map α (iota 0 60).
 
 Definition dsum_alpha n := \sum_(i < n) α i.
 
-Local Notation S1 := dsum_alpha.
+Abbreviation S1 := dsum_alpha.
 
 Lemma dsum_alpha_0 : S1 0 = 0.
 Proof. by rewrite /S1 big_ord0 // =>  [] []. Qed.
@@ -574,7 +574,7 @@ Proof. by move=> nO; rewrite -{2}(odd_double_half n) (negPf nO). Qed.
 Lemma S1_leq n i : i <= n -> S1 n <= (S1 (n - i)).*2 + (3 ^ i).-1./2.
 Proof.
 move=> iLn.
-rewrite -leq_double doubleD div2K; last first.
+rewrite -leq_double doubleD div2K.
   by rewrite -subn1 oddB ?expn_gt0 //= oddX orbT.
 rewrite -!mul2n predn_exp.
 rewrite -mulnDr leq_mul2l /=.
@@ -620,7 +620,7 @@ Lemma S1_eq n : 0 < n ->
 Proof.
 case: n => // n _.
 apply: double_inj.
-rewrite doubleD div2K; last first.
+rewrite doubleD div2K.
   by rewrite -subn1 oddB ?expn_gt0 //= oddX orbT.
 rewrite -!mul2n predn_exp -mulnDr; congr (2 * _).
 have iLn : 3 ^ (log3 (α n)) <= α n < 3 ^ (log3 (α n)).+1.
@@ -637,7 +637,7 @@ apply/eqP; rewrite eqn_leq; apply/andP; split; last first.
   apply: bigmin_inf (leqnn _) => //.
   by rewrite leq_subLR addSnnS leq_addl.
 apply/bigmin_leqP => i iLn.
-rewrite -{1}(subKn (_ : i <= n.+1)); last by apply: ltnW.
+rewrite -{1}(subKn (_ : i <= n.+1)); first by apply: ltnW.
 by apply/S1_leq/leq_subr.
 Qed.
 
@@ -735,10 +735,10 @@ Qed.
 Lemma alphaLE l n : 
   α_[l] n = fmerge (fun i : nat => (α i).*2) (fun i : nat => l * 3 ^ i) n.
 Proof.
-rewrite [LHS]delta_conv; last by apply: convex_3l.
-  apply: fmerge_ext => i; first by rewrite delta_2S1.
-  by rewrite delta_3l.
-by apply: convex_2S1.
+rewrite [LHS]delta_conv; first by apply: convex_2S1.
+  by apply: convex_3l.
+apply: fmerge_ext => i; first by rewrite delta_2S1.
+by rewrite delta_3l.
 Qed.
 
 Lemma increasing_alphaL l : increasing α_[l].
@@ -751,7 +751,7 @@ Qed.
 
 Lemma increasing_alphaL_l n : increasing (fun l => α_[l] n).
 Proof.
-move=> l; rewrite !alphaLE !fmergeE //; last 4 first.
+move=> l; rewrite !alphaLE !fmergeE //.
 - by move=> k; rewrite leq_double; apply/ltnW/alpha_mono.
 - by move=> k; rewrite leq_mul2l leq_exp2l ?leqnSn ?orbT.
 - by move=> k; rewrite leq_double; apply/ltnW/alpha_mono.
@@ -765,9 +765,9 @@ Qed.
 Lemma submodular_dsum_alphaL l n :
   S_[l] n.+1 + S_[l.+1] n <= S_[l] n + S_[l.+1] n.+1.
 Proof.
-rewrite -leq_subLR -addnBAC; last first.
+rewrite -leq_subLR -addnBAC.
   by have [daI _] := convex_dsum_alphaL l.
-rewrite -[_ - _]/(α_[l] _) addnC -leq_subRL; last first.
+rewrite -[_ - _]/(α_[l] _) addnC -leq_subRL.
   by have [daI _] := convex_dsum_alphaL l.+1.
  rewrite -[_ - _]/(α_[l.+1] _).
 by apply: increasing_alphaL_l.
@@ -792,8 +792,8 @@ case => [|i].
   by rewrite /dsum_alphaL /conv /= dsum_alpha_0.
 rewrite S1_bigmin /dsum_alphaL /conv /= subnn addn0 -S1_bigmin.
 rewrite (_ : \min_(_ <= _) _ = S1 i.+1).
-  by rewrite (minn_idPr _) // -addnn leq_addr.
-by rewrite S1_bigmin; apply: bigmin_ext => i1 i1H; rewrite mul1n.
+  by rewrite S1_bigmin; apply: bigmin_ext => i1 i1H; rewrite mul1n.
+by rewrite (minn_idPr _) // -addnn leq_addr.
 Qed.
 
 
@@ -816,14 +816,14 @@ Proof.
 rewrite alphaL1E.
 have [SLl|lLS] := leqP (S1 n.+1).*2 l.
  rewrite /alphaL /delta !lim_dsum_alphaL_l //.
-   by rewrite -delta_S1 doubleB.
- by apply: leq_trans SLl; case: convex_2S1.
+   by apply: leq_trans SLl; case: convex_2S1.
+  by rewrite -delta_S1 doubleB.
 rewrite -delta_S1 /delta doubleB.
 rewrite -(lim_dsum_alphaL_l (leqnn _)).
 rewrite -[(S1 n).*2](@lim_dsum_alphaL_l (S1 n.+1).*2).
-  rewrite -[_ - _]/(α_[_] _).
-  by apply: increasingE (increasing_alphaL_l n) _; apply: ltnW.
-by case: convex_2S1.
+  by case: convex_2S1.
+rewrite -[_ - _]/(α_[_] _).
+by apply: increasingE (increasing_alphaL_l n) _; apply: ltnW.
 Qed.
 
 Lemma iotaS m n : iota m n.+1 = m :: iota m.+1 n.
@@ -913,7 +913,7 @@ pose l1 := [seq 3 * α i | i <- iota n2 (m2 - n2).+1].
 have l1size : size l1 = (m2 - n2).+1 by rewrite size_map size_iota.
 have H : {subset l <= l1}.
   move=> i iIl; case: (Il _ iIl) => j jE.
-  apply/mapP; exists j; rewrite // mem_iota addnS addnC subnK //; last first.
+  apply/mapP; exists j; rewrite // mem_iota addnS addnC subnK //.
     by rewrite ltnW.
   rewrite ltnS; apply/andP; split.
     have: n1 <= i.
@@ -935,7 +935,7 @@ have H : {subset l <= l1}.
   rewrite m2E jE leq_mul2l /=; case: (ltngtP m2 j) => // jLn2.
   by rewrite leqNgt alpha_mono.
 have kn2Lm2 : k + n2 < m2.
-  rewrite -addSn addnC -leq_subRL; last by apply: ltnW.
+  rewrite -addSn addnC -leq_subRL; first by apply: ltnW.
   by rewrite -ltnS -l1size (leq_trans kLsl) // uniq_leq_size.
 have anLan2 : α n <= 3 * α n2.
   rewrite -n2E.
@@ -1000,11 +1000,11 @@ apply: leq_trans (_ : (α m).*2 + (3 ^ (n - m).-1).*2 <= _).
   by rewrite -[n -m]prednK ?subn_gt0 // expnSr -!muln2 -mulnA leq_mul.
 rewrite -doubleD leq_double.
 have := @alpha_min_exp3_cor m (n - m).-1.
-rewrite prednK ?subn_gt0 // [_ + (_ - _)]addnC subnK; last by apply: ltnW.
+rewrite prednK ?subn_gt0 // [_ + (_ - _)]addnC subnK; first by apply: ltnW.
 apply.
 have : S_[l] n <= (S1 m.+1).*2 + l * (3 ^ (n - m.+1)).-1./2.
   by apply: bigmin_inf mLn (leqnn _).
-rewrite mH (_ : S1 m.+1 = S1 m + α m); last first.
+rewrite mH (_ : S1 m.+1 = S1 m + α m).
   by rewrite addnC -delta_S1 subnK // increasing_dsum_alpha.
 rewrite doubleD -!addnA leq_add2l.
 rewrite addnC -leq_subLR -mulnBr -[_ <= α m]leq_double.
@@ -1027,8 +1027,8 @@ rewrite -mulnAC -{3}[l]mul1n -mulnDl mulnC; congr (_ * _).
 rewrite -even_halfMl ?even_expn3_pred // -{4}[1]/(2./2).
 rewrite -even_halfD ?oddM ?even_expn3_pred //; congr (_./2).
 rewrite subSn // expnS -!subn1 mulnBr muln1 addn2 -!subSn ?subSS //.
-  by rewrite ltnS -expnS (ltn_exp2l 0).
-by rewrite -expnS (leq_exp2l 1).
+  by rewrite -expnS (leq_exp2l 1).
+by rewrite ltnS -expnS (ltn_exp2l 0).
 Qed.
 
 
@@ -1224,7 +1224,7 @@ Definition alpha_small :=
 
 End S23.
 
-Notation α := (alpha 2 3).
+Abbreviation α := (alpha 2 3).
 
 Notation "\min_ ( i <= n ) F" := (bigmin (fun i => F) n)
  (at level 41, F at level 41, i, n at level 50,
@@ -1236,4 +1236,4 @@ Notation " 'S_[' l ']' " := (dsum_alphaL l)
 Notation " 'α_[' l ']' " := (alphaL l) 
  (format "α_[ l ]").
 
-Notation S1 := dsum_alpha.
+Abbreviation S1 := dsum_alpha.

@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 From hanoi Require Import extra gdist ghanoi ghanoi3.
 
 Set Implicit Arguments.
@@ -166,7 +166,7 @@ Proof.
 case: eqP => [<-|/eqP p1Dp2]; first by rewrite muln0 gdist0.
 rewrite muln1.
 apply/eqP; rewrite eqn_leq -(size_ppeg n p1 p2).
-rewrite gdist_path_le //=; last 2 first.
+rewrite gdist_path_le //=.
 - by apply: path_ppeg.
 - by rewrite last_ppeg.
 have /gpath_connect [cs csH] : connect rmove `c[p1, n] `c[p2].
@@ -248,8 +248,8 @@ Qed.
 Lemma move_connect_lpeg n (c : configuration _ n) p : `c[p] `-->*_r c.
 Proof. 
 rewrite [connect _ _ _]connect_sym //.
-  by apply: move_connect_rpeg.
-by exact: rsym.
+  by exact: rsym.
+by apply: move_connect_rpeg.
 Qed.
 
 (* Two configurations are always connected *)
@@ -456,7 +456,7 @@ have Scs4' : size cs4' < m.+1.
 rewrite cs2E /= size_cat /= !size_map.
 have /IH := c2'cs5Epp5 => /(_ Scs3 c2'Pcs3) IHc1.
 have c2'E : c2' = `c[p3] by rewrite [LHS]cliftrK.
-rewrite c2'E size_rpegE rpeg_ppeg // in IHc1; last by rewrite eq_sym.
+rewrite c2'E size_rpegE rpeg_ppeg // in IHc1; first by rewrite eq_sym.
 rewrite size_ppeg in IHc1.
 have p6Dp : p5 != p.
   by apply: contra p5Dp3 => /eqP->; apply/eqP.
@@ -478,7 +478,7 @@ Qed.
 Lemma gdist_size_rpeg n (c1 : _ _ n) p :  `d[c1, `c[p]]_rmove = size_rpeg c1 p.
 Proof.
 apply/eqP; rewrite eqn_leq [size_rpeg _ _]size_rpegE.
-rewrite gdist_path_le; last 2 first.
+rewrite gdist_path_le.
 - by apply: path_rpeg.
 - by rewrite last_rpeg.
 have /gpath_connect [p1 p1H] : connect rmove c1 `c[p].
@@ -555,8 +555,8 @@ by rewrite last_rpeg.
 Qed.
 
 Fixpoint rhanoi3 {n : nat} :=
-  if n is n1.+1 return configuration 3 n -> configuration 3 n -> _
-  _  then
+  if n is n1.+1 return configuration 3 n -> configuration 3 n ->
+                         seq (configuration 3 n) then
       fun c1 c2 =>
        let p1 := c1 ldisk in
        let p2 := c2 ldisk in
@@ -706,8 +706,8 @@ have p3Ep : p3 = p.
 have p4Ep2 : p4 = p2.
   apply/eqP.
   rewrite /p4 p3Ep /p -/p1 -/p2 p1'Ep1 !opeg3E //.
-    by rewrite p1Dp2 negbK eqxx.
-  by rewrite eq_sym opeg3E // eqxx eq_sym.
+    by rewrite eq_sym opeg3E // eqxx eq_sym.
+  by rewrite p1Dp2 negbK eqxx.
 case: path3SP c3Pcs2=> // [c3' cs2' p5 cs2E c3'Pcs2' _|
                           cs3 cs4 p5 p6 p7 c3' c4 p5Dp6 p5p6
                           c3'cs3Epp7 cs2E c3'Pcs3 c4Pcs4 _].
@@ -800,7 +800,7 @@ Qed.
 Lemma gdist_rhanoi3 n (c1 c2 : _ _ n) : `d[c1, c2]_rmove = size_rhanoi3 c1 c2.
 Proof.
 apply/eqP; rewrite eqn_leq.
-rewrite [size_rhanoi3 _ _]size_rhanoi3E gdist_path_le //=; last 2 first.
+rewrite [size_rhanoi3 _ _]size_rhanoi3E gdist_path_le //=.
 - by apply: path_rhanoi3.
 - by apply: last_rhanoi3.
 have /gpath_connect [p1 p1H] : connect rmove c1 c2 by apply:  move_connect.

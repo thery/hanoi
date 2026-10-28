@@ -5,7 +5,7 @@
 (******************************************************************************)
 
 From Stdlib Require Import ArithRing.
-From mathcomp Require Import all_boot finmap.
+From mathcomp Require Import boot finmap.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -179,7 +179,7 @@ Open Scope fset_scope.
 Definition sint a b : {fset nat} :=
    [fset @nat_of_ord _ i | i in 'I_b & a <= i].
 
-Lemma mem_sint a b i : i \in sint a b = (a <= i < b).
+Lemma mem_sint a b i : (i \in sint a b) = (a <= i < b).
 Proof.
 apply/imfsetP/idP => [[j /= aLj ->]|/andP[aLi iLb]].
   by rewrite ltn_ord andbT.
@@ -221,11 +221,11 @@ elim: b => [|b IH].
   apply/eqP; rewrite cardfs_eq0; apply/eqP/fsetP=> i.
   by rewrite mem_sint andbF inE.
 have [aLb|bLa] := leqP a b; last first.
-  rewrite (_ : _ - _ =  0); last first.
+  rewrite (_ : _ - _ =  0).
     by apply/eqP; rewrite subn_eq0.
   apply/eqP; rewrite cardfs_eq0; apply/eqP/fsetP=> i; rewrite mem_sint inE ltnS.
   by apply/idP => /andP[H1 /(leq_trans H1)]; rewrite leqNgt bLa.
-rewrite (cardfsD1 b) (_ : _ \in _); last by rewrite mem_sint aLb /=.
+rewrite (cardfsD1 b) (_ : _ \in _); first by rewrite mem_sint aLb /=.
 by rewrite sintSr IH subSn.
 Qed.
 
@@ -236,7 +236,7 @@ Proof.  by apply/fsetP=> i; rewrite mem_sint inE; case: ltngtP. Qed.
 
 Definition s2f n (s : {set 'I_n}) := [fset nat_of_ord i | i in s]. 
 
-Lemma mem_s2f n (s : {set 'I_n}) (i : 'I_n) : (i : nat) \in s2f s = (i \in s).
+Lemma mem_s2f n (s : {set 'I_n}) (i : 'I_n) : ((i : nat) \in s2f s) = (i \in s).
 Proof.
 apply/imfsetP/idP => /= [[j jIs iEj]|iIs]; last by exists i.
 by rewrite (_ : i = j) //; apply: val_inj.
@@ -305,9 +305,9 @@ Lemma card_s2f n (s : {set 'I_n}) : #|` s2f s| = #|s|.
 Proof.
 have [m sLm] := ubnP #|s|; elim: m => // m IH s sLm in s sLm *.
  case: (set_0Vmem s) => [->|[i iIs]]; first by rewrite s2f_set0 cards0.
-rewrite (cardsD1 i) iIs /= -IH //; last first.
+rewrite (cardsD1 i) iIs /= -IH //.
   by move: sLm; rewrite (cardsD1 i) iIs.
-rewrite [LHS](cardfsD1 (nat_of_ord i)) (_ : _ \in _); last first.
+rewrite [LHS](cardfsD1 (nat_of_ord i)) (_ : _ \in _).
   by rewrite mem_s2f.
 by rewrite s2fD1.
 Qed.
@@ -346,9 +346,9 @@ apply/sym_equal.
 case: (leqP n t) => [nLt|tLn].
   by rewrite isOE_ge //= cardsT card_ord.
 case: n tLn => // n tLn.
-rewrite isOE_le // card_imset // => [|i j /val_eqP/eqP /=].
-  by rewrite card_ord.
-by rewrite !inordK ?(leq_trans _ tLn) ?ltnS 1?ltnW // => /eqP/val_eqP.
+rewrite isOE_le // card_imset // => [i j /val_eqP/eqP /=|].
+  by rewrite !inordK ?(leq_trans _ tLn) ?ltnS 1?ltnW // => /eqP/val_eqP.
+by rewrite card_ord.
 Qed.
 
 Lemma s2fD_isO n (s : {set 'I_n}) t : s2f (s :\: isO n t)  = s2f s `\` sint 0 t.
@@ -564,8 +564,8 @@ have fk1Lfk : f (i - k.+1) <= f (i - k).
 have := leq_add (decreasingE dfD H) (IH (ltnW kLi)).
 rewrite /delta [f (i - k) + _]addnC addnA subnK ?fU // addnC.
 rewrite -subSn // subSS addnBAC // leq_subRL.
-  by rewrite addnCA leq_add2l addnS.
-by apply: leq_trans fk1Lfk (leq_addr _ _).
+  by apply: leq_trans fk1Lfk (leq_addr _ _).
+by rewrite addnCA leq_add2l addnS.
 Qed.
 
 Lemma concaveEk1 (f : nat -> nat) (i k1 k2 : nat) :
@@ -742,14 +742,14 @@ elim: n i j => /= [i j [|] // _|n IH i j k kLn].
   by rewrite !addn0.
 case: leqP => [gLf|fLg].
   move: kLn; rewrite leq_eqVlt => /orP[/eqP->|kLn].
-    rewrite subnn addn0 (minn_idPr _); last first.
+    rewrite subnn addn0 (minn_idPr _).
       by rewrite (leq_trans gLf) // increasingE // leq_addr.
     apply: leq_trans (IH _ _ _ (leqnn _)).
     rewrite subnn addn0 leq_min increasingE // andbT (leq_trans gLf) //.
     by rewrite increasingE // leq_addr.
   by rewrite subSn // -addSnnS IH.
 case: k kLn => [_ | k kLn].
-  rewrite addn0 subn0 (minn_idPl _); last first.
+  rewrite addn0 subn0 (minn_idPl _).
     by rewrite (leq_trans (ltnW fLg)) // increasingE // leq_addr.
   apply: leq_trans (IH i.+1 j 0 isT).
   rewrite addn0 leq_min increasingE //= (leq_trans (ltnW fLg)) //.
@@ -910,7 +910,7 @@ Lemma delta_conv f g :
   convex f -> convex g -> delta (conv f g) =1 fmerge (delta f) (delta g).
 Proof.
 move=> [fI dfI] [gI dgI] n.
-rewrite -delta_fnorm; last by apply: increasing_conv.
+rewrite -delta_fnorm; first by apply: increasing_conv.
 rewrite -(delta_ext (conv_fnorm _ _)) //.
 have/delta_ext-> : conv (fnorm f) (fnorm g) =1
          conv (fun n => \sum_(i < n) (delta (fnorm f)) i) 
@@ -1042,8 +1042,9 @@ Ltac applyr H :=
   H: is_true (leq _ ?X1) |- is_true (leq _ ?Y1) =>
     let v := delta_lterm1 Y1 X1 in
     (try (rewrite [Z in _ <= Z](_ : _ = v + X1))); 
-    [ apply: leq_trans (leq_add (leqnn _) H); rewrite {H}// ?(add0n,addn0) 
-     | nat_ring]
+    [ nat_ring|
+      apply: leq_trans (leq_add (leqnn _) H); rewrite {H}// ?(add0n,addn0) 
+    ]
   end.
   
 Ltac applyl H :=
@@ -1058,8 +1059,8 @@ Ltac applyl H :=
   H: is_true (leq ?X1 _) |- is_true (leq ?Y1 _) =>
     let v := delta_lterm1 Y1 X1 in
     (try rewrite [Z in Z <= _](_ : Y1 = v + X1));
-    [apply: leq_trans (leq_add (leqnn _) H) _;
-     rewrite {H}// ?(add0n,addn0) | nat_ring]
+    [nat_ring | apply: leq_trans (leq_add (leqnn _) H) _;
+     rewrite {H}// ?(add0n,addn0)]
   end.
 
 Ltac gsimpl :=
@@ -1077,21 +1078,21 @@ Ltac gsimpl :=
     let v := delta_lterm1 X1 Y1 in
     let v1 := delta_lterm1 X1 v in
     let v2 := delta_lterm1 Y1 v1 in
-    (try (rewrite [Z in _ <= Z](_ : Y1 = v2 + v1); last by nat_ring));
-    (try (rewrite [Z in Z <= _](_ : X1 = v + v1); last by nat_ring));
+    (try (rewrite [Z in _ <= Z](_ : Y1 = v2 + v1); first by nat_ring));
+    (try (rewrite [Z in Z <= _](_ : X1 = v + v1); first by nat_ring));
     rewrite ?leq_add2r
     | _ => 
     let v1 := delta_lterm1 Y1 v in
     let v2 := delta_lterm1 X1 v1 in
-    (try (rewrite [Z in _ <= Z](_ : Y1 = v + v1); last by nat_ring));
-    (try (rewrite [Z in Z <= _](_ : X1 = v2 + v1); last by nat_ring));
+    (try (rewrite [Z in _ <= Z](_ : Y1 = v + v1); first by nat_ring));
+    (try (rewrite [Z in Z <= _](_ : X1 = v2 + v1); first by nat_ring));
     rewrite ?leq_add2r
   end
   end.
 
 Ltac changel t :=
   let X := fresh "X" in 
-  rewrite [X in X <= _](_ : _ = t); last by (ring || nat_ring).
+  rewrite [X in X <= _](_ : _ = t); first by (ring || nat_ring).
 Ltac changer t := 
   let X := fresh "X" in 
-  rewrite [X in _ <= X](_ : _ = t); last by (ring || nat_ring).
+  rewrite [X in _ <= X](_ : _ = t); first by (ring || nat_ring).

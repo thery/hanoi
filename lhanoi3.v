@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 From hanoi Require Import gdist ghanoi ghanoi3.
 
 (******************************************************************************)
@@ -460,9 +460,9 @@ case: (boolP (lrel _ _)) => [Hrel1|Hrel1]; last first.
   by case: expn (expn_gt0 3 n) => // k _; rewrite !addnS addnA.
 case: (boolP (lrel _ _)) => [Hrel2|Hrel2].
   rewrite !ifN.
-    by rewrite Hd halfD /= odd_double andbF add0n doubleK prednK ?expn_gt0.
-  by have := lrel3B p1Dp2; rewrite Hrel1 Hrel2 lsym.
-rewrite ifT; last by rewrite lsym; apply: lrel3ON.
+    by have := lrel3B p1Dp2; rewrite Hrel1 Hrel2 lsym.
+  by rewrite Hd halfD /= odd_double andbF add0n doubleK prednK ?expn_gt0.
+rewrite ifT; first by rewrite lsym; apply: lrel3ON.
 rewrite Hd halfD /= odd_double andbF add0n doubleK -addSnnS addnC.
 by rewrite prednK // expn_gt0.
 Qed.
@@ -507,7 +507,7 @@ Lemma gdist_lhanoi3_size n (c1 c2 : _ _ n) :
   `d[c1, c2]_lmove = size_lhanoi3 c1 c2.     
 Proof.
 apply/eqP; rewrite eqn_leq [size_lhanoi3 _ _]size_lhanoi3E.
-rewrite gdist_path_le //=; last 2 first.
+rewrite gdist_path_le //=.
 - by apply: path_lhanoi3.
 - by apply: last_lhanoi3.
 have /gpath_connect[p1 p1H] : connect lmove c1 c2 by apply: move_lconnect3.

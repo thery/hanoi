@@ -50,29 +50,29 @@ license:
   identifier: MIT
 
 supported_coq_versions:
-  text: '9.1 or later'
-  opam: '{(>= "9.1")}'
+  text: '9.2 or later'
+  opam: '{(>= "9.2")}'
 
 dependencies:
 - opam:
     name: rocq-mathcomp-ssreflect
-    version: '{(>= "2.5.0")}'
+    version: '{(>= "2.6.0")}'
   description: |-
-    [MathComp ssreflect 2.5 or later](https://math-comp.github.io)
+    [MathComp ssreflect 2.6 or later](https://math-comp.github.io)
 - opam:
     name: rocq-mathcomp-algebra
-    version: '{(>= "2.5.0")}'
+    version: '{(>= "2.6.0")}'
   description: |-
-    [MathComp algebra 2.5 or later](https://math-comp.github.io)
+    [MathComp algebra 2.6 or later](https://math-comp.github.io)
 - opam:
     name: coq-mathcomp-finmap
-    version: '{(>= "2.2.2")}'
+    version: '{(>= "2.2.4")}'
   description: |-
-    [MathComp finmap 2.2.2 or later](https://github.com/math-comp/finmap)
+    [MathComp finmap 2.2.4 or later](https://github.com/math-comp/finmap)
 
 
 tested_coq_opam_versions:
-- version: '2.5.0-rocq-prover-9.1'
+- version: '2.6.0-rocq-prover-9.2'
   repo: 'mathcomp/mathcomp'
 
 namespace: hanoi

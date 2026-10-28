@@ -7,7 +7,7 @@
 (*                                                                            *)
 (******************************************************************************)
 
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 From hanoi Require Import triangular.
 
 Set Implicit Arguments.
@@ -16,7 +16,7 @@ Unset Printing Implicit Defensive.
 
 Definition phi n := foldr (addn \o (fun i => 2 ^ troot i)) 0 (iota 0 n).
 
-Notation "'ϕ' n" := (phi n) (format "'ϕ' n", at level 0).
+Abbreviation ϕ := phi.
 
 Compute zip (iota 0 11) (map phi (iota 0 11)).
 
@@ -45,7 +45,7 @@ Lemma phi_deltaD n p :
 Proof.
 elim: n p => [|n IHn]; first by case => // [] [|p].
 elim => [_|p IHp pLn].
-  rewrite !addn0 deltaS IHn // -addnBA; last first.
+  rewrite !addn0 deltaS IHn // -addnBA.
     by rewrite -[X in X <= _]mul1n leq_mul2r addnS orbT.
   rewrite -[X in _ + (_ - X)]mul1n -mulnBl addnS subn1 /=.
   rewrite addnn -muln2 -mulnA -expnS.
@@ -53,17 +53,17 @@ elim => [_|p IHp pLn].
   by rewrite -[X in X <= _]mul1n leq_mul2r orbT.
 rewrite addnS phiS IHp 1?ltnW //.
 rewrite (_ : troot _ = n.+1).
-  rewrite subnK.
-    by rewrite addnS mulSn [X in _ = _ + X - _]addnC addnA addnK.
+  by apply/eqP; rewrite trootE leq_addr [delta _.+2]deltaS ltn_add2l.
+rewrite subnK.
   by rewrite [_ + p]addSn mulSn addnC -addnA leq_addr.
-by apply/eqP; rewrite trootE leq_addr [delta _.+2]deltaS ltn_add2l.
+by rewrite addnS mulSn [X in _ = _ + X - _]addnC addnA addnK.
 Qed.
 
 Fact phi_simpl a n p q :
   0 < n -> a + (n + p) * 2 ^ q - 2 ^ q  = a + (n.-1 + p) * 2 ^ q.
 Proof.
 case: n => // n _.
-rewrite -addnBA; last by rewrite addSn mulSn leq_addr.
+rewrite -addnBA; first by rewrite addSn mulSn leq_addr.
 by rewrite [_ + p]addSn mulSn [2 ^ _ + _]addnC addnK.
 Qed.
 
@@ -174,7 +174,7 @@ Lemma phi_gmin n : phi n = g n (gmin n).
 Proof.
 case: n => // n.
 rewrite {1}phi_modE /g /gmin.
-rewrite phi_deltaD; last by rewrite prednK // tmod_le.
+rewrite phi_deltaD; first by rewrite prednK // tmod_le.
 set x := troot _; set y := tmod _.
 rewrite phi_simpl //.
 rewrite doubleB doubleD -!muln2 -!mulnA -!expnSr !prednK //.
@@ -192,19 +192,19 @@ Qed.
 Lemma gS n m : m.+1 < n -> g n m.+1 + 2 ^ (n - m.+1) = g n m + 2 ^ (troot m).+1.
 Proof.
 move=> H; rewrite /g !phi_modE.
-rewrite phi_simpl; last by rewrite troot_gt0.
-rewrite -[n - m]prednK; last first.
+rewrite phi_simpl; first by rewrite troot_gt0.
+rewrite -[n - m]prednK.
   by rewrite subn_gt0 (leq_trans _ H).
 rewrite -subnS expnS mul2n -[(2 ^ _).*2]addnn.
 have := troot_mod_case m.
 case/orP=> [/andP[/eqP H1 /eqP H2]|/and3P[/eqP H1 /eqP H2 /eqP H3]].
-  rewrite /g H1 H2 phi_simpl; last by rewrite -H1 troot_gt0.
+  rewrite /g H1 H2 phi_simpl; first by rewrite -H1 troot_gt0.
   rewrite addnS mulSnr !addnA doubleD -!addnA; congr (_ + _).
   rewrite -mul2n -expnS addnC; congr (_ + _).
   by case: (_ ^ _).
 rewrite H1 H2 H3 addnn addn0 /=.
 set x := troot _; set y := n - _.
-rewrite doubleB [in RHS]addnAC -[(2 ^ _).*2]mul2n -expnS subnK; last first.
+rewrite doubleB [in RHS]addnAC -[(2 ^ _).*2]mul2n -expnS subnK.
   rewrite expnS mul2n leq_double.
   by case: x => //= x; rewrite doubleS mulSnr addnA leq_addl.
 rewrite -[x.*2]muln2 -mulnA -expnS -addnA; congr (_ +_).
